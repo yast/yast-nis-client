@@ -158,6 +158,31 @@
     global string YpbindErrors = "";
 
     /* ---------------------------------------------------------------- */
+    // used also for nis-server
+
+    /**
+     * Check syntax of a NIS domain name
+     * @param domain	a domain name
+     * @return		true if correct
+     */
+    global define boolean check_nisdomainname (string domain) ``{
+	// TODO
+	// disallow whitespace and special characters...
+	return domain != "" && domain != "(none)" && size (domain) <= 64;
+    }
+
+    /**
+     * @return describe a valid NIS domain name
+     */
+    global define string valid_nisdomainname () ``{
+	// Translators: do not translate (none)!
+	return _(
+"A NIS domain name must not be empty,
+it must not be \"(none)\"
+and it must be at most 64 characters long.");
+    }
+
+    /* ---------------------------------------------------------------- */
 
     /**
      * Has the configuration been changed?
