@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jan 24 16:30:39 CET 2003 - mvidner@suse.de
+
+- Now DHCP can be used to get the domain and servers (#14323).
+- Don't display a popup before writing (#23050).
+- 2.7.4
+
+-------------------------------------------------------------------
 Mon Jan 20 10:27:38 CET 2003 - mvidner@suse.de
 
 - Properly handle nsswitch for nis.
