@@ -62,13 +62,13 @@
 	    `VBox(
 		  `VSpacing(1),
 		  `RichText( `id(`summary), Nis::Summary()),
-		  `VSpacing(0.5),
+		  `VSpacing(),
 		  `HBox(
 			`PushButton(`id(`configure), _("&Configure NIS")),
 			`HStretch(),
 			`PushButton(`id(`reset), _("&Reset Configuration"))
 			),
-		  `VSpacing(1)
+		  `VSpacing()
 		  );
 	Wizard::SetContents(_("NIS Configuration"),
 			    contents, "", true, true);
@@ -95,7 +95,7 @@
 	    Nis::Set(settings);
 	    set_contents();
 	}
-    } until (ret == `back || ret == `next || ret ==`key);
+    } until (ret == `back || ret == `next || ret ==`key || ret ==`abort);
 
     return [ret, settings];
 }
