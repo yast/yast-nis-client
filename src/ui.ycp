@@ -69,7 +69,12 @@
 
     global /*const*/ string broadcast_help =
 	// Translators: network broadcast address
-	_("<p><b>Use any server</b> broadcasts in the local network to find a server. It is a security risk!</p>");
+	_("<p>The <b>Broadcast</b> option enables searching
+in the local network to find a server. It is a security risk!</p>");
+
+    global /*const*/ string details_help =
+	_("<p>The <b>Details</b> button gives access to some
+less frequently used settings.</p>");
 
     /**
      * The switch dialog.
@@ -111,7 +116,7 @@ either locally or over NIS.</p>");
 					   `Left (`RadioButton (`id (`nisno), `opt (`notify), _("Do &not use NIS"), !yp_client)),
 					   // radio button label
 					   `Left (`RadioButton (`id (`nisyes), `opt (`notify), _("&Use NIS"), yp_client)),
-					   `Left (`RadioButton (`id (`nisdhcp), `opt (`notify), _("&Configure with DHCP")+ " [TODO!]", yp_client || false && TODO))
+					   `Left (`RadioButton (`id (`nisdhcp), `opt (`notify), _("&Configure with DHCP")+ " [TODO!]", false && TODO))
 					   )))),
 			   `VSpacing (0.2)
 			)
@@ -199,8 +204,12 @@ by separating their addresses with spaces.</p>
 	// help text 3/3
 	help_text = help_text + broadcast_help;
 
+	// help text 3/3
+	help_text = help_text + details_help;
+
 	// help text 2/3
-	help_text = help_text + _("<p>If you need to access <b>Multiple domains</b>, use the button to switch to a detailed dialog.</p>");
+	help_text = help_text + _("<p>If you need to access
+<b>Multiple domains</b>, use the button to switch to a detailed dialog.</p>");
 
 
 	string yp_domain  = Nis::GetDomain ();
@@ -214,8 +223,9 @@ by separating their addresses with spaces.</p>
 		    `VBox (`VSpacing (0.2),
 			   // text entry label
 			   `TextEntry (`id (`ypd), _("NIS &domain"), yp_domain),
+			   `VSpacing (0.2),
 			   // check box label
-			   `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Use &any server"), broadcast)),
+			   `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("&Broadcast"), broadcast)),
 			   // text entry label
 			   `TextEntry (`id (`ypa), _("&IP addresses of NIS servers"), yp_address),
 			   `VSpacing (0.2),
@@ -238,7 +248,7 @@ by separating their addresses with spaces.</p>
 	repeat
 	{
 	    UI::ChangeWidget (`id (`ypa), `Enabled, !broadcast);
-	    UI::ChangeWidget (`id (`multiple), `Enabled, !broadcast);
+	    //UI::ChangeWidget (`id (`multiple), `Enabled, !broadcast);
 
 	    result = UI::UserInput ();
 	    if (result == `cancel)
@@ -388,104 +398,53 @@ by separating their addresses with spaces.</p>
 
 	// help text 3/3
 	// network broadcast address
-	help_text = help_text + _("<p><b>Use any server for this domain</b> broadcasts in the local network after the servers specified above fail to respond.</p>");
+	help_text = help_text + _("<p>If enabled for a specific domain, broadcast will be used after the specified servers fail to respond.</p>");
+
+	// help text 3/3
+	help_text = help_text + details_help;
 
 	// help text 3/3
 	help_text = help_text + _("<p>If you do not need multiple domains, use <b>Single domain</b> to switch to a simpler dialog.</p>");
 
 	string default_d = Nis::GetDomain ();
 	boolean broadcast = Nis::broadcast;
-	map multidomain_servers = Nis::multidomain_servers;
-	multidomain_servers = add (multidomain_servers, "", Nis::servers);
-	map multidomain_broadcast = Nis::multidomain_broadcast;
+	map all_servers = mapmap (string d, list s, Nis::multidomain_servers,
+				  ``( [d, [s, Nis::multidomain_broadcast[d]:false]] ));
+	all_servers = add (all_servers, "", [Nis::servers, false]);
 
 	// "" means the default domain
 	string current_d = "";
 
 	// build the dialog contents
-	// depending on the UI, the domain and server selection boxes
-	// are stacked horizontaly or vertically
-
-	boolean horizontal = !lookup (UI::GetDisplayInfo (), "TextMode", false);
-	term t_domains =
-	    `VBox (
-		`ReplacePoint (`id (`r_domains),
-			       DomainBox (default_d, multidomain_servers)),
-		`HBox (
-		    `PushButton (`id (`add_d), _("A&dd")),
-		    `PushButton (`id (`edit_d), _("&Edit")),
-		    `PushButton (`id (`del_d), _("De&lete"))
-		    )
-		);
-	term t_servers =
-	    `VBox (
-		`ReplacePoint (`id (`r_servers),
-			       ServerBox (current_d, default_d, multidomain_servers)),
-		`VBox (
-		    `CheckBox (`id (`multidomain_broadcast),
-			       _("Use any server &for this domain")),
-		    `HBox (
-			`PushButton (`id (`add_s), _("&Add")),
-			`PushButton (`id (`edit_s), _("Ed&it")),
-			`PushButton (`id (`del_s), _("Dele&te"))
-			)
-		    )
-		);
-
-	string note1 = "  [editable if Use any server is on]";
-	string note2 = "  [disabled if Use any server is on]";
-
 	term multiple =
 	    `Frame (
-		`id (`multiple), _("Server settings"),
-		`VBox (
-		    `VSpacing (0.2),
-		    horizontal ?
-		    `HBox (
-			t_domains,
-			`HSpacing (1),
-			t_servers
-			) :
-		    `VBox (
-			t_domains,
-			t_servers
-			),
-		    `VSpacing (0.2)
-		    )
-		);
-
-	// Another prototype BEGIN
-	if (size (default_d) < 5)
-	{
-	multiple =
-	    `Frame (
-		`id (`multiple), _("Server settings"),
+		`id (`multiple), _("Multiple domains"),
 		`VBox (
 		    `VSpacing (0.2),
 		    `Table (
 			`id (`domains),
 			`opt (`notify, `immediate),
-			`header (_("Domain"), _("Any server"), _("Servers")),
-			DomainTableItems (default_d, multidomain_servers, multidomain_broadcast)
+			`header (_("Domain"), _("Broadcast"), _("Servers")),
+			DomainTableItems (default_d, all_servers)
 			),
 		    `HBox (
-			`PushButton (`id (`add_d), _("A&dd")),
-			`PushButton (`id (`edit_d), _("Edi&t")),
+			`PushButton (`id (`add_d), _("&Add")),
+			`PushButton (`id (`edit_d), _("E&dit")),
 			`PushButton (`id (`del_d), _("De&lete"))
 			),
 		    `VSpacing (0.2)
 		    )
 		);
-	}
-	// Another prototype END
 
 	term nis_vbox =
 	    `VBox (`VSpacing (0.2),
 		   // text entry label
-		   `TextEntry (`id (`domain), `opt (`notify), _("&Default NIS domain"), default_d),
+		   `TextEntry (`id (`domain), `opt (`notify),
+			       _("Default NIS do&main"), default_d),
 		   `VSpacing (0.5),
 		   // check box label
-		   `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Use &any server"), broadcast)),
+		   `Left (`CheckBox (`id (`broadcast), `opt (`notify),
+				     _("&Broadcast"), broadcast)),
 		   multiple,
 		   `VSpacing (0.2),
 		   `HBox (
@@ -502,184 +461,119 @@ by separating their addresses with spaces.</p>
 	term contents = nis_vbox;
 
 	Wizard::SetContentsButtons (
+	    sformat ("%1 - %2",
 	    // dialog title
-	    _("Server settings"), contents, help_text,
+		     _("Configuration of NIS client"),
+		     _("Multiple domains")), contents, help_text,
 	    BackButtonLabel (), FinishButtonLabel ());
 
 	//UI::ChangeWidget (`id (`domains), `CurrentItem, current_d);
 
 	any result = nil;
-	string old_d = nil;	// circumvent not getting UserInput
-	integer ui_count = 0;	// circumvent getting too many UserInputs
-	integer last_domain_ui = -1;
-	boolean domain_change_pending = false;
 	// preselect an item
 	// there is always the first item - the default domain
 	UI::ChangeWidget (`id (`domains), `CurrentItem, "");
 
-	repeat
+	while (true)
 	{
 	    current_d = UI::QueryWidget (`id (`domains), `CurrentItem);
 	    boolean any_d = current_d != nil;
 
 	    UI::ChangeWidget (`id (`edit_d), `Enabled, any_d);
-	    UI::ChangeWidget (`id (`del_d), `Enabled, any_d && current_d !="");
-	    UI::ChangeWidget (`id (`add_s), `Enabled, any_d);
+	    // deleting the defalut domain
+	    // actually deletes only the server list
+	    UI::ChangeWidget (`id (`del_d), `Enabled, any_d
+			      /*&& current_d !=""*/);
 
 	    UI::ChangeWidget (`id (`multiple), `Enabled, !broadcast);
-
-	    if (current_d != old_d)
-	    {
-		if (old_d != nil)
-		{
-		    multidomain_broadcast =
-			add (multidomain_broadcast, old_d,
-			     UI::QueryWidget (`id (`multidomain_broadcast),
-					       `Value));
-		}
-		if (current_d == nil)
-		{
-		    current_d = "";//TODO:copied from nfsserver but should work
-		}
-		old_d = current_d;
-		ServerBoxSet (current_d, default_d, multidomain_servers);
-		BroadcastCheckSet (current_d, multidomain_broadcast);
-	    }
-	    boolean any_s = UI::QueryWidget (`id (`servers), `CurrentItem) != nil;
-	    UI::ChangeWidget (`id (`edit_s), `Enabled, any_s);
-	    UI::ChangeWidget (`id (`del_s), `Enabled, any_s);
 
 	    result = UI::UserInput ();
 	    if (result == `cancel)
 	    {
 		result = `abort;
 	    }
-	    ui_count = ui_count + 1;
 
 	    broadcast = UI::QueryWidget (`id (`broadcast), `Value);
 
-	    // ugh. TextEntry with notify sends UserInput after each character!
-	    // But we do a replacewidget which is expensive. Must discard some
-	    // of the UserInputs
 	    if (result == `domain)
 	    {
-/*
-		last_domain_ui = ui_count;
-	    }
-	    else if (ui_count == last_domain_ui + 1)
-	    {
-*/
 		default_d = UI::QueryWidget (`id (`domain), `Value);
 		// update the Default: item
-		// TODO: (make an interface to do
-		// just that, when the widget supports it)
-		UI::ReplaceWidget (`id (`r_domains), DomainBox (default_d, multidomain_servers));
-		UI::ChangeWidget (`id (`domains), `CurrentItem, current_d);
+		UI::ChangeWidget (`id (`domains), `Item ("", 0),
+				  DefaultCell (default_d));
 	    }
 
 	    // switch
 	    if (result == `add_d)
 	    {
-		string d = InputDomain ("", mapkeys (multidomain_servers));
-		if (d != nil)
+		list name_servers = DomainPopup (nil, default_d, [[], false], mapkeys (all_servers));
+		if (name_servers != nil)
 		{
-		    multidomain_servers = add (multidomain_servers, d, []);
-		    multidomain_broadcast = add (multidomain_broadcast, d, false);
-		    // this also triggers updating the server list
-		    UI::ReplaceWidget (`id (`r_domains), DomainBox (default_d, multidomain_servers));
-		    UI::ChangeWidget (`id (`domains), `CurrentItem, d);
-		    // TODO: add servers right away
+		    string d = name_servers[0]:nil;
+		    list s_sp = name_servers[1]:[];
+		    all_servers = add (all_servers, d, s_sp);
+		    // show these items, d selected
+		    UpdateDomainTable (default_d, all_servers, d);
 		}
 	    }
 	    else if (result == `edit_d)
 	    {
 		string d0 = UI::QueryWidget (`id (`domains), `CurrentItem);
+
 		if (d0 != nil)
 		{
 		    // editing the default domain is a special case
-		    string def = (d0=="")? default_d: d0;
-		    string d = InputDomain (def, mapkeys (multidomain_servers));
-		    if (d != nil)
+		    list name_servers = DomainPopup (d0, default_d,
+						     all_servers[d0]:[],
+						     mapkeys (all_servers));
+		    if (name_servers != nil)
 		    {
+			string d = name_servers[0]:nil;
+			list s_sp = name_servers[1]:[];
 			string newkey = (d0=="")? "": d;
-			multidomain_servers = mapmap (string k, any v, multidomain_servers, ``( [ (k==d0)? newkey: k, v]));
-			multidomain_broadcast = mapmap (string k, any v, multidomain_broadcast, ``( [ (k==d0)? newkey: k, v]));
+			all_servers = mapmap (string k, list v, all_servers,``(
+						  (k == d0) ?
+						  [ newkey, s_sp ] :
+						  [ k, v]
+						  ));
 			// update the default domain box
 			if (d0 == "")
 			{
 			    default_d = d;
-			    UI::ChangeWidget (`id (`domain), `Value, default_d);
+			    UI::ChangeWidget (`id (`domain),`Value, default_d);
 			}
-			// this also triggers updating the server list
-			UI::ReplaceWidget (`id (`r_domains), DomainBox (default_d, multidomain_servers));
-			UI::ChangeWidget (`id (`domains), `CurrentItem, newkey);
+			// show these items, d selected
+			// TODO: if it flickers,
+			//  only replace the old line by a new one
+			UpdateDomainTable (default_d, all_servers, newkey);
 		    }
 		}
 	    }
 	    else if (result == `del_d)
 	    {
 		string d0 = UI::QueryWidget (`id (`domains), `CurrentItem);
-		if (d0 != nil && d0 != "")
+		if (d0 == "")
 		{
-		    // TODO confirmation
-		    multidomain_servers = filter (string k, any v, multidomain_servers, ``( k != d0 ));
-		    multidomain_broadcast = filter (string k, any v, multidomain_broadcast, ``( k != d0 ));
-		    // this also triggers updating the server list
-		    UI::ReplaceWidget (`id (`r_domains), DomainBox (default_d, multidomain_servers));
-		    UI::ChangeWidget (`id (`domains), `CurrentItem, "");
-		}
-	    }
-	    else if (result == `add_s)
-	    {
-		string d = UI::QueryWidget (`id (`domains), `CurrentItem);
-		if (d != nil)
-		{
-		    list servers = multidomain_servers[d]:[];
-		    string s = InputServer ("", servers);
-		    if (s != nil)
+		    // do not delete the default domain, just the servers
+		    // Translators: a yes-no popup
+		    if (UI::YesNoPopup (_("Really delete the server list
+for the default domain?")))
 		    {
-			servers = add (servers, s);
-			multidomain_servers = add (multidomain_servers, d, servers);
-			ServerBoxSet (d, default_d, multidomain_servers);
-			UI::ChangeWidget (`id (`servers), `CurrentItem, s);
+			all_servers = add (all_servers, "", [[], false]);
 		    }
+		    // show these items, the default domain selected
+		    UpdateDomainTable (default_d, all_servers, "");
 		}
-	    }
-	    else if (result == `edit_s)
-	    {
-		string d = UI::QueryWidget (`id (`domains), `CurrentItem);
-		string s0 = UI::QueryWidget (`id (`servers), `CurrentItem);
-		if (d != nil && s0 != nil)
+		else if (d0 != nil)
 		{
-		    list servers = multidomain_servers[d]:[];
-		    string s = InputServer (s0, servers);
-		    if (s != nil)
+		    // Translators: a yes-no popup
+		    if (UI::YesNoPopup (_("Really delete this domain?")))
 		    {
-			servers = maplist (string e, servers, ``(
-					       (e == s0)? s: e
-					       ));
-			multidomain_servers = add (multidomain_servers, d, servers);
-			ServerBoxSet (d, default_d, multidomain_servers);
-			UI::ChangeWidget (`id (`servers), `CurrentItem, s);
+			all_servers = filter (string k, list v,
+					      all_servers, ``(k != d0));
 		    }
-		}
-	    }
-	    else if (result == `del_s)
-	    {
-		string d = UI::QueryWidget (`id (`domains), `CurrentItem);
-		string s0 = UI::QueryWidget (`id (`servers), `CurrentItem);
-		if (d != nil && s0 != nil)
-		{
-		    // probably no confirmation.
-		    list servers = multidomain_servers[d]:[];
-		    servers = filter (string e, servers, ``( e != s0 ));
-		    multidomain_servers = add (multidomain_servers, d, servers);
-		    ServerBoxSet (d, default_d, multidomain_servers);
-		    if (size (servers) > 0)
-		    {
-			s = servers[0]:"";
-			UI::ChangeWidget (`id (`servers), `CurrentItem, s);
-		    }
+		    // show these items, the default domain selected
+		    UpdateDomainTable (default_d, all_servers, "");
 		}
 	    }
 	    else if (contains ([`next, `expert, `single], result))
@@ -691,21 +585,29 @@ by separating their addresses with spaces.</p>
 		{
 		    UI::SetFocus (`id (`domain));
 		    UI::ErrorPopup (valid_nisdomainname ());
-		    result = nil;
-		    continue;
 		}
 		else
 		{
 		    // all checks OK, break the input loop
-		    // TODO warn about discarding when `single
+		    // Warn about discarding when `single
 		    //  or warn before checking?
-		    break;
+		    if (result != `single ||
+			size (all_servers) <= 1 ||
+			UI::ContinueCancelPopup(_(
+// Translators: Continue/Cancel popup
+"The setttings for all domains except for
+the default domain will be lost.")))
+		    {
+			break;
+		    }
 		}
 	    }
+	    else if (result == `back || (result == `abort &&
+					 UI::ReallyAbortPopup (Nis::touched)))
+	    {
+		break;
+	    }
 	}
-	until (result == `back || result == `next ||
-	       result == `expert || result == `single ||
-	       (result == `abort && UI::ReallyAbortPopup (Nis::touched)));
 
 	if (contains ([`next, `expert, `single], result))
 	{
@@ -713,16 +615,32 @@ by separating their addresses with spaces.</p>
 	    Nis::SetDomain (default_d);
 	    Nis::Touch (Nis::broadcast != broadcast);
 	    Nis::broadcast = broadcast;
-	    list servers = multidomain_servers[""]:[];
+
+	    map only_servers = mapmap (string d, list v, all_servers, ``(
+					   [d, v[0]:[]]
+					   ));
+	    list servers = only_servers[""]:[];
+	    map multidomain_servers = nil;
+	    map multidomain_broadcast = nil;
+	    if (result == `single)
+	    {
+		multidomain_servers = $[];
+		multidomain_broadcast = $[];
+	    }
+	    else
+	    {
+		map only_broadcast = mapmap (string d, list v, all_servers, ``(
+						 [d, v[1]:false]
+						 ));
+		multidomain_servers = filter (string d, list v,
+					      only_servers, ``( d != "") );
+		multidomain_broadcast = filter (string d, boolean v,
+						only_broadcast, ``( d != "") );
+	    }
 	    Nis::Touch (Nis::servers != servers);
 	    Nis::servers = servers;
-	    multidomain_servers = filter (string k, any v, multidomain_servers, ``( k != "") );
 	    Nis::Touch (false); //TODO need to know earlier for abort?
 	    Nis::multidomain_servers = multidomain_servers;
-	    multidomain_broadcast =
-		add (multidomain_broadcast, current_d,
-		     UI::QueryWidget (`id (`multidomain_broadcast), `Value));
-	    multidomain_broadcast = filter (string k, any v, multidomain_broadcast, ``( k != "") );
 	    Nis::Touch (false); //TODO need to know earlier for abort?
 	    Nis::multidomain_broadcast = multidomain_broadcast;
 	}
@@ -739,13 +657,38 @@ by separating their addresses with spaces.</p>
     }
 
     /**
-     * Used for adding and editing a domain name
-     * @param init	initial value ("" has no special significance here)
-     * @param existing	current domain list
-     * @return a domain or nil
+     * @tuple server_sp
+     * 0 list(string)	server list
+     * 1 boolean	broadcast
      */
-    global define string InputDomain (string init, list(string) existing) ``{
-	string domain = init;
+
+    /**
+     * Add/Edit a domain, including its name and servers
+     * @param	init		currently selected domain: nil=add, ""=default
+     * @param	default_d	the default domain
+     * @param	server_sp	@ref server_sp
+     * @param	existing	existing domains
+     * @return [name, [ [server1, server2], broadcast? ]]
+     */
+    global define list DomainPopup (string init, string default_d,
+				    list server_sp, list(string) existing) ``{
+	string domain = (init == nil)? "": (init == "")? default_d: init;
+	list servers = server_sp[0]:[];
+	boolean broadcast = server_sp[1]:false;
+
+	term t_servers =
+	    `VBox (
+		`ReplacePoint (`id (`r_servers), ServerBox (servers)),
+		// TODO: disable? omit? explain? `opt (`notify)?
+		`CheckBox (`id (`local_broadcast),
+			   _("&Broadcast"), broadcast),
+		`HBox (
+		    `PushButton (`id (`add_s), _("&Add")),
+		    `PushButton (`id (`edit_s), _("&Edit")),
+		    //&Delete could be activated if the user wanted &Domain
+		    `PushButton (`id (`del_s), _("De&lete"))
+		    )
+		);
 
 	term contents =
 	    `HBox(
@@ -754,8 +697,11 @@ by separating their addresses with spaces.</p>
 		    `VSpacing(0.2),
 		    // Translators: popup dialog heading
 //		    `Heading (_("Domain name")),
+		    // Add a domain, Adding a domain? Edit...
 		    // Translators: text entry label
 		    `Left (`TextEntry (`id (`domain), _("&Domain name"), domain)),
+		    `VSpacing(0.5),
+		    t_servers,
 		    `VSpacing(0.2),
 		    `HBox(`PushButton(`id(`ok), `opt(`default), OKButtonLabel()),
 			  `PushButton(`id(`cancel), CancelButtonLabel())),
@@ -767,25 +713,33 @@ by separating their addresses with spaces.</p>
 	UI::OpenDialog (`opt(`decorated), contents);
 	UI::SetFocus (`id (`domain));
 
-	any ret = nil;
+	any ui = nil;
 	while (true)
 	{
-	    ret = UI::UserInput ();
-	    if (ret == `cancel)
+	    boolean any_s = UI::QueryWidget (`id (`servers), `CurrentItem) != nil;
+	    UI::ChangeWidget (`id (`edit_s), `Enabled, any_s);
+	    UI::ChangeWidget (`id (`del_s), `Enabled, any_s);
+
+	    ui = UI::UserInput ();
+	    if (ui == `cancel)
 	    {
 		break;
 	    }
-	    else if (ret == `ok)
+	    else if (ui == `ok)
 	    {
 		// Input validation
+		// all querywidgets done now for consistency
 		domain = UI::QueryWidget (`id (`domain), `Value);
+		// servers are kept up to date
+		broadcast = UI::QueryWidget (`id (`local_broadcast), `Value);
 
 		if (!check_nisdomainname (domain)) //also disallows ""
 		{
 		    UI::SetFocus (`id (`domain));
 		    UI::ErrorPopup (valid_nisdomainname ());
 		}
-		else if (contains (existing, domain) && domain != init)
+		else if (init != "" && domain != init &&
+			 contains (existing, domain))
 		{
 		    UI::SetFocus (`id (`domain));
 		    // Translators: error message
@@ -797,10 +751,51 @@ by separating their addresses with spaces.</p>
 		    break;
 		}
 	    }
+	    else if (ui == `add_s)
+	    {
+		string s = InputServer ("", servers);
+		if (s != nil)
+		{
+		    servers = add (servers, s);
+		    ServerBoxSet (servers);
+		    UI::ChangeWidget (`id (`servers), `CurrentItem, s);
+		}
+	    }
+	    else if (ui == `edit_s)
+	    {
+		string s0 = UI::QueryWidget (`id (`servers), `CurrentItem);
+		if (s0 != nil)
+		{
+		    string s = InputServer (s0, servers);
+		    if (s != nil)
+		    {
+			servers = maplist (string e, servers, ``(
+					       (e == s0)? s: e
+					       ));
+			ServerBoxSet (servers);
+			UI::ChangeWidget (`id (`servers), `CurrentItem, s);
+		    }
+		}
+	    }
+	    else if (ui == `del_s)
+	    {
+		string s0 = UI::QueryWidget (`id (`servers), `CurrentItem);
+		if (s0 != nil)
+		{
+		    // probably no confirmation.
+		    servers = filter (string e, servers, ``( e != s0 ));
+		    ServerBoxSet (servers);
+		    if (size (servers) > 0)
+		    {
+			s = servers[0]:"";
+			UI::ChangeWidget (`id (`servers), `CurrentItem, s);
+		    }
+		}
+	    }
 	}
 
 	UI::CloseDialog ();
-	return (ret == `ok)? domain : nil;
+	return (ui == `ok)? [domain, [servers, broadcast]] : nil;
     }
 
     /**
@@ -811,80 +806,66 @@ by separating their addresses with spaces.</p>
     global define boolean check_nisdomainname (string domain) ``{
 	// TODO
 	// disallow whitespace and special characters...
-	return domain != "" && size (domain) <= 64;
+	return domain != "" && domain != "(none)" && size (domain) <= 64;
     }
 
     /**
      * @return describe a valid NIS domain name
      */
     global define string valid_nisdomainname () ``{
-	// TODO
-	return _("A NIS domain name must not be empty
+	// Translators: do not translate (none)!
+	return _(
+"A NIS domain name must not be empty,
+it must not be \"(none)\"
 and it must be at most 64 characters long.");
     }
 
     /**
-     * Constructs a whole SelectionBox
-     * because we cannot replace its items (#8826)
-     * @param	default_d	the default domain.
-     * @param	multiple_ds	multiple-domain map
-     * @return a SelectionBox
+     * @param default_d the default domain
+     * @return "Default: default_d"
      */
-    global define term DomainBox (string default_d, map multiple_ds) ``{
-	return `SelectionBox (
-	    `id (`domains), `opt (`notify, `shrinkable),
-	    _("Do&mains"),
-	    DomainListItems (default_d, multiple_ds)
-	    );
-    }
-
-    /**
-     * Constructs items for the domain selection box
-     * @param	default_d	the default domain
-     * @param	multiple_ds	multiple-domain map
-     * @return a list of items
-     * @see Nis#multidomain_servers
-     */
-    global define list DomainListItems (string default_d, map multiple_ds) ``{
+    global define string DefaultCell (string default_d) ``{
 	// Translators: the default NIS domain
-	string dd = sformat (_("Default: %1"), default_d);
-	// maps are sorted, so the default domain, "", comes first
-	return maplist (string d, any value, multiple_ds, ``(
-			    `item (`id (d), (d == "")? dd: d)
-			    ));
+	return sformat (_("Default: %1"), default_d);
     }
 
+    global string check_g = nil;
     /**
      * Constructs items for the domain table
      * @param	default_d	the default domain
-     * @param	multiple_ds	multiple-domain map
-     * @param	multiple_b	multiple-domain broadcast
+     * @param	all_servers	map of @ref server_sp
      * @return a list of items
-     * @see Nis#multidomain_servers
+     * @see Nis#multidomain_servers TODO
      */
-    global define list DomainTableItems (string default_d, map multiple_ds, map multiple_b) ``{
-	// Translators: the default NIS domain
-	string dd = sformat (_("Default: %1"), default_d);
+    global define list DomainTableItems (string default_d, map all_servers) ``{
+	if (check_g == nil)
+	{
+	    // fake center alignment:
+	    // indent it a bit because the column header is wide: "Broadcast"
+	    check_g = "  " + UI::Glyph (`CheckMark);
+	}
 	// maps are sorted, so the default domain, "", comes first
-	return maplist (string d, list servers, multiple_ds, ``(
+	return maplist (string d, list server_sp, all_servers, ``(
 			    `item (
 				`id (d),
-				(d == "")? dd: d,
-				multiple_b[d]:false? "X": "",	// TODO glyph?
-				mergestring (servers, ", ")
+				(d == "")? DefaultCell (default_d): d,
+				// this would be a priority example x ]:
+				(server_sp[1]:false)? check_g: "",
+				mergestring (server_sp[0]:[], ", ")
 				)
 			    ));
     }
 
     /**
-     * Updates the server box when a domain has changed
-     * @param	domain	a new domain. "" is the defauld domain.
-     * @param	multiple_b	multiple-domain broadcasts
+     * @param	default_d	the default domain
+     * @param	all_servers show these items
+     * @param	d	the selected item
      */
-    global define void BroadcastCheckSet (string domain, map multiple_b) ``{
-	UI::ChangeWidget (`id (`multidomain_broadcast), `Enabled, domain !="");
-	UI::ChangeWidget (`id (`multidomain_broadcast), `Value,
-			  multiple_b[domain]:false);
+    global define void UpdateDomainTable (string default_d, map all_servers,
+					  string d) ``{
+	UI::ChangeWidget (`id (`domains), `Items,
+			  DomainTableItems (default_d, all_servers));
+	UI::ChangeWidget (`id (`domains), `CurrentItem, d);
     }
 
     /**
@@ -955,41 +936,23 @@ and it must be at most 64 characters long.");
 
     /**
      * Updates the server box when a domain has changed
-     * @param	domain	a new domain. "" is the default domain.
-     * @param	default_d	the default domain.
-     * @param	multiple_ds	multiple-domain map
+     * @param	servers	a server list
      */
-    global define void ServerBoxSet (string domain, string default_d, map multiple_ds) ``{
-	UI::ReplaceWidget (`id (`r_servers), ServerBox (domain, default_d, multiple_ds));
+    global define void ServerBoxSet (list(string) servers) ``{
+	UI::ReplaceWidget (`id (`r_servers), ServerBox (servers));
     }
 
     /**
      * Constructs a whole SelectionBox
      * because we cannot replace its items (#8826)
-     * @param	domain	a new domain. "" is the default domain.
-     * @param	default_d	the default domain.
-     * @param	multiple_ds	multiple-domain map
+     * @param	servers	a server list
      * @return a SelectionBox
      */
-    global define term ServerBox (string domain, string default_d, map multiple_ds) ``{
-	// Translators: part of "Servers for the default domain"
-	string label = (domain == "")? _("the default domain"): domain;
+    global define term ServerBox (list(string) servers) ``{
 	return `SelectionBox (
-	    `id (`servers), `opt (`notify, `shrinkable),
-	    // Translators: %1 is a domain name or "the default domain" above
-	    sformat (_("Servers for %1"), label),
-	    ServerListItems (domain, multiple_ds) );
-    }
-
-    /**
-     * Constructs items for the server selection box
-     * @param	domain		a domain. "" is the default domain.
-     * @param	multiple_ds	multiple-domain map
-     * @return a list of items
-     * @see Nis#multidomain_servers
-     */
-    global define list ServerListItems (string domain, map multiple_ds) ``{
-	return multiple_ds[domain]:[];
+	    `id (`servers), `opt (`notify/*, `shrinkable*/),
+	    _("&Servers"),
+	    servers);
     }
 
 
