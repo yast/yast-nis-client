@@ -9,7 +9,8 @@
 Summary:	Configuration of nis
 Requires:	yast2 yast2-trans-nis
 Requires:	yast2-lib-wizard >= 2.5.8
-Requires:	yast2-lib-sequencer yast2-lib-network
+Requires:	yast2-lib-sequencer
+Requires:	yast2-lib-network >= 2.5.2
 Requires:	yast2-config-package-manager
 Requires:       yast2-config-runlevel >= 2.4.12
 Requires:       yast2-agent-targetpkg
@@ -45,7 +46,6 @@ Group:		System Environment/YaST
 @YAST2DIR@/menuentries/menuentry_nis.y2cc
 @YAST2DIR@/servers_non_y2/ag_yp_conf
 @YAST2DIR@/scrconf/yp_conf.scr
-@YAST2DIR@/scrconf/domainname.scr
 
 %files devel
 %defattr(-,root,root)
