@@ -62,7 +62,8 @@
 	    "nsswitch_conf": $[
 		"passwd": "compat",
 		"group": "compat",
-		"automount": "files"
+		"hosts": "files dns6",
+		"automount": "files",
 		],
 	    ],
 	"sysconfig": $[

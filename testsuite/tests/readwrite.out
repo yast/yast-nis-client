@@ -11,6 +11,7 @@ Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
 Read	.sysconfig.ypbind.YPBIND_OPTIONS ""
 Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.etc.nsswitch_conf.hosts "files dns6"
 Return	true
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true
