@@ -72,7 +72,7 @@
     // dialog title
     UI (`SetWizardContents (_("Configuration of NIS client"), con, help_text, true, true));
     // "Finish" button: Proceed to finish the configuration
-    UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
+    UI(`ChangeWidget (`id(`next), `Label, FinishButtonLabel()));
     UI(`ChangeWidget(`id(`ypd), `Enabled, yp_client));
     UI(`ChangeWidget(`id(`ypa), `Enabled, yp_client));
     
@@ -111,7 +111,7 @@
             ! UI(`YesNoPopup(_("The configuration of the NIS client will be saved\nand the client will be restarted."))))
             result = nil;
         
-    } while (result != `back && result != `next && result != `cancel);
+    } while (result != `back && result != `next);
     
     if (result == `next && 
         CallFunction(`nis_write($[ "start_yp" : yp_client,
