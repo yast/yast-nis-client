@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Dec  5 12:51:04 CET 2002 - mvidner@suse.cz
+
+- Use the faked Pkg instead of the real one to prevent testsuite failures.
+- 2.7.1
+
+-------------------------------------------------------------------
 Mon Aug 26 16:13:49 CEST 2002 - mvidner@suse.cz
 
 - Adapted for the new packagemanager.
