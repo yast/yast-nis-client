@@ -35,7 +35,7 @@
     global list(string) servers = [];
 
     /**
-     * @return Access the servers as a string 
+     * @return Access the servers as a string
      */
     global define string GetServers () ``{
 	return mergestring (servers, " ");
@@ -203,23 +203,24 @@ Please check that you are running this as a \"root\"
 		    return false;
 		}
 	    }
-	}
-	sleep(1000);	// workaround for bug #10428, ypbind restart
-	if (Runlevel::RunInitScript ("ypbind", "start") != 0)
-	{
-	    // error popup message
-	    errorNoPopup(_("Error while running ypclient."));
-	    return false;
-	}
-	// only test for a server if domain not changed
-	if (! domain_changed)
-	{
-	    if (SCR::Execute(.target.bash, "/usr/bin/ypwhich >/dev/null") != 0)
+	    sleep(1000);	// workaround for bug #10428, ypbind restart
+	    if (Runlevel::RunInitScript ("ypbind", "start") != 0)
 	    {
 		// error popup message
-		errorNoPopup(_("NIS server not found."));
+		errorNoPopup(_("Error while running ypclient."));
 		return false;
 	    }
+	    // only test for a server if domain not changed
+	    if (! domain_changed)
+	    {
+		if (SCR::Execute(.target.bash, "/usr/bin/ypwhich >/dev/null") != 0)
+		{
+		    // error popup message
+		    errorNoPopup(_("NIS server not found."));
+		    return false;
+		}
+	    }
 	}
+	return true;
     }
 }
