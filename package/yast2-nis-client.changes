@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jul 29 15:05:03 CEST 2002 - mvidner@suse.cz
+
+- yast2-runlevel is no longer required.
+- Tests fixed for perl 5.8.0.
+- 2.6.9
+
+-------------------------------------------------------------------
 Fri Jul 19 17:50:52 CEST 2002 - mvidner@suse.cz
 
 - Merged proofread texts.
