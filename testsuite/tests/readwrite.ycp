@@ -1,0 +1,78 @@
+/**
+ * Module:
+ *   NIS client configuration
+ *
+ * Summary:
+ *   Testsuite
+ *
+ * Authors:
+ *   Martin Vidner <mvidner@suse.cz>
+ *
+ * $Id$
+ */
+{
+    include "testsuite.ycp";
+    import "Nis";
+
+    map READ = $[
+	// Runlevel:
+	"init": $[
+	    "scripts": $[
+		"exists": true,
+		"runlevel": $[
+		    "portmap": $[
+			"start": [ "3", "5"],
+			"stop":	 [ "3", "5"],
+			],
+		    "ypbind": $[
+			"start": [ "3", "5"],
+			"stop":	 [ "3", "5"],
+			],
+		    "autofs": $[
+			"start": [ "3", "5"],
+			"stop":	 [ "3", "5"],
+			],
+		    ],
+		// their contents is not important for ServiceAdjust
+		"comment": $[
+		    "portmap": $[],
+		    "ypbind": $[],
+		    "autofs": $[],
+		    ],
+		],
+	    ],
+	// targetpkg:
+	"targetpkg": $[
+	    // autofs
+	    "installed": true,
+	    ],
+	// Nis itself:
+	"etc": $[
+	    "yp_conf": $[
+		"servers": [ "10.20.30.40", "10.20.30.80" ],
+		],
+	    "defaultdomain": "mydomain",
+	    "nsswitch_conf": $[
+		"passwd": "compat",
+		"group": "compat",
+		"automount": "files"
+		],
+	    ]
+	];
+
+    map WRITE = $[
+	];
+
+    map EXECUTE = $[
+	"target": $[
+	    "bash_output": $[
+		"exit": 0,
+		"stdout": "",
+		"stderr": "",
+		],
+	    ],
+	];
+			     
+    TEST (``(Nis::Read ()), [READ, WRITE, EXECUTE], nil);
+    TEST (``(Nis::Write (false)), [READ, WRITE, EXECUTE], nil);
+}
