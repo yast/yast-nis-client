@@ -1,8 +1,6 @@
-## yast2-nis-client.spec.in, processed by y2tool create-spec,
-## invoked automatically from Makefile.am
 @HEADER-COMMENT@
 
-# neededforbuild yast2-devel-packages yast2-base yast2-runlevel
+# neededforbuild  yast2-devel-packages yast2-runlevel
 
 @HEADER@
 
