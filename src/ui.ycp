@@ -231,7 +231,7 @@ either locally or over NIS.<br>
 If it is not installed and you want to use it, it will be installed
 automatically.</p>");
 
-	boolean yp_client = Nis::start;
+	boolean yp_client = Mode::cont || Nis::start; // #23733
 	boolean autofs = Nis::_start_autofs;
 
 	term con = nil;
