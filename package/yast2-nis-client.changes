@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Feb 24 15:59:32 CET 2003 - mvidner@suse.de
+
+- Made it possible to freely switch between static and DHCP setup
+  (#23734).
+- Removed the "Successfully saved" popup in installation workflow (#23777).
+- 2.7.8
+
+-------------------------------------------------------------------
 Wed Feb 19 14:17:23 CET 2003 - jsuchome@suse.de
 
 - Enable only starting service if run during the installation (#23831)
