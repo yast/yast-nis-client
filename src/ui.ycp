@@ -487,7 +487,8 @@ by separating their addresses with spaces.</p>
 	boolean broadcast = Nis::broadcast;
 	map all_servers = mapmap (string d, list s, Nis::multidomain_servers,
 				  ``( [d, [s, Nis::multidomain_broadcast[d]:false]] ));
-	all_servers = add (all_servers, "", [Nis::servers, false]);
+	all_servers = add (all_servers, "",
+			   [Nis::servers, Nis::default_broadcast]);
 
 	// "" means the default domain
 	string current_d = "";
@@ -688,7 +689,6 @@ the default domain will be lost.")))
 
 	if (contains ([`next, `expert, `single], result))
 	{
-	    // TODO discard multidomain_* if `single
 	    Nis::SetDomain (default_d);
 	    Nis::Touch (Nis::broadcast != broadcast);
 	    Nis::broadcast = broadcast;
@@ -697,10 +697,13 @@ the default domain will be lost.")))
 					   [d, v[0]:[]]
 					   ));
 	    list servers = only_servers[""]:[];
+	    boolean default_broadcast = nil;
 	    map multidomain_servers = nil;
 	    map multidomain_broadcast = nil;
 	    if (result == `single)
 	    {
+		//TODO default_broadcast
+		default_broadcast = false;
 		multidomain_servers = $[];
 		multidomain_broadcast = $[];
 	    }
@@ -709,6 +712,7 @@ the default domain will be lost.")))
 		map only_broadcast = mapmap (string d, list v, all_servers, ``(
 						 [d, v[1]:false]
 						 ));
+		default_broadcast = only_broadcast[""]:false;
 		multidomain_servers = filter (string d, list v,
 					      only_servers, ``( d != "") );
 		multidomain_broadcast = filter (string d, boolean v,
@@ -716,6 +720,8 @@ the default domain will be lost.")))
 	    }
 	    Nis::Touch (Nis::servers != servers);
 	    Nis::servers = servers;
+	    Nis::Touch (Nis::default_broadcast != default_broadcast);
+	    Nis::default_broadcast = default_broadcast;
 	    Nis::Touch (false); //TODO need to know earlier for abort?
 	    Nis::multidomain_servers = multidomain_servers;
 	    Nis::Touch (false); //TODO need to know earlier for abort?

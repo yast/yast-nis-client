@@ -50,6 +50,7 @@
 	"etc": $[
 	    "yp_conf": $[
 		"servers": [ "10.20.30.40", "10.20.30.80" ],
+		"defaultbroadcast": false,
 		"domainservers": $[
 		    "otherdomain": [ "1.2.3.4" ],
 		    ],

@@ -12,6 +12,10 @@
 # %broadcast: keys are domains, values booleans
 #  if true, broadcast will be used as fallback.
 #  The maps must have the same set of keys!
+# $defaultbroadcast: boolean
+#
+# The interface is not very pretty, but it works
+# and Nis::Read beautifies it for YaST2 anyway.
 
 use lib "/usr/lib/YaST2/agents_non_y2";
 use ycp;
@@ -22,11 +26,13 @@ my $comment;
 my @servers;
 my %domainservers;
 my %broadcast;
+my $defaultbroadcast;
 
 my $filename;
 my $modified;
 
 # fill in default values for missing entries
+# and normalize booleans (yuck).
 sub complete_maps ()
 {
     my $domain;
@@ -53,6 +59,15 @@ sub complete_maps ()
 	    $broadcast{$domain} = "true";
 	}
     }
+
+    if ($defaultbroadcast eq 0)
+    {
+	$defaultbroadcast = "false";
+    }
+    elsif ($defaultbroadcast eq 1)
+    {
+	$defaultbroadcast = "true";
+    }
 }
 
 # return false if an error occurred
@@ -61,6 +76,7 @@ sub parse_file ()
     $comment = "";
     @servers = ();
     %domainservers = ();
+    $defaultbroadcast = "false";
 
     if (!open (FILE, $filename))
     {
@@ -86,9 +102,13 @@ sub parse_file ()
 	{
 	    push @{$domainservers{$1}}, $2;
 	}
-	elsif (/^domain\s+(\S+)\s+broadcast/)
+	elsif (/^domain\s+(\S+)\s+broadcast\b/)
 	{
 	    $broadcast{$1} = "true";
+	}
+	elsif (/^broadcast\b/)
+	{
+	    $defaultbroadcast = "true";
 	}
 	else
 	{
@@ -116,6 +136,10 @@ sub write_file ()
     foreach (@servers)
     {
 	print FILE "ypserver $_\n";
+    }
+    if ($defaultbroadcast eq "true")
+    {
+	print FILE "broadcast\n";
     }
     foreach my $domain (sort keys %domainservers)
     {
@@ -177,7 +201,13 @@ while ( <STDIN> )
     {
 	if ($path eq ".")
 	{
-	    ycp::Return (["broadcast", "comment", "domainservers", "servers"]);
+	    ycp::Return ([
+			  "broadcast",
+			  "comment",
+			  "defaultbroadcast",
+			  "domainservers",
+			  "servers"
+			 ]);
 	}
 	else
 	{
@@ -215,6 +245,11 @@ while ( <STDIN> )
 	    %broadcast = %{$argument};
 	    $modified = 1;
 	}
+	elsif ($path eq ".defaultbroadcast" && !ref ($argument))
+	{
+	    $defaultbroadcast = $argument;
+	    $modified = 1;
+	}
 	elsif ($path eq ".comment" && !ref ($argument))
 	{
 	    $comment = $argument;
@@ -231,6 +266,7 @@ while ( <STDIN> )
 	    @servers = @{$argument->{"servers"}};
 	    %domainservers = %{$argument->{"domainservers"}};
 	    %broadcast = %{$argument->{"broadcast"}};
+	    $defaultbroadcast = $argument->{"defaultbroadcast"};
 	    $modified = 1;
 	}
 	else
@@ -256,6 +292,10 @@ while ( <STDIN> )
 	{
 	    ycp::Return (\%broadcast);
 	}
+	elsif ($path eq ".defaultbroadcast")
+	{
+	    ycp::Return ($defaultbroadcast);
+	}
 	elsif ($path eq ".comment")
 	{
 	    ycp::Return ($comment);
@@ -267,6 +307,7 @@ while ( <STDIN> )
 			  "comment" => $comment,
 			  "domainservers" => \%domainservers,
 			  "broadcast" => \%broadcast,
+			  "defaultbroadcast" => $defaultbroadcast,
 			  "servers" => \@servers,
 			  });
 	}

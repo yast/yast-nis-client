@@ -13,3 +13,5 @@ domain other-domain.test   server  yp2.other-domain.test
 domain bad-domain server  foo.bad-domain.test
 domain bad-domain server  bar.bad-domain.test
 domain bad-domain broadcast
+# broadcast for the default domain works too
+broadcast

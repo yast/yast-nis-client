@@ -1,6 +1,7 @@
 Read	.init.scripts.exists "ypbind" true
 Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.etc.yp_conf.servers ["10.20.30.40", "10.20.30.80"]
+Read	.etc.yp_conf.defaultbroadcast false
 Read	.etc.yp_conf.domainservers $["otherdomain":["1.2.3.4"]]
 Read	.etc.yp_conf.broadcast $["otherdomain":true]
 Read	.etc.defaultdomain "mydomain"
@@ -22,6 +23,7 @@ Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3
 Read	.init.scripts.comment "ypbind" $["autofs":$[], "portmap":$[], "ypbind":$[]]
 Write	.etc.defaultdomain "mydomain" true
 Write	.etc.yp_conf.servers ["10.20.30.40", "10.20.30.80"] true
+Write	.etc.yp_conf.defaultbroadcast false true
 Write	.etc.yp_conf.domainservers $["otherdomain":["1.2.3.4"]] true
 Write	.etc.yp_conf.broadcast $["otherdomain":true] true
 Write	.etc.yp_conf nil true
