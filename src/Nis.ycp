@@ -136,7 +136,7 @@
      * Dump the NIS settings to a map, for autoinstallation use.
      * @return $["start":, "servers":[...], "domain":]
      */
-    global define map Export () ``{	
+    global define map Export () ``{
 	return $[
 	    "start_nis": start,
 	    "nis_servers": servers,
@@ -151,8 +151,8 @@
      */
     global define boolean Read () ``{
 	start = Runlevel::ServiceEnabled ("ypbind");
-	SetServers (SCR::Read (.rc.system.YP_SERVER));
-	domain  = SCR::Read (.rc.system.YP_DOMAINNAME);
+	servers = SCR::Read (.etc.yp_conf.servers);
+	domain  = SCR::Read (.etc.defaultdomain);
 	old_domain = domain;
 
 	_autofs_allowed = SCR::Read (.targetpkg.installed, "autofs");
@@ -173,33 +173,19 @@
 	    Runlevel::ServiceAdjust ("portmap", "enable");
 	    Runlevel::ServiceAdjust ("ypbind", "enable");
 
-	    SCR::Write (.rc.system.CREATE_YP_CONF, "yes");
-	    SCR::Write (.rc.system.YP_DOMAINNAME, domain);
-	    SCR::Write (.rc.system.YP_SERVER, GetServers ());
+	    // TODO: report errors
+	    SCR::Write (.etc.defaultdomain, domain);
+	    SCR::Write (.etc.yp_conf.servers, servers);
 	}
 	else
 	{
 	    Runlevel::ServiceAdjust ("ypbind", "disable");
 	}
 
-	if (!SCR::Write (.rc.system, nil))
-	{
-	    // error popup message
-	    Report::Error (_("Error while saving /etc/rc.config.
-Please check that you are running this as a \"root\"
-"));
-	    return false;
-	}
-
-	if (SCR::Execute (.target.bash, "/sbin/SuSEconfig --nonewpackage --module ypclient") != 0)
-	{
-	    // warning dialog message
-	    Report::Error (_("Error while running SuSEconfig"));
-	    return false;
-	}
-
 	if (start)
 	{
+	    WritePluses ();
+
 	    if (Runlevel::ServiceStatus ("portmap") != 0)
 	    {
 		// portmap must not be started if it is running already (see bug # 9999)
@@ -244,5 +230,37 @@ Please check that you are running this as a \"root\"
 	    }
 	}
 	return true;
+    }
+
+    /*!global*/
+    define void WritePluses () ``{
+	list(string) files = [];
+	if (SCR::Read (.etc.nsswitch_conf.passwd) == "compat")
+	{
+	    files = ["passwd", "shadow"];
+	}
+	if (SCR::Read (.etc.nsswitch_conf.group) == "compat")
+	{
+	    files = add (files, "group");
+	}
+
+	//don't forget a newline
+	map what_to_write = $[
+	    "passwd":	"+::::::",
+	    "group":	"+:::",
+	    "shadow":	"+",
+	    ];
+	foreach (string f, files, ``{
+	    WritePlusesTo (sformat ("/etc/%1", f), what_to_write[f]:"");
+	});
+    }
+
+    define void WritePlusesTo (string file, string what) ``{
+	if (SCR::Execute (.target.bash, "/usr/bin/grep -q '^[+-]' " + file) != 0)
+	{
+	    // not there, add it
+	    // TODO: backup? 
+	    SCR::Execute (.target.bash, sformat ("/bin/echo '%1' >> %2", what, file));
+	}
     }
 }

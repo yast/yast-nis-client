@@ -1,0 +1,117 @@
+#!/usr/bin/perl -w
+#
+# $Id$
+# Author: Martin Vidner <mvidner@suse.cz>
+#
+# An agent for parsing and writing /etc/yp.conf.
+# Only ypserver is supported.
+
+use lib "/usr/lib/YaST2/agents_non_y2";
+use ycp;
+use strict;
+
+my @servers;
+
+my $filename = "/etc/yp.conf";
+
+sub parse_file ()
+{
+    @servers = ();
+
+    open (FILE, $filename) or return y2error ("$filename: $!"), 0;
+    while (<FILE>)
+    {
+	chomp;
+	s/\#.*//;		# comments
+	if (/ypserver\s+(\S+)/)
+	{
+	    push @servers, $1;
+	}
+    }
+    close (FILE);
+    return 1;
+}
+
+sub write_file ()
+{
+    open (FILE, ">$filename.YaST2.new") or return y2error ("$filename: $!"), 0;
+
+    foreach (@servers)
+    {
+	print FILE "ypserver $_\n";
+    }
+    close (FILE);
+
+    rename $filename, "$filename.YaST2.save" or return y2error ("$filename: $!"), 0;
+    rename "$filename.YaST2.new", $filename or return  y2error ("$filename: $!"), 0;
+    return 1;
+}
+
+
+#
+# MAIN cycle
+#
+
+parse_file ();
+
+while ( <STDIN> )
+{
+    my ($command, $path, $argument) = ycp::ParseCommand ($_);
+
+    if ($command eq "Dir")
+    {
+	if ($path eq ".")
+	{
+	    ycp::Return (["servers"]);
+	}
+	else
+	{
+	    ycp::Return ([]);
+	}
+    }
+
+    elsif ($command eq "Write")
+    {
+	my $result = "true";
+	if ($path eq ".servers" && ref ($argument) eq "ARRAY")
+	{
+	    @servers = @{$argument};
+	}
+	elsif ($path eq "." && !defined ($argument))
+	{
+	    $result = write_file () ? "true":"false";
+	}
+	else
+	{
+	    y2error ("Wrong path $path or argument: ", ref ($argument));
+	    $result = "false";
+	}
+
+	ycp::Return ($result);
+    }
+
+    elsif ($command eq "Read")
+    {
+	if ($path eq ".servers")
+	{
+	    ycp::Return (\@servers);
+	}
+	else
+	{
+	    y2error ("Unrecognized path! '$path'");
+	    ycp::Return ("");
+	}
+    }
+
+    elsif ($command eq "result")
+    {
+	exit;
+    }
+
+    # Unknown command
+    else
+    {
+	y2error ("Unknown instruction $command or argument: ", ref ($argument));
+	ycp::Return ("false");
+    }
+}
