@@ -45,6 +45,9 @@ else if (func == "Reset") {
 else if (func == "Change") {
 	ret = AutoSequence();
 }
+else if (func == "Read") {
+	ret = Nis::Read();
+}
 else if (func == "Result") {
 	ret = Nis::Export();
 }
