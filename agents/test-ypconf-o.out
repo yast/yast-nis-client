@@ -2,11 +2,13 @@
 #Another comment
 #that continues
 # lots of servers
-# broadcast will override specific servers
+# broadcast will supplement specific servers instead of overriding
 ypserver 192.168.0.1
 ypserver 192.168.0.2
 ypserver 192.168.0.3
 ypserver 192.168.0.4
+domain bad-domain server foo.bad-domain.test
+domain bad-domain server bar.bad-domain.test
 domain bad-domain broadcast
 domain mydomain broadcast
 domain other-domain.test server yp.other-domain.test
