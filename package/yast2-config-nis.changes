@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Aug 21 17:25:01 CEST 2001 - mvidner@suse.cz
+
+- Only one <p> per string. (2.4.5)
+
+-------------------------------------------------------------------
 Tue Aug  7 17:24:46 CEST 2001 - mvidner@suse.cz
 
 - Warn about the necessity of reboot when changing the domain. 
