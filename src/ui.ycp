@@ -196,8 +196,8 @@ Change the DHCP server configuration to provide it.
 	Wizard::SetScreenShotName ("nis-client-2a-single");
 
 	// help text
-	string help_text = _("<p>Enter your NIS domain (e.g, foo.com)
- and the NIS server's address (e.g., nis.foo.com or 10.20.1.1).</p>");
+	string help_text = _("<p>Enter your NIS domain (e.g, example.com)
+ and the NIS server's address (e.g., nis.example.com or 10.20.1.1).</p>");
 
 	// help text
 	help_text = help_text + _("<p>Specify multiple servers
@@ -1092,9 +1092,7 @@ This option is only available if the firewall is enabled.</p>
 	    {
 		if (Nis::start && Nis::DomainChanged ())
 		{
-		    // waring popup
-		    Popup::Warning (_("The domain has changed.
-You must reboot for the changes to take effect."));
+		    Popup::Warning (Message::DomainHasChangedMustReboot());
 		}
 	    }
 	}
