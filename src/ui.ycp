@@ -483,8 +483,8 @@ by separating their addresses with spaces.</p>
 <b>Multiple domains</b>, use the button to switch to a detailed dialog.</p>");
 
 	boolean dhcp_wanted = Nis::dhcp_wanted;
-	string yp_domain  = Nis::GetDomain ();
-	string yp_address = Nis::GetServers ();
+	string domain  = Nis::GetDomain ();
+	string servers = Nis::GetServers ();
 
 	// In this simple case, let's discard the distinction.
 	boolean default_broadcast =
@@ -508,10 +508,10 @@ by separating their addresses with spaces.</p>
 
 
 			   // text entry label
-			   `TextEntry (`id (`ypd), _("NIS &domain"), yp_domain),
+			   `TextEntry (`id (`domain), _("NIS &domain"), domain),
 			   `VSpacing (0.2),
 			   // text entry label
-			   `TextEntry (`id (`ypa), _("&Addresses of NIS servers"), yp_address),
+			   `TextEntry (`id (`servers), _("&Addresses of NIS servers"), servers),
 			   `HBox (
 			       // check box label
 			       `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Br&oadcast"), default_broadcast)),
@@ -546,8 +546,8 @@ by separating their addresses with spaces.</p>
 	repeat
 	{
 	    dhcp_wanted = UI::QueryWidget (`id (`dhcpg), `CurrentButton) == `dhcpyes;
-	    UI::ChangeWidget (`id (`ypd), `Enabled, !dhcp_wanted);
-	    UI::ChangeWidget (`id (`ypa), `Enabled, !dhcp_wanted);
+	    UI::ChangeWidget (`id (`domain), `Enabled, !dhcp_wanted);
+	    UI::ChangeWidget (`id (`servers), `Enabled, !dhcp_wanted);
 	    UI::ChangeWidget (`id (`broadcast), `Enabled, !dhcp_wanted);
 	    UI::ChangeWidget (`id (`find), `Enabled, !dhcp_wanted);
 	    UI::ChangeWidget (`id (`multiple), `Enabled, !dhcp_wanted);
@@ -564,46 +564,46 @@ by separating their addresses with spaces.</p>
 	    }
 	    else if (result == `find)
 	    {
-		yp_domain =  UI::QueryWidget (`id (`ypd), `Value);
-		if (yp_domain == "")
+		domain =  UI::QueryWidget (`id (`domain), `Value);
+		if (domain == "")
 		{
 		    // Message popup. The user wants to Find servers
 		    // but the domain is unknown.
 		    Popup::Message (_("Finding servers works only when the domain is known."));
-		    UI::SetFocus (`id (`ypd));
+		    UI::SetFocus (`id (`domain));
 		}
 		else
 		{
-		    string servers = SelectNisServers (yp_domain);
+		    string servers = SelectNisServers (domain);
 		    if (servers != "")
 		    {
-			UI::ChangeWidget (`id (`ypa), `Value, servers);
+			UI::ChangeWidget (`id (`servers), `Value, servers);
 		    }
 		}
 	    }
 	    else if (contains ([`next, `expert, `multiple], result))
 	    {
-		yp_domain =  UI::QueryWidget (`id (`ypd), `Value);
-		yp_address = UI::QueryWidget (`id (`ypa), `Value);
+		domain =  UI::QueryWidget (`id (`domain), `Value);
+		servers = UI::QueryWidget (`id (`servers), `Value);
 		default_broadcast = UI::QueryWidget (`id (`broadcast), `Value);
 
 		if (!dhcp_wanted &&
-		    !Nis::check_nisdomainname (yp_domain))
+		    !Nis::check_nisdomainname (domain))
 		{
-		    UI::SetFocus (`id (`ypd));
+		    UI::SetFocus (`id (`domain));
 		    Popup::Error (Nis::valid_nisdomainname ());
 		    result = nil;
 		    continue;
 		}
 
-		list temp_ad = filter (string a, splitstring (yp_address, " "),
+		list temp_ad = filter (string a, splitstring (servers, " "),
 				       ``(a != ""));
 		if (!dhcp_wanted && !default_broadcast &&
 		    (size (temp_ad) == 0 ||
 		     find (string a, temp_ad,
 			   ``(!Nis::check_address_nis (a))) != nil))
 		{
-		    UI::SetFocus (`id (`ypa));
+		    UI::SetFocus (`id (`servers));
 		    Popup::Message (Nis::valid_address_nis ());
 		    result = nil;
 		    continue;
@@ -621,8 +621,8 @@ by separating their addresses with spaces.</p>
 	    Nis::Touch (Nis::dhcp_restart);
 	    Nis::dhcp_wanted = dhcp_wanted;
 
-	    Nis::SetDomain (yp_domain);
-	    Nis::SetServers (yp_address);
+	    Nis::SetDomain (domain);
+	    Nis::SetServers (servers);
 	    Nis::Touch (Nis::default_broadcast != default_broadcast);
 	    Nis::default_broadcast = default_broadcast;
 	    Nis::Touch (Nis::global_broadcast != false);
