@@ -29,9 +29,8 @@
     import "Nis";
     import "Wizard";
     include "require.ycp";
-    include "ui/common_popups.ycp";
 
-    include "network/dns.ycp";
+    include "nis/ui.ycp";
 
     if (!RequireAndConflict (["ypbind"], [],
 			     // notification 1/2
@@ -45,112 +44,33 @@
     Wizard::CreateDialog ();
     Wizard::ReplaceAbortButton(`Empty ());
 
-
-// ===== main =====
-
-// help text 1/3
-    string help_text = _("<p>Here your machine can be set up as a
- <b>NIS client</b>. Just enter your NIS domain (e.g, suse.de) as the
- first entry and the NIS server's IP address (e.g., 10.20.0.2) as the second. To
- deactivate NIS services, select the <b>Do not use NIS</b> button.</p>");
-
-// help text 2/3
-    help_text = help_text + _("<p>You can specify multiple servers
-by separating their addresses with spaces.</p>
-");
-
-// help text 3/3
-    help_text = help_text + _("<p>The Network Information Service (NIS)
- was formerly known as Sun <b>Yellow Pages</b> (YP). The name Yellow
- Pages is a registered trademark in the United Kingdom of British
- Telecommunications plc and may not be used without
- permission.</p>
-");
-
     Nis::Read ();
-    boolean yp_client = Nis::start;
-    string yp_domain  = Nis::GetDomain ();
-    string yp_address = Nis::GetServers ();
 
-// frame label
-    term con = `HVSquash(`Frame (_("NIS client"),
-				 `VBox (`VSpacing (0.2),
-					`RadioButtonGroup(`id(`rd),
-							  // radio button label
-							  `Left(`HVSquash(`VBox (`Left (`RadioButton(`id(`nisno), `opt (`notify), _("Do &not use NIS"), !yp_client)),
-										 // radio button label
-										 `Left(`RadioButton(`id(`nisyes), `opt (`notify), _("&Use NIS"), yp_client)))))),
-					// text entry label
-					`TextEntry (`id (`ypd), _("NIS &domain"), yp_domain),
-					// test entry label
-					`TextEntry (`id (`ypa), _("&IP addresses of NIS servers"), yp_address),
-					`VSpacing (0.2)
-				     )
-			     ));
-
-    // dialog title
-    Wizard::SetContents (_("Configuration of NIS client"), con, help_text, true, true);
-    // "Finish" button: Proceed to finish the configuration
-    UI::ChangeWidget (`id(`next), `Label, FinishButtonLabel());
-    UI::ChangeWidget(`id(`ypd), `Enabled, yp_client);
-    UI::ChangeWidget(`id(`ypa), `Enabled, yp_client);
-
-    any result = nil;
-    do {
-	result = UI::UserInput ();
-
-	yp_client = (UI::QueryWidget(`id(`rd), `CurrentButton) == `nisyes);
-
-	if (result == `nisyes || result == `nisno) {
-	    UI::ChangeWidget(`id(`ypd), `Enabled, yp_client);
-	    UI::ChangeWidget(`id(`ypa), `Enabled, yp_client);
-	}
-
-	if (result == `next && yp_client) {
-	    yp_domain =  UI::QueryWidget(`id(`ypd), `Value);
-	    yp_address = UI::QueryWidget(`id(`ypa), `Value);
-
-	    if (!check_domainname (yp_domain)) {
-		// error popup label
-		UI::MessagePopup(_("The domain name is not correct."));
-		result = nil;
-		continue;
-	    }
-
-	    list temp_ip = splitstring (yp_address, " ");
-	    if (contains (maplist(`i, temp_ip, ``(checkIP (i))), false)) {
-		// error popup label
-		UI::MessagePopup(_("The IP address is not correct."));
-		result = nil;
-		continue;
-	    }
-	}
-
-	if (result == `next &&
-	    ! UI::YesNoPopup(_("The configuration of the NIS client will be saved.")))
-	    result = nil;
-
-    } while (result != `back && result != `next);
+    symbol result = NisDialog ();
 
     if (result == `next)
     {
-	Nis::start = yp_client;
-	Nis::SetDomain (yp_domain);
 	Nis::SetServers (yp_address);
 	if (Nis::Write ())
 	{
-	    if (yp_client)
+	    if (Nis::start)
 	    {
 		if (Nis::DomainChanged ())
+		{
 		    UI::WarningPopup (_("The domain has changed.
 You must reboot for the changes to take effect."));
+		}
 		else
+		{
 		    UI::MessagePopup(_("The configuration of the NIS client
 was saved and can be used."));
+		}
 	    }
 	    else
+	    {
 		UI::MessagePopup(_("The configuration of the NIS
 client was saved."));
+	    }
 	}
     }
 
