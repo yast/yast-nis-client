@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Nov 30 16:46:48 CET 2001 - mvidner@suse.cz
+
+- Converted to a Module.
+- Using y2autoconf and create-spec.
+- 2.5.2
+
+-------------------------------------------------------------------
 Thu Oct 11 10:52:33 CEST 2001 - mvidner@suse.cz
 
 - Don't report to start the client when stopping it. (#11614)
