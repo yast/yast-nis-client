@@ -691,6 +691,13 @@ either locally or over NIS.</p>");
 			_("The format of server address '%1' is not correct."), bad_server);
 		    Popup::Error (msg + "\n\n" + Nis::valid_address_nis ());
 		}
+		// check options (local broadcast and slp)
+		else if (broadcast && slp)
+		{
+		    UI::SetFocus (`id (`local_broadcast));
+		    // error message, 'Broadcast' and 'SLP' are checkboxes
+		    Popup::Error(_("Enabling both Broadcast and SLP options\ndoes not make any sense. Select just one option."));
+		}
 		else
 		{
 		    // all checks OK, break the input loop
@@ -740,7 +747,7 @@ either locally or over NIS.</p>");
 			    _("Domain"),
 			    // table header
 			    `Center (_("Broadcast")),
-			    // table header
+			    // table header - Service Location Protocol
 			    `Center (_("SLP")),
 			    // table header
 			    _("Servers")),
