@@ -78,9 +78,9 @@ by separating their addresses by spaces.</p>");
 										 // radio button label
 										 `Left(`RadioButton(`id(`nisyes), `opt (`notify), _("&Use NIS"), yp_client)))))),
 					// text entry label
-					`HSquash(`TextEntry (`id (`ypd), _("NIS &domain"), yp_domain)),
+					`TextEntry (`id (`ypd), _("NIS &domain"), yp_domain),
 					// test entry label
-					`HSquash(`TextEntry (`id (`ypa), _("&IP addresses of NIS servers"), yp_address)),
+					`TextEntry (`id (`ypa), _("&IP addresses of NIS servers"), yp_address),
 					`VSpacing (0.2)
 				     )
 			     ));
