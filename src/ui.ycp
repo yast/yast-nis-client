@@ -87,6 +87,18 @@
 	];
 
     /**
+     * The dialog that appears when the [Abort] button is pressed.
+     * @param touched data modified?
+     * @return `abort if user really wants to abort, `back otherwise
+     */
+    global define boolean ReallyAbort (boolean touched) ``{
+
+	return (!Mode::cont)
+	    ? Popup::ReallyAbort (touched)
+	    : Popup::ConfirmAbort (`incomplete);
+    }
+
+    /**
      * The normal workflow
      * @return `back, `abort or `next
      */
@@ -277,6 +289,8 @@ automatically.</p>");
 	if (Mode::cont)
 	{
 	    UI::ChangeWidget (`id(`nisno), `Enabled, false);
+	    Wizard::ReplaceAbortButton (
+		`PushButton(`id(`abort), Label::AbortInstallationButton()));
 	}
 
 	any result = nil;
@@ -298,7 +312,7 @@ automatically.</p>");
 	    }
 	}
 	until (result == `back || result == `next ||
-	       (result == `abort && Popup::ReallyAbort (Nis::touched)));
+	       (result == `abort && ReallyAbort (Nis::touched)));
 
 	if (result == `next)
 	{
@@ -504,6 +518,8 @@ by separating their addresses with spaces.</p>
 	    // dialog title
 	    _("Configuration of NIS client"), con, help_text,
 	    Label::BackButton (), Mode::cont? Label::NextButton():Label::FinishButton ());
+	if (Mode::cont) Wizard::ReplaceAbortButton (
+	    `PushButton(`id(`abort), Label::AbortInstallationButton()));
 
 	any result = nil;
 	repeat
@@ -564,7 +580,7 @@ by separating their addresses with spaces.</p>
 	}
 	until (result == `back || result == `next || result == `expert ||
 	       result == `multiple ||
-	       (result == `abort && Popup::ReallyAbort (Nis::touched)));
+	       (result == `abort && ReallyAbort (Nis::touched)));
 
 	if (contains ([`next, `expert, `multiple], result))
 	{
@@ -632,6 +648,8 @@ by separating their addresses with spaces.</p>
 	    // dialog title
 	    _("Expert settings"), contents, help_text,
 	    Label::BackButton (), Label::OKButton ());
+	if (Mode::cont) Wizard::ReplaceAbortButton (
+	    `PushButton(`id(`abort), Label::AbortInstallationButton()));
 
 	any result = nil;
 	repeat
@@ -658,7 +676,7 @@ by separating their addresses with spaces.</p>
 	    }
 	}
 	until (result == `back || result == `next ||
-	       (result == `abort && Popup::ReallyAbort (Nis::touched)));
+	       (result == `abort && ReallyAbort (Nis::touched)));
 
 	if (result == `next)
 	{
@@ -806,6 +824,8 @@ This check box only appears if it is turned on.</p>
 		     // dialog subtitle
 		     _("Multiple domains")), contents, help_text,
 	    Label::BackButton (), Mode::cont? Label::NextButton():Label::FinishButton ());
+	if (Mode::cont) Wizard::ReplaceAbortButton (
+	    `PushButton(`id(`abort), Label::AbortInstallationButton()));
 
 	//UI::ChangeWidget (`id (`domains), `CurrentItem, current_d);
 
@@ -966,7 +986,7 @@ the default domain will be lost.")))
 		}
 	    }
 	    else if (result == `back || (result == `abort &&
-					 Popup::ReallyAbort (Nis::touched)))
+					 ReallyAbort (Nis::touched)))
 	    {
 		break;
 	    }
