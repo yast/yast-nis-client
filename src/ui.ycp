@@ -331,10 +331,13 @@ by separating their addresses with spaces.</p>
 			   `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Br&oadcast"), default_broadcast)),
 			   `VSpacing (0.2),
 			   `HBox (
-			       // button label
-			       `PushButton (`id (`expert), _("D&etails ...")),
-			       // button label
-			       `PushButton (`id (`multiple), _("&Multiple domains >>"))
+			       `PushButton (`id (`expert), `opt (`key_F7),
+					    // button label
+					    // (short for Expert settings)
+					    _("&Expert ...")),
+			       `PushButton (`id (`multiple), `opt (`key_F2),
+					    // button label
+					    _("&Multiple domains >>"))
 			       ),
 			   `VSpacing (0.2)
 			)
@@ -553,11 +556,11 @@ This check box only appears if it is turned on.</p>
 			),
 		    `HBox (
 			// button label
-			`PushButton (`id (`add_d), _("&Add")),
+			`PushButton (`id (`add_d), `opt (`key_F3), _("&Add")),
 			// button label
-			`PushButton (`id (`edit_d), _("E&dit")),
+			`PushButton (`id (`edit_d), `opt (`key_F4), _("E&dit")),
 			// button label
-			`PushButton (`id (`del_d), _("De&lete"))
+			`PushButton (`id (`del_d), `opt (`key_F5), _("De&lete"))
 			),
 		    `VSpacing (0.2)
 		    )
@@ -583,10 +586,13 @@ This check box only appears if it is turned on.</p>
 		   multiple,
 		   `VSpacing (0.2),
 		   `HBox (
-		       // button label
-		       `PushButton (`id (`expert), _("D&etails ...")),
-		       // button label
-		       `PushButton (`id (`single), _("&Single domain <<"))
+		       `PushButton (`id (`expert), `opt (`key_F7),
+				    // button label
+				    // (short for Expert settings)
+				    _("&Expert ...")),
+		       `PushButton (`id (`single), `opt (`key_F2),
+				    // button label
+				    _("&Single domain <<"))
 		       ),
 		   `VSpacing (0.2)
 		);
@@ -864,8 +870,10 @@ the default domain will be lost.")))
 		    `VSpacing(0.5),
 		    t_servers,
 		    `VSpacing(0.2),
-		    `HBox(`PushButton(`id(`ok), `opt(`default), OKButtonLabel()),
-			  `PushButton(`id(`cancel), CancelButtonLabel())),
+		    `HBox (`PushButton (`id (`ok), `opt (`default, `key_F10),
+					OKButtonLabel ()),
+			   `PushButton (`id (`cancel), `opt (`key_F9),
+					CancelButtonLabel ())),
 		    `VSpacing(0.2)
 		    ),
 		`HSpacing(1)
