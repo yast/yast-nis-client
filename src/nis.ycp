@@ -210,7 +210,7 @@ map cmdline = $[
     "options"		: $[
 	"server"	:$[
 	    // command line help text for the 'server' option
-	    "help"	: _("NIS server name or adress"),
+	    "help"	: _("NIS server name or address"),
 	    "type"	: "string"
 	],
 	"domain"	:$[
@@ -220,12 +220,12 @@ map cmdline = $[
 	],
 	"automounter"	:$[
 	    // help text for the 'automounter' option (do not trans. values)
-	    "help"	: _("Start or stop automounter (use on/off values)"),
+	    "help"	: _("Start or stop automounter (use on or off values)"),
 	    "type"	: "string"
 	],
 	"broadcast"	:$[
 	    // help text for the 'broadcast' option (do not trans. values)
-	    "help"	: _("Set or unset broadcast search (use on/off values)"),
+	    "help"	: _("Set or unset broadcast search (use on or off values)"),
 	    "type"	: "string"
 	],
     ],
