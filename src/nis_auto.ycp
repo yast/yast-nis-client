@@ -51,19 +51,19 @@
 	while (i < size (Args()))
 	{
 	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);
-	    else if (Args (i) == .cms)			cms_mode=true;	   
+	    else if (Args (i) == .cms)			cms_mode=true;
 	    i = i + 1;
 	}
     }
 
     // The settings are in the first argument
-    
+
     y2milestone("Imported: (%1)", settings);
     Nis::Import ( settings );
-     
+
     define set_contents(map settings) ``{
 	Nis::Import ( settings );
-        term contents =
+	term contents =
 	    `VBox(
 		  `VSpacing(1),
 		  `RichText( `id(`summary), Nis::Summary()),
@@ -81,9 +81,9 @@
 
     // Create Summary and buttons for launching
     // in auto mode
-    
+
     if ( cms_mode) {
-	import "Wizard"; 
+	import "Wizard";
 	set_contents(settings);
 	any ret = nil;
 	repeat {
@@ -111,7 +111,7 @@
 
     }
 
-   
+
     Nis::_autofs_allowed = true;
 
     Wizard::CreateDialog ();
