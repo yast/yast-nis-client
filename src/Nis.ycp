@@ -24,8 +24,8 @@
     import "Runlevel";
     import "Report";
     import "Summary";
+    import "Require";
     include "network/dns.ycp";
-    include "require.ycp";
 
     /**
      * Should ypbind be started at boot?
@@ -270,12 +270,12 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 
     /**
      * Read only, set by ProbePackages.
-     * Use as an argument to require.ycp/DoInstallAndRemove
+     * Use as an argument to Require::DoInstallAndRemove
      */
     global list(string) install_packages = [];
     /**
      * Read only, set by ProbePackages.
-     * Use as an argument to require.ycp/DoInstallAndRemove
+     * Use as an argument to Require::DoInstallAndRemove
      */
     global list(string) remove_packages = [];
 
@@ -292,8 +292,8 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	if (_autofs_allowed && _start_autofs)
 	{
 	    string pkg = "autofs";
-	    if (! IsPackageInstalled (pkg) &&
-		! IsPackageInstalled ("autofs4"))
+	    if (! Require::IsPackageInstalled (pkg) &&
+		! Require::IsPackageInstalled ("autofs4"))
 	    {
 		install_packages = add (install_packages, pkg);
 		// Translators: popup message part, ends with a newline
@@ -588,8 +588,8 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	_autofs_allowed = true;
 	/*
 	_autofs_allowed =
-	    IsPackageInstalled ("autofs") ||
-	    IsPackageInstalled ("autofs4");
+	    Require::IsPackageInstalled ("autofs") ||
+	    Require::IsPackageInstalled ("autofs4");
 	*/
 	_start_autofs = _autofs_allowed && Runlevel::ServiceEnabled ("autofs");
 
