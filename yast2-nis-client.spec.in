@@ -1,8 +1,8 @@
 @HEADER-COMMENT@
-# neededforbuild gpp libgpp yast2-devel-packages yast2-network yast2-packager yast2-pam
+# neededforbuild gpp libgpp yast2-devel-packages yast2-network yast2-pam
 
 @HEADER@
-Requires:	yast2 yast2-network yast2-packager yast2-pam
+Requires:	yast2 yast2-network yast2-pam
 # .net.hostnames.rpc
 Requires:	yast2-core >= 2.8.0
 
