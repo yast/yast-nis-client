@@ -25,6 +25,7 @@
     import "Report";
     import "Summary";
     import "Require";
+    import "Progress";
     include "network/dns.ycp";
 
     /**
@@ -872,6 +873,26 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    return false;
 	}
 
+	// dialog label
+	Progress::New (_("Writing NIS Configuration..."), " ", 2, [
+	    // progress stage label
+	    _("Stop services"),
+	    // progress stage label
+	    _("Start services"),
+           ], [
+	    // progress step label
+	    _("Stopping services..."),
+	    // progress step label
+	    _("Starting services..."),
+	    // final progress step label
+	    _("Finished") ],
+	    "" );
+
+	// help text
+	Wizard::RestoreHelp(_("Writing NIS client settings"));
+
+	Progress::NextStage ();
+
 	if (dhcp_restart)
 	{
 	    // Restart the dhcp client, if it is running, to parse the changed
@@ -880,6 +901,8 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	}
 
 	Runlevel::RunInitScript ("ypbind", "stop");
+
+	Progress::NextStage ();
 
 	if (start)
 	{
@@ -937,6 +960,10 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		}
 	    }
 	}
+
+	// final stage
+	Progress::NextStage ();
+
 	return true;
     }
 
