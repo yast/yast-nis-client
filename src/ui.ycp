@@ -174,7 +174,7 @@ Change the DHCP server configuration to provide it.
 
 	list <string> selected_servers =
 	    // selection box label
-	    ChooseItems (sformat (_("&NIS Servers in domain %1"), domain),
+	    ChooseItems (sformat (_("&NIS Servers in Domain %1"), domain),
 			 found_servers[domain]:[]);
 	y2milestone ("selected_servers: %1", selected_servers);
 	if (selected_servers == nil)
@@ -1148,7 +1148,7 @@ automatically.</p>");
 	{
 	    if (Nis::start)
 		// popup text FIXME better...
-		Autologin::AskForDisabling(_("Now you have enabled NIS."));
+		Autologin::AskForDisabling(_("NIS is now enabled."));
 
 	    // Install packages if needed.
 	    // Cannot do it in Write, autoinstall does it differently.
