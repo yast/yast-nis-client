@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Apr 24 01:37:17 EDT 2002 - nashif@suse.de
+
+- Adapted to new autoinst interface
+
+-------------------------------------------------------------------
 Mon Apr 15 10:52:12 CEST 2002 - mvidner@suse.cz
 
 - Moved autoinst code from y2c_autoinst (nashif).
