@@ -76,7 +76,7 @@ sub write_file ()
 
     open (FILE, ">$filename.YaST2.new") or return y2error ("$filename: $!"), 0;
 
-    foreach (split $comment)
+    foreach (split /\n/, $comment)
     {
 	print FILE "#$_\n";
     }
@@ -193,8 +193,8 @@ while ( <STDIN> )
 	{
 	    # a hack to make testing simple
 	    $comment = $argument->{"comment"};
-	    @servers = @$argument->{"servers"};
-	    %domainservers = %$argument->{"domainservers"};
+	    @servers = @{$argument->{"servers"}};
+	    %domainservers = %{$argument->{"domainservers"}};
 	    $modified = 1;
 	}
 	else

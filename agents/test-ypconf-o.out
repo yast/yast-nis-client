@@ -1,0 +1,14 @@
+# This is a comment
+#Another comment
+#that continues
+# lots of servers
+# broadcast will override specific servers
+ypserver 192.168.0.1
+ypserver 192.168.0.2
+ypserver 192.168.0.3
+ypserver 192.168.0.4
+domain bad-domain broadcast
+domain mydomain broadcast
+domain other-domain.test server yp.other-domain.test
+domain other-domain.test server yp2.other-domain.test
+domain yourdomain server 10.0.0.1
