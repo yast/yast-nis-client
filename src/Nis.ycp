@@ -36,7 +36,7 @@
      * Required packages for this module to operate
      *
      */
-    global list required_packages = ["ypbind"];
+    global list<string> required_packages = ["ypbind"];
 
     /**
      * Should ypbind be started at boot?

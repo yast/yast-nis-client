@@ -34,23 +34,23 @@
      * A Wizard Sequencer helper
      * @return	`next
      */
-    global define symbol JustNext () ``{
+    define symbol JustNext () ``{
 	return `next;
     }
 
-    global /*const*/ string broadcast_help =
+    /*const*/ string broadcast_help =
 	// Translators: network broadcast address
 	_("<p>The <b>Broadcast</b> option enables searching
 in the local network to find a server after the specified servers
 fail to respond. It is a security risk.</p>
 ");
 
-    global /*const*/ string dhcp_help =
+    /*const*/ string dhcp_help =
 	// Translators: help text
 	// DHCP = Dynamic host configuration protocol
 	_("<p>If you are using <b>DHCP</b> and the server provides the NIS domain name or servers, you can enable their use here. DHCP itself can be set up in the network module.</p>");
 
-    global /*const*/ string expert_help =
+    /*const*/ string expert_help =
 	// Translators: short for Expert settings
 	_("<p><b>Expert</b> gives access to some
 less frequently used settings.</p>
@@ -61,7 +61,7 @@ less frequently used settings.</p>
      * @param touched data modified?
      * @return `abort if user really wants to abort, `back otherwise
      */
-    global define boolean ReallyAbort (boolean touched) ``{
+    define boolean ReallyAbort (boolean touched) ``{
 
 	return (!Mode::cont)
 	    ? Popup::ReallyAbort (touched)
@@ -71,7 +71,7 @@ less frequently used settings.</p>
     /**
      * Pop up a warning if dhcp does not provide nis configuration
      */
-    global define void WarnIfDhcpNotServed () ``{
+    define void WarnIfDhcpNotServed () ``{
 	if (!Nis::dhcp_possible)
 	{
 	    // Translators: warning popup
@@ -87,7 +87,7 @@ Change the DHCP server configuration to provide it.
      * @param items	a list of items
      * @return		items or nil on cancel
      */
-    global define list<string> ChooseItems (string title, list<string> items) ``{
+    define list<string> ChooseItems (string title, list<string> items) ``{
 	list<term> msb_items = maplist (string entry, items,
 					 ``( `item (`id (entry), entry)));
 	UI::OpenDialog (
@@ -145,14 +145,14 @@ Change the DHCP server configuration to provide it.
      * A cache of NIS servers found on the LAN for each domain.
      * @see SelectNisServers
      */
-    global map found_servers = $[]; // map <string, list <string> >
+    map found_servers = $[]; // map <string, list <string> >
 
     /**
      * Scan the network for NIS servers and let the user select among them.
      * @param domain which domain
      * @return space separated list of servers or ""
      */
-    global define string SelectNisServers (string domain) ``{
+    define string SelectNisServers (string domain) ``{
 	Wizard::SetScreenShotName ("nis-client-2a1-servers");
 	if (Mode::screen_shot)
 	{
@@ -190,7 +190,7 @@ Change the DHCP server configuration to provide it.
      * The simple dialog
      * @return	`back, `abort, `next, `multiple or `expert
      */
-    global define symbol NisDialog () ``{
+    define symbol NisDialog () ``{
 	Wizard::SetScreenShotName ("nis-client-2a-single");
 
 	// help text 1/3
@@ -368,7 +368,7 @@ by separating their addresses with spaces.</p>
      * The expert dialog
      * @return	`back, `abort or `next
      */
-    global define symbol ExpertDialog () ``{
+    define symbol ExpertDialog () ``{
 	Wizard::SetScreenShotName ("nis-client-2c-expert");
 
 	// help text 1/4
@@ -458,12 +458,12 @@ by separating their addresses with spaces.</p>
      * @param default_d the default domain
      * @return "Default: default_d"
      */
-    global define string DefaultCell (string default_d) ``{
+    define string DefaultCell (string default_d) ``{
 	// Translators: the default NIS domain
 	return sformat (_("Default: %1"), default_d);
     }
 
-    global string check_g = nil;
+    string check_g = nil;
     /**
      * Constructs items for the domain table
      * @param	default_d	the default domain
@@ -471,7 +471,7 @@ by separating their addresses with spaces.</p>
      * @return a list of items
      * @see Nis#multidomain_servers TODO
      */
-    global define list DomainTableItems (string default_d, map all_servers) ``{
+    define list DomainTableItems (string default_d, map all_servers) ``{
 	if (check_g == nil)
 	{
 	    check_g = UI::Glyph (`CheckMark);
@@ -493,7 +493,7 @@ by separating their addresses with spaces.</p>
      * @param	all_servers show these items
      * @param	d	the selected item
      */
-    global define void UpdateDomainTable (string default_d, map all_servers,
+    define void UpdateDomainTable (string default_d, map all_servers,
 					  string d) ``{
 	UI::ChangeWidget (`id (`domains), `Items,
 			  DomainTableItems (default_d, all_servers));
@@ -504,7 +504,7 @@ by separating their addresses with spaces.</p>
      * @param	m	a map
      * @return		keys of the map
      */
-    global define list mapkeys (map m) ``{
+    define list mapkeys (map m) ``{
 	return maplist (any k, any v, m, ``( k ));
     }
 
@@ -522,12 +522,12 @@ by separating their addresses with spaces.</p>
      * @param	existing	existing domains
      * @return [name, [ [server1, server2], broadcast? ]]
      */
-    global define list DomainPopup (string init, string default_d,
+    define list DomainPopup (string init, string default_d,
 				    list server_sp, list<string> existing) ``{
 	Wizard::SetScreenShotName ("nis-client-2b1-domain");
 
 	string domain = (init == nil)? "": ((init == "") ? default_d: init);
-	list servers = server_sp[0]:[];
+	list<string> servers = server_sp[0]:[];
 	string servers_s = mergestring (servers, "\n");
 	boolean broadcast = server_sp[1]:false;
 
@@ -652,7 +652,7 @@ by separating their addresses with spaces.</p>
      * The servers dialog
      * @return	`back, `abort or `next
      */
-    global define symbol MultipleDialog () ``{
+    define symbol MultipleDialog () ``{
 	Wizard::SetScreenShotName ("nis-client-2b-multiple");
 
 	boolean dhcp_wanted = Nis::dhcp_wanted;
@@ -676,7 +676,7 @@ by separating their addresses with spaces.</p>
 	{
 	    // help text
 	    // only shown if a deprecated advanced option (%1) is used.
-	    help_text = help_text + sformat (_("<p>The global broadcast option (%1) was made obsolete
+	    help_text = help_text + sformat (_("<p>The broadcast option (%1) was made obsolete
 by the <tt>broadcast</tt> keyword in <tt>/etc/yp.conf</tt>.
 This check box only appears if it is turned on.</p>
 "),
@@ -834,10 +834,10 @@ This check box only appears if it is turned on.</p>
 	    // switch
 	    if (result == `add_d)
 	    {
-		list name_servers = DomainPopup (nil, default_d, [[], false], mapkeys (all_servers));
+		list name_servers = DomainPopup (nil, default_d, [[], false], (list<string>)mapkeys (all_servers));
 		if (name_servers != nil)
 		{
-		    string d = name_servers[0]:nil;
+		    string d = (string) name_servers[0]:nil;
 		    list s_sp = name_servers[1]:[];
 		    all_servers = add (all_servers, d, s_sp);
 		    // show these items, d selected
@@ -853,10 +853,10 @@ This check box only appears if it is turned on.</p>
 		    // editing the default domain is a special case
 		    list name_servers = DomainPopup (d0, default_d,
 						     all_servers[d0]:[],
-						     mapkeys (all_servers));
+						     (list<string>) mapkeys (all_servers));
 		    if (name_servers != nil)
 		    {
-			string d = name_servers[0]:nil;
+			string d = (string) name_servers[0]:nil;
 			list s_sp = name_servers[1]:[];
 			string newkey = (d0=="")? "": d;
 			all_servers = mapmap (string k, list v, all_servers,``(
@@ -962,7 +962,7 @@ the default domain will be lost.")))
 	    map only_servers = mapmap (string d, list v, all_servers, ``(
 					   $[d: v[0]:[]]
 					   ));
-	    list servers = only_servers[""]:[];
+	    list<string> servers = only_servers[""]:[];
 	    boolean default_broadcast = nil;
 	    map multidomain_servers = nil;
 	    map multidomain_broadcast = nil;
@@ -1003,7 +1003,7 @@ the default domain will be lost.")))
      * Selects NIS: off/on, Automount off/on
      * @return	`back, `abort, `next, `finish
      */
-    global define symbol SwitchDialog () ``{
+    define symbol SwitchDialog () ``{
 	Wizard::SetScreenShotName ("nis-client-1-start");
 
 	// help text 1/3
@@ -1122,7 +1122,7 @@ automatically.</p>");
      * Decide whether a complex dialog for multiple domains will be displayed
      * @return `yes or `no
      */
-    global define symbol IsMultiple () ``{
+    define symbol IsMultiple () ``{
 	return size (Nis::multidomain_servers) > 0 ? `yes: `no;
     }
 
@@ -1132,7 +1132,7 @@ automatically.</p>");
      * #23050 don't display the dialog
      * @return `back or `next
      */
-    global define symbol SaveDialog () ``{
+    define symbol SaveDialog () ``{
 	Wizard::SetScreenShotName ("nis-client-3-save");
 	// continue-cancel popup
 	string message1 = _("The configuration of the NIS client will be saved.\n");
@@ -1144,7 +1144,7 @@ automatically.</p>");
 	return ret ? `next : `back;
     }
 
-    global map Dialogs = $[
+    map Dialogs = $[
 	"switch":	``(SwitchDialog ()),
 	"ismultiple":	[ ``(IsMultiple ()), true ],
 	"single":	``(NisDialog ()),
@@ -1154,7 +1154,7 @@ automatically.</p>");
 	"common-next":	[ ``( JustNext () ), true ],
 	];
 
-    global map Sequence = $[
+    map Sequence = $[
 	"ws_start"  : "switch",
 	"switch"    : $[
 	    `next   : "ismultiple",
@@ -1196,13 +1196,13 @@ automatically.</p>");
      * Let's try rewriting it so that it fits into the simple dialog.
      * It is done only after read.
      */
-    global define void FitIntoSingle () ``{
+    define void FitIntoSingle () ``{
 	if (Nis::dhcp_wanted && Nis::dhcp_possible)
 	{
 	    string d = Nis::GetDomain ();
 	    if (size (Nis::multidomain_servers) == 1)
 	    {
-		list s = Nis::multidomain_servers[d]:[];
+		list<string> s = Nis::multidomain_servers[d]:[];
 		// if there's only one entry, for the correct domain
 		if (size (s) > 0)
 		{
@@ -1220,7 +1220,7 @@ automatically.</p>");
      * The normal workflow
      * @return `back, `abort or `next
      */
-    global define symbol NormalSequence() ``{
+    define symbol NormalSequence() ``{
 	map normal_override = $[
 	    "common-next": $[
 		`next: "end",
@@ -1277,7 +1277,7 @@ You must reboot for the changes to take effect."));
      * The autoinstallation workflow
      * @return `back, `abort or `next
      */
-    global define symbol AutoSequence() ``{
+    define symbol AutoSequence() ``{
 	Wizard::CreateDialog ();
 	symbol ret = WizardSequencer (Dialogs, Sequence);
 	UI::CloseDialog ();
