@@ -23,7 +23,9 @@
 
     import "Runlevel";
     import "Report";
+    import "Summary";
 
+    
     /**
      * Should ypbind be started at boot?
      * If not, other settings are not touched.
@@ -178,6 +180,28 @@
 	return (Write(true));
     }
 
+
+    /**
+     * returns html formated configuration summary
+     * @return string
+     */
+
+    global define string Summary() ``{
+	string summary = "";
+	summary = Summary::AddHeader(summary, _("NIS Client enabled"));
+	summary = Summary::AddLine(summary, (start) ? "Yes" : Summary::NotConfigured());
+	summary = Summary::AddHeader(summary, _("NIS Domain"));
+	summary = Summary::AddLine(summary, (domain != "") ? domain : Summary::NotConfigured());
+	summary = Summary::AddHeader(summary, _("NIS Server"));
+	summary = Summary::AddLine(summary,(servers !=[]) ? mergestring(servers,"<br>") : Summary::NotConfigured());
+	summary = Summary::AddHeader(summary, _("Auto-mounter enabled"));
+	summary = Summary::AddLine(summary, (_start_autofs) ? "Yes" : Summary::NotConfigured());
+
+	return summary;
+
+    }
+
+    
     /**
      * Saves NIS configuration.
      * @param writeonly	 true for autoinstal - don't start the service yet
