@@ -107,12 +107,10 @@ define boolean NisChangeConfiguration (map options ) {
 define boolean NisEnableHandler (map options ) {
 
     boolean ret = NisChangeConfiguration (options);
-    if (!Nis::start)
-    {
-	Nis::start = true;
-	ret = true;
-    }
-    return ret;
+    Nis::start = true;
+    if (Nis::GetDomain () == "" || Nis::GetServers () == "")
+	Nis::dhcp_wanted	= true;
+    return true;
 }
 
 /**

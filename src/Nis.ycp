@@ -691,17 +691,27 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
      * @return success?
      */
     define boolean WritePlusesTo (string file, string what) ``{
+	boolean ok = true;
 	if (!HasPlus (file))
 	{
-	    // not there, add it
-	    // TODO: backup?
+	    // backup the file:
+	    SCR::Execute (.target.bash,sformat("/bin/cp %1 %1.YaST2save",file));
 	    if (SCR::Execute (.target.bash, sformat ("/bin/echo '%1' >> %2", what, file)) != 0)
 	    {
-		Report::Error (Message::ErrorWritingFile (file));
-		return false;
+		ok = false;
 	    }
 	}
-	return true;
+	// TODO only for passwd?
+	// replace the 'nologin' occurence (#40571)
+	else if (SCR::Execute (.target.bash, sformat ("/bin/grep -q '^%1/sbin/nologin' %2", what, file)) == 0)
+	{
+            ok = SCR::Execute (.target.bash, sformat ("/usr/bin/sed -i.YaST2save -e 's@%1/sbin/nologin@%1@' %2", what, file)) == 0;
+	}
+	if (!ok)
+	{
+	    Report::Error (Message::ErrorWritingFile (file));
+	}
+	return ok;
     }
 
     /**
@@ -731,8 +741,8 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    "group":	"+:::",
 	    "shadow":	"+",
 	    ];
-	foreach (string f, files, ``{
-		y2milestone("Writing pluses to %1", f );
+	foreach (string f, files, {
+	    y2milestone("Writing pluses to %1", f);
 	    if (! WritePlusesTo (sformat ("/etc/%1", f), what_to_write[f]:""))
 	    {
 		return false;
@@ -781,7 +791,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	else // not start
 	{
 
-		y2milestone("not writing pluses");
+	y2milestone("not writing pluses");
 	    boolean have_plus = HavePlus ();
 
 	    if (!have_plus)

@@ -1,4 +1,18 @@
 -------------------------------------------------------------------
+Mon Aug 23 12:58:51 CEST 2004 - jsuchome@suse.cz
+
+- cmdline: always save status on 'enable' command,
+    enable DHCP-configured NIS client when static data weren't provided 
+- clear nologin from passwd (#40571)
+- 2.10.3
+
+-------------------------------------------------------------------
+Thu Aug 19 09:40:33 CEST 2004 - jsuchome@suse.cz
+
+- cmdline: use standardized enum type for "automounter" and
+  "broadcast" options
+
+-------------------------------------------------------------------
 Mon Aug 16 15:31:41 CEST 2004 - jsuchome@suse.cz
 
 - 2.10.2
