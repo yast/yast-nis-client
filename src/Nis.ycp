@@ -46,7 +46,7 @@
     /**
      * IP addresses of NIS servers.
      */
-    global list(string) servers = [];
+    global list<string> servers = [];
 
     /**
      * @return Access the servers as a string
@@ -282,12 +282,12 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
      * Read only, set by ProbePackages.
      * Use as an argument to Require::DoInstallAndRemove
      */
-    global list(string) install_packages = [];
+    global list<string> install_packages = [];
     /**
      * Read only, set by ProbePackages.
      * Use as an argument to Require::DoInstallAndRemove
      */
-    global list(string) remove_packages = [];
+    global list<string> remove_packages = [];
 
     /**
      * Detect which packages have to be installed
@@ -337,7 +337,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	list other_domains = settings["nis_other_domains"]:[];
 	foreach (map other_domain, other_domains, ``{
 	    string d = other_domain["nis_domain"]:"";
-	    list(string) s = other_domain["nis_servers"]:[];
+	    list<string> s = other_domain["nis_servers"]:[];
 	    boolean b = other_domain["nis_broadcast"]:false;
 	    multidomain_servers = add (multidomain_servers, d, s);
 	    multidomain_broadcast = add (multidomain_broadcast, d, b);
@@ -436,6 +436,41 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    ];
     }
 
+    // copied from Mail.ycp
+    // replace with a custom list
+    /**
+     * Summarizes a list of data
+     * @param title passed to Summary::AddHeader
+     * @param value a list (of scalars, lists or maps)
+     * @return Summary-formatted description
+     */
+    define string ListItem(string title, any value) ``{
+	string summary = "";
+	summary = Summary::AddHeader(summary, title);
+	//enhancement BEGIN
+	if (is (value, map))
+	{
+	    value = maplist (any k, any v, (map) value, ``(k));
+	}
+	//enhancement END
+	if (is(value,list) && size((list) value)>0) {
+	    summary = Summary::OpenList(summary);
+	    foreach (any d, (list) value, ``{
+		string entry = "";
+		if (is(d,map) || is (d,list))
+		    entry = sformat("%1 Entries configured", is(d, map) ? size((map) value) : size((list) value));
+		else
+		    entry = (string) d;
+
+		summary = Summary::AddListItem(summary, entry);
+	    });
+	    summary = Summary::CloseList(summary);
+	} else {
+	    summary = Summary::AddLine(summary,Summary::NotConfigured ());
+	}
+	return summary;
+    }
+
     /**
      * @return Html formatted configuration summary
      */
@@ -526,48 +561,13 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	return summary;
     }
 
-    // copied from Mail.ycp
-    // replace with a custom list
-    /**
-     * Summarizes a list of data
-     * @param title passed to Summary::AddHeader
-     * @param value a list (of scalars, lists or maps)
-     * @return Summary-formatted description
-     */
-    define string ListItem(string title, any value) ``{
-	string summary = "";
-	summary = Summary::AddHeader(summary, title);
-	//enhancement BEGIN
-	if (is (value, map))
-	{
-	    value = maplist (any k, any v, value, ``(k));
-	}
-	//enhancement END
-	if (is(value,list) && size(value)>0) {
-	    summary = Summary::OpenList(summary);
-	    foreach (`d, value, ``{
-		string entry = "";
-		if (is(d,map) || is (d,list))
-		    entry = sformat("%1 Entries configured", size(value));
-		else
-		    entry = d;
-
-		summary = Summary::AddListItem(summary, entry);
-	    });
-	    summary = Summary::CloseList(summary);
-	} else {
-	    summary = Summary::AddLine(summary,Summary::NotConfigured ());
-	}
-	return summary;
-    }
-
     /**
      * Reads a database entry from nsswitch_conf and returns it as a list
      * @param db eg. "passwd"
      * @return   eg. ["files", "nis"]
      */
-    define list(string) ReadNssDb (string db) ``{
-	string db_s = SCR::Read (add (.etc.nsswitch_conf, db));
+    define list<string> ReadNssDb (string db) ``{
+	string db_s = (string) SCR::Read (add (.etc.nsswitch_conf, db));
 	if (db_s == nil)
 	{
 	    db_s = "";
@@ -581,7 +581,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
      * @param entries eg. ["files", "nis"]
      * @return success?
      */
-    define boolean WriteNssDb (string db, list(string) entries) ``{
+    define boolean WriteNssDb (string db, list<string> entries) ``{
 	// if there are no entries, delete the key using nil
 	string entry = mergestring (entries, " ");
 	return SCR::Write (add (.etc.nsswitch_conf, db),
@@ -595,12 +595,12 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
     global define boolean Read () ``{
 	start = Runlevel::ServiceEnabled ("ypbind");
 
-	servers = SCR::Read (.etc.yp_conf.servers);
-	default_broadcast = SCR::Read (.etc.yp_conf.defaultbroadcast);
-	multidomain_servers = SCR::Read (.etc.yp_conf.domainservers);
-	multidomain_broadcast = SCR::Read (.etc.yp_conf.broadcast);
+	servers = (list<string>) SCR::Read (.etc.yp_conf.servers);
+	default_broadcast = (boolean) SCR::Read (.etc.yp_conf.defaultbroadcast);
+	multidomain_servers = (map) SCR::Read (.etc.yp_conf.domainservers);
+	multidomain_broadcast = (map) SCR::Read (.etc.yp_conf.broadcast);
 
-	map out = SCR::Execute (.target.bash_output, "/bin/ypdomainname");
+	map out = (map) SCR::Execute (.target.bash_output, "/bin/ypdomainname");
 	domain = deletechars (out["stdout"]:"", "\n");
 	old_domain = domain;
 
@@ -629,7 +629,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	local_only = SCR::Read (.sysconfig.ypbind.YPBIND_LOCAL_ONLY) == "yes";
 	global_broadcast = SCR::Read (.sysconfig.ypbind.YPBIND_BROADCAST) == "yes";
 	broken_server = SCR::Read (.sysconfig.ypbind.YPBIND_BROKEN_SERVER) == "yes";
-	options = SCR::Read (.sysconfig.ypbind.YPBIND_OPTIONS);
+	options = (string) SCR::Read (.sysconfig.ypbind.YPBIND_OPTIONS);
 
 	// install on demand
 	_autofs_allowed = true;
@@ -678,12 +678,80 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
     }
 
     /**
+     * @param file a pathname
+     * @return is there a nis inclusion?
+     */
+    define boolean HasPlus (string file) ``{
+	// does the file have a plus?
+	y2milestone("file %1 has pluses", file);
+	return (0 == SCR::Execute (.target.bash, "/usr/bin/grep -q '^[+-]' " + file));
+    }
+
+    /**
+     * If a file does not contain a NIS entry, add it.
+     * @param	file	pathname
+     * @param	what	a "+" line without a '\n'
+     * @return success?
+     */
+    define boolean WritePlusesTo (string file, string what) ``{
+	if (!HasPlus (file))
+	{
+	    // not there, add it
+	    // TODO: backup?
+	    if (SCR::Execute (.target.bash, sformat ("/bin/echo '%1' >> %2", what, file)) != 0)
+	    {
+		// error popup
+		Report::Error (sformat (_("Error writing file %1."), file));
+		return false;
+	    }
+	}
+	return true;
+    }
+
+    /**
+     * Do we need compat? Is there a plus in any of the user databases?
+     * @return true/false
+     */
+    define boolean HavePlus () ``{
+	list<string> files = [
+	    "/etc/passwd",
+	    "/etc/shadow",
+	    "/etc/group",
+	    ];
+	// find a file having a plus
+	return nil != find (string file, files, ``( HasPlus (file) ));
+    }
+
+    /**
+     * Add "+" lines to system files so that NIS entries get merged in.
+     * (Formerly this was done in SuSEconfig.ypclient)
+     * @return success?
+     */
+    define boolean WritePluses () ``{
+	list<string> files = ["passwd", "shadow", "group"];
+	//don't forget a newline
+	map what_to_write = $[
+	    "passwd":	"+::::::",
+	    "group":	"+:::",
+	    "shadow":	"+",
+	    ];
+	foreach (string f, files, ``{
+		y2milestone("Writing pluses to %1", f );
+	    if (! WritePlusesTo (sformat ("/etc/%1", f), what_to_write[f]:""))
+	    {
+		return false;
+	    }
+	});
+	return true;
+    }
+
+    /**
      * Configures the name service switch for the user databases
      * according to chosen settings
      * @return success?
      */
     global define boolean WriteNssUsers () ``{
-	list(string) dbs = ["passwd", "group", "shadow"];
+	list<string> dbs = ["passwd", "group", "shadow"];
 	// Why bother with both compat and nis?
 	// If there's no plus, we don't have to write passwd etc.
 	// And it's supposed to be faster.
@@ -695,7 +763,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		foreach (string db, dbs, ``{
 		    // what if a db is not mentioned?
 		    // We get [] meaning compat, so it's ok to make it explicit
-		    list(string) db_l = ReadNssDb (db);
+		    list<string> db_l = ReadNssDb (db);
 
 		    if (!contains (db_l, "compat"))
 		    {
@@ -728,7 +796,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    else
 	    {
 		foreach (string db, dbs, ``{
-		    list(string) db_l = ReadNssDb (db);
+		    list<string> db_l = ReadNssDb (db);
 
 		    // remove "nis" if there;
 		    db_l = filter (string s, db_l, ``(s != "nis"));
@@ -762,7 +830,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 
 	// nsswitch automount:
 	// bracket options not allowed, order does not matter
-	list(string) automount_l = ReadNssDb ("automount");
+	list<string> automount_l = ReadNssDb ("automount");
 	boolean enabled = contains (automount_l, "nis");
 	// enable it if it is not enabled yet and both services run
 	if (start && _start_autofs && !enabled)
@@ -935,7 +1003,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    }
 	    sleep(1000);	// workaround for bug #10428, ypbind restart
 
-	    map out = SCR::Execute (.target.bash_output, "/etc/init.d/ypbind start", $["TERM": "raw"]);
+	    map out = (map) SCR::Execute (.target.bash_output, "/etc/init.d/ypbind start", $["TERM": "raw"]);
 	    if (out["exit"]:1 == 0)
 	    {
 		YpbindErrors = "";
@@ -986,73 +1054,6 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	return true;
     }
 
-    /**
-     * @param file a pathname
-     * @return is there a nis inclusion?
-     */
-    define boolean HasPlus (string file) ``{
-	// does the file have a plus?
-	y2milestone("file %1 has pluses", file);
-	return (0 == SCR::Execute (.target.bash, "/usr/bin/grep -q '^[+-]' " + file));
-    }
-
-    /**
-     * Do we need compat? Is there a plus in any of the user databases?
-     * @return true/false
-     */
-    define boolean HavePlus () ``{
-	list(string) files = [
-	    "/etc/passwd",
-	    "/etc/shadow",
-	    "/etc/group",
-	    ];
-	// find a file having a plus
-	return nil != find (string file, files, ``( HasPlus (file) ));
-    }
-
-    /**
-     * Add "+" lines to system files so that NIS entries get merged in.
-     * (Formerly this was done in SuSEconfig.ypclient)
-     * @return success?
-     */
-    define boolean WritePluses () ``{
-	list(string) files = ["passwd", "shadow", "group"];
-	//don't forget a newline
-	map what_to_write = $[
-	    "passwd":	"+::::::",
-	    "group":	"+:::",
-	    "shadow":	"+",
-	    ];
-	foreach (string f, files, ``{
-		y2milestone("Writing pluses to %1", f );
-	    if (! WritePlusesTo (sformat ("/etc/%1", f), what_to_write[f]:""))
-	    {
-		return false;
-	    }
-	});
-	return true;
-    }
-
-    /**
-     * If a file does not contain a NIS entry, add it.
-     * @param	file	pathname
-     * @param	what	a "+" line without a '\n'
-     * @return success?
-     */
-    define boolean WritePlusesTo (string file, string what) ``{
-	if (!HasPlus (file))
-	{
-	    // not there, add it
-	    // TODO: backup?
-	    if (SCR::Execute (.target.bash, sformat ("/bin/echo '%1' >> %2", what, file)) != 0)
-	    {
-		// error popup
-		Report::Error (sformat (_("Error writing file %1."), file));
-		return false;
-	    }
-	}
-	return true;
-    }
     /**
      * Return needed packages and packages to be removed
      * during autoinstallation.
