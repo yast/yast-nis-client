@@ -26,6 +26,8 @@
     import "Summary";
     import "Require";
     import "Progress";
+    import "Wizard";
+
     include "network/dns.ycp";
 
     /**
