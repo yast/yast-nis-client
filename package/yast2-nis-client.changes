@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jan 31 08:56:39 CET 2005 - jsuchome@suse.cz
+
+- fixed build (failing testsuite on SuSEFirewall initialization)
+- 2.11.5
+
+-------------------------------------------------------------------
 Mon Jan 24 10:25:46 CET 2005 - jsuchome@suse.cz
 
 - fixed testusite (new Autologin.ycp)
