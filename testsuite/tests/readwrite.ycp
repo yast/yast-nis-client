@@ -93,6 +93,7 @@
 		"stdout": "mydomain\n",
 		"stderr": "",
 		],
+	    "remove": true, // /etc/yp.conf.sv
 	    ],
 	];
 

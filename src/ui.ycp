@@ -148,10 +148,10 @@ client was saved."));
     /**
      * Dhcpcd writes yp.conf in the multidomain form.
      * Let's try rewriting it so that it fits into the simple dialog.
-     * It is read-only now anyway.
+     * It is done only after read.
      */
     global define void FitIntoSingle () ``{
-	if (Nis::ServersByDhcpActual () && Nis::DomainByDhcpActual ())
+	if (Nis::dhcp_wanted && Nis::dhcp_possible)
 	{
 	    string d = Nis::GetDomain ();
 	    if (size (Nis::multidomain_servers) == 1)
@@ -189,14 +189,9 @@ fail to respond. It is a security risk.</p>
 ");
 
     global /*const*/ string dhcp_help =
-	// Translators: optional help text
+	// Translators: help text
 	// DHCP = Dynamic host configuration protocol
-	_("<p>The domain or servers are currently provided
-by <b>DHCP</b> and cannot be changed.
-This can be turned off in the Expert dialog
-but it will take effect only after restarting the module.</p>
-");
-
+	_("<p>If you are using <b>DHCP</b> and the server provides the NIS domain name or servers, you can enable their use here. DHCP itself can be set up in the network module.</p>");
 
     global /*const*/ string expert_help =
 	// Translators: short for Expert settings
@@ -206,7 +201,7 @@ less frequently used settings.</p>
 
     /**
      * The switch dialog.
-     * Selects NIS: off/on/on with dhcp, Automount off/on
+     * Selects NIS: off/on, Automount off/on
      * @return	`back, `abort, `next, `finish
      */
     global define symbol SwitchDialog () ``{
@@ -284,9 +279,11 @@ automatically.</p>");
 	    BackButtonLabel (),
 	    (yp_client || Mode::cont)? NextButtonLabel (): FinishButtonLabel ());
 
-    // during installation, only enabling makes sence (#23831)
-    if (Mode::cont)
-        UI::ChangeWidget (`id(`nisno), `Enabled, false);
+	// during installation, only enabling makes sence (#23831)
+	if (Mode::cont)
+	{
+	    UI::ChangeWidget (`id(`nisno), `Enabled, false);
+	}
 
 	any result = nil;
 	repeat
@@ -329,6 +326,18 @@ automatically.</p>");
     }
 
     /**
+     * Pop up a warning if dhcp does not provide nis configuration
+     */
+    global define void WarnIfDhcpNotServed () ``{
+	if (!Nis::dhcp_possible)
+	{
+	    // Translators: warning popup
+	    UI::WarningPopup (_("NIS configuration isn't currently provided by DHCP.
+Change the DHCP server configuration to provide it."));
+	}
+    }
+
+    /**
      * The simple dialog
      * @return	`back, `abort, `next, `multiple or `expert
      */
@@ -343,22 +352,18 @@ automatically.</p>");
 	help_text = help_text + _("<p>Specify multiple servers
 by separating their addresses with spaces.</p>
 ");
-	// help text 3/3
+
 	help_text = help_text + broadcast_help;
 
-	if (Nis::DomainByDhcpActual () || Nis::ServersByDhcpActual ())
-	{
-	    help_text = help_text + dhcp_help;
-	}
+	help_text = help_text + dhcp_help;
 
-	// help text 3/3
 	help_text = help_text + expert_help;
 
 	// help text 2/3
 	help_text = help_text + _("<p>If you need to access
 <b>Multiple domains</b>, use the button to switch to a detailed dialog.</p>");
 
-
+	boolean dhcp_wanted = Nis::dhcp_wanted;
 	string yp_domain  = Nis::GetDomain ();
 	string yp_address = Nis::GetServers ();
 
@@ -371,6 +376,18 @@ by separating their addresses with spaces.</p>
 	    // frame label
 	    `Frame (_("NIS client"),
 		    `VBox (`VSpacing (0.2),
+
+
+			   `RadioButtonGroup (
+			       `id (`dhcpg),
+			       `VBox (
+				   // radio button label
+				   `Left (`RadioButton (`id (`dhcpyes), `opt (`notify), _("&Automatic setup (via DHCP)"), dhcp_wanted)),
+				   // radio button label
+				   `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static setup"), !dhcp_wanted))
+				   )),
+
+
 			   // text entry label
 			   `TextEntry (`id (`ypd), _("NIS &domain"), yp_domain),
 			   `VSpacing (0.2),
@@ -399,36 +416,32 @@ by separating their addresses with spaces.</p>
 	    _("Configuration of NIS client"), con, help_text,
 	    BackButtonLabel (), Mode::cont? NextButtonLabel():FinishButtonLabel ());
 
-	if (Nis::DomainByDhcpActual ())
-	{
-	    UI::ChangeWidget (`id (`ypd), `Enabled, false);
-	}
-	if (Nis::ServersByDhcpActual ())
-	{
-	    UI::ChangeWidget (`id (`ypa), `Enabled, false);
-	    UI::ChangeWidget (`id (`broadcast), `Enabled, false);
-	    UI::ChangeWidget (`id (`multiple), `Enabled, false);
-	}
-
 	any result = nil;
 	repeat
 	{
+	    dhcp_wanted = UI::QueryWidget (`id (`dhcpg), `CurrentButton) == `dhcpyes;
+	    UI::ChangeWidget (`id (`ypd), `Enabled, !dhcp_wanted);
+	    UI::ChangeWidget (`id (`ypa), `Enabled, !dhcp_wanted);
+	    UI::ChangeWidget (`id (`broadcast), `Enabled, !dhcp_wanted);
+	    UI::ChangeWidget (`id (`multiple), `Enabled, !dhcp_wanted);
+
 	    result = UI::UserInput ();
 	    if (result == `cancel)
 	    {
 		result = `abort;
 	    }
 
-	    if (contains ([`next, `expert, `multiple], result))
+	    if (result == `dhcpyes)
+	    {
+		WarnIfDhcpNotServed ();
+	    }
+	    else if (contains ([`next, `expert, `multiple], result))
 	    {
 		yp_domain =  UI::QueryWidget (`id (`ypd), `Value);
 		yp_address = UI::QueryWidget (`id (`ypa), `Value);
 		default_broadcast = UI::QueryWidget (`id (`broadcast), `Value);
 
-		// Don't check when going to the expert dialog
-		// because they may want to leave the inputs empty here
-		// and turn on DHCP there.
-		if (!Nis::DomainByDhcpActual () && result != `expert &&
+		if (!dhcp_wanted &&
 		    !Nis::check_nisdomainname (yp_domain))
 		{
 		    UI::SetFocus (`id (`ypd));
@@ -439,7 +452,7 @@ by separating their addresses with spaces.</p>
 
 		list temp_ad = filter (string a, splitstring (yp_address, " "),
 				       ``(a != ""));
-		if (!Nis::ServersByDhcpActual () && result != `expert &&
+		if (!dhcp_wanted &&
 		    (size (temp_ad) == 0 ||
 		     find (string a, temp_ad,
 			   ``(!Nis::check_address_nis (a))) != nil))
@@ -457,6 +470,11 @@ by separating their addresses with spaces.</p>
 
 	if (contains ([`next, `expert, `multiple], result))
 	{
+	    Nis::dhcp_restart = Nis::dhcp_restart ||
+		(Nis::dhcp_wanted != dhcp_wanted);
+	    Nis::Touch (Nis::dhcp_restart);
+	    Nis::dhcp_wanted = dhcp_wanted;
+
 	    Nis::SetDomain (yp_domain);
 	    Nis::SetServers (yp_address);
 	    Nis::Touch (Nis::default_broadcast != default_broadcast);
@@ -487,14 +505,9 @@ by separating their addresses with spaces.</p>
 	// help text 3/4
 	help_text = help_text + _("<p>See <b>man ypbind</b> for details on other options.</p>");
 
-	// help text 4/4
-	help_text = help_text + _("<p>If you are using <b>DHCP</b> and the server provides the NIS domain name or servers, you can enable their use here. DHCP itself can be set up in the network module.</p>");
-
 	boolean local_only = Nis::local_only;
 	boolean broken_server = Nis::broken_server;
 	string options = Nis::options;
-	boolean domain_dhcp = Nis::domain_by_dhcp_wanted;
-	boolean servers_dhcp = Nis::servers_by_dhcp_wanted;
 
 	term contents =
 	    `HSquash (`VBox (
@@ -514,20 +527,7 @@ by separating their addresses with spaces.</p>
 			`VSpacing (0.2)
 			)
 		    ),
-		`VSpacing (1),
-		`Frame (
-		    // frame label
-		    _("DHCP Settings"),
-		    `VBox (
-			`VSpacing (0.2),
-			// check box label
-			`Left (`CheckBox (`id (`domain_dhcp), _("Get the &Domain by DHCP"), domain_dhcp)),
-			// check box label
-			`Left (`CheckBox (`id (`servers_dhcp), _("Get the &Servers by DHCP"), servers_dhcp)),
-
-			`VSpacing (0.2)
-			)
-		    )
+		`Empty ()
 		));
 
 	Wizard::SetContentsButtons (
@@ -550,8 +550,6 @@ by separating their addresses with spaces.</p>
 		broken_server = UI::QueryWidget (`id (`broken_server), `Value);
 		// TODO: disallow " in options
 		options = UI::QueryWidget (`id (`options), `Value);
-		domain_dhcp = UI::QueryWidget (`id (`domain_dhcp), `Value);
-		servers_dhcp = UI::QueryWidget (`id (`servers_dhcp), `Value);
 
 		if (false && some_error)
 		{
@@ -572,14 +570,6 @@ by separating their addresses with spaces.</p>
 	    Nis::broken_server = broken_server;
 	    Nis::Touch (Nis::options != options);
 	    Nis::options = options;
-
-	    Nis::dhcp_restart = Nis::dhcp_restart ||
-		(Nis::domain_by_dhcp_wanted != domain_dhcp);
-	    Nis::dhcp_restart = Nis::dhcp_restart ||
-		(Nis::servers_by_dhcp_wanted != servers_dhcp);
-	    Nis::Touch (Nis::dhcp_restart);
-	    Nis::domain_by_dhcp_wanted = domain_dhcp;
-	    Nis::servers_by_dhcp_wanted = servers_dhcp;
 	}
 
 	Wizard::RestoreScreenShotName ();
@@ -593,6 +583,7 @@ by separating their addresses with spaces.</p>
     global define symbol MultipleDialog () ``{
 	Wizard::SetScreenShotName ("nis-client-2b-multiple");
 
+	boolean dhcp_wanted = Nis::dhcp_wanted;
 	// variable naming: _d means _domain, _s means _server
 	string default_d = Nis::GetDomain ();
 	boolean global_broadcast = Nis::global_broadcast;
@@ -620,12 +611,8 @@ This check box only appears if it is turned on.</p>
 					     "<tt>ypbind -broadcast</tt>");
 	}
 
-	if (Nis::DomainByDhcpActual () || Nis::ServersByDhcpActual ())
-	{
-	    help_text = help_text + dhcp_help;
-	}
+	help_text = help_text + dhcp_help;
 
-	// help text
 	help_text = help_text + expert_help;
 
 	// help text
@@ -677,6 +664,18 @@ This check box only appears if it is turned on.</p>
 
 	term nis_vbox =
 	    `VBox (`VSpacing (0.2),
+
+
+			   `RadioButtonGroup (
+			       `id (`dhcpg),
+			       `VBox (
+				   // radio button label
+				   `Left (`RadioButton (`id (`dhcpyes), `opt (`notify), _("&Automatic setup (via DHCP)"), dhcp_wanted)),
+				   // radio button label
+				   `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static setup"), !dhcp_wanted))
+				   )),
+
+
 		   `TextEntry (`id (`domain), `opt (`notify),
 		   // text entry label
 			       _("Default NIS do&main"), default_d),
@@ -711,15 +710,6 @@ This check box only appears if it is turned on.</p>
 	    BackButtonLabel (), Mode::cont? NextButtonLabel():FinishButtonLabel ());
 
 	//UI::ChangeWidget (`id (`domains), `CurrentItem, current_d);
-	if (Nis::DomainByDhcpActual ())
-	{
-	    UI::ChangeWidget (`id (`domain), `Enabled, false);
-	}
-	if (Nis::ServersByDhcpActual ())
-	{
-	    UI::ChangeWidget (`id (`multiple), `Enabled, false);
-	    UI::ChangeWidget (`id (`single), `Enabled, false);
-	}
 
 	any result = nil;
 	// preselect an item
@@ -728,6 +718,7 @@ This check box only appears if it is turned on.</p>
 
 	while (true)
 	{
+	    dhcp_wanted = UI::QueryWidget (`id (`dhcpg), `CurrentButton) == `dhcpyes;
 	    current_d = UI::QueryWidget (`id (`domains), `CurrentItem);
 	    boolean any_d = current_d != nil;
 
@@ -737,7 +728,9 @@ This check box only appears if it is turned on.</p>
 	    UI::ChangeWidget (`id (`del_d), `Enabled, any_d
 			      /*&& current_d !=""*/);
 
-	    UI::ChangeWidget (`id (`multiple), `Enabled, !global_broadcast);
+	    UI::ChangeWidget (`id (`domain), `Enabled, !dhcp_wanted);
+	    UI::ChangeWidget (`id (`multiple), `Enabled, !dhcp_wanted && !global_broadcast);
+	    UI::ChangeWidget (`id (`single), `Enabled, !dhcp_wanted);
 
 	    // Kludge, because a `Table still does not have a shortcut.
 	    // exclude textentry-notify
@@ -841,12 +834,16 @@ for the default domain?")))
 		    UpdateDomainTable (default_d, all_servers, "");
 		}
 	    }
+	    else if (result == `dhcpyes)
+	    {
+		WarnIfDhcpNotServed ();
+	    }
 	    else if (contains ([`next, `expert, `single], result))
 	    {
 		// Input validation
 		default_d = UI::QueryWidget (`id (`domain), `Value);
 
-		if (!Nis::DomainByDhcpActual () && result != `expert &&
+		if (!dhcp_wanted &&
 		    !Nis::check_nisdomainname (default_d))
 		{
 		    UI::SetFocus (`id (`domain));
@@ -879,6 +876,11 @@ the default domain will be lost.")))
 
 	if (contains ([`next, `expert, `single], result))
 	{
+	    Nis::dhcp_restart = Nis::dhcp_restart ||
+		(Nis::dhcp_wanted != dhcp_wanted);
+	    Nis::Touch (Nis::dhcp_restart);
+	    Nis::dhcp_wanted = dhcp_wanted;
+
 	    Nis::SetDomain (default_d);
 	    Nis::Touch (Nis::global_broadcast != global_broadcast);
 	    Nis::global_broadcast = global_broadcast;

@@ -8,6 +8,9 @@ Read	.etc.yp_conf.broadcast $["otherdomain":true]
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Read	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "no"
 Read	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "no"
+Execute	.target.bash "test -f /var/run/dhcpcd-*.pid" 0
+Execute	.target.bash "/bin/grep -qs '^NISSERVERS' /var/lib/dhcpcd/dhcpcd-*.info" 0
+Execute	.target.bash "/bin/grep -qs '^NISDOMAIN' /var/lib/dhcpcd/dhcpcd-*.info" 0
 Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
 Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
 Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
@@ -25,6 +28,7 @@ Read	.init.scripts.exists "ypbind" true
 Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.init.scripts.comment "ypbind" $["autofs":$[], "portmap":$[], "ypbind":$[]]
 Write	.etc.defaultdomain "mydomain" true
+Execute	.target.remove "/etc/yp.conf.sv" true
 Write	.etc.yp_conf.servers ["10.20.30.40", "10.20.30.80"] true
 Write	.etc.yp_conf.defaultbroadcast false true
 Write	.etc.yp_conf.domainservers $["otherdomain":["1.2.3.4"]] true
