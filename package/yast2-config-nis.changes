@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Apr 15 10:52:12 CEST 2002 - mvidner@suse.cz
+
+- Moved autoinst code from y2c_autoinst (nashif).
+- Fix to work with automake 1.6.
+- 2.6.1
+
+-------------------------------------------------------------------
 Mon Mar 11 12:44:14 CET 2002 - mvidner@suse.cz
 
 - Report the error message from init.d/ypbind to the server module (#14706).
