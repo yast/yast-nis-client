@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Mar  3 10:58:00 CET 2003 - mvidner@suse.de
+
+- Prefer "compat" to "files nis" so that daemons
+  don't have to be restarted to read nsswitch.conf (#23203).
+- 2.7.9
+
+-------------------------------------------------------------------
 Mon Feb 24 15:59:32 CET 2003 - mvidner@suse.de
 
 - Made it possible to freely switch between static and DHCP setup
