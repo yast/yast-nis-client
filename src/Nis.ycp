@@ -123,7 +123,7 @@
 	}
 
 	start = lookup (settings, "start_nis", false);
-	servers = splitstring(lookup (settings, "nis_servers", ""), " ");
+	servers = lookup (settings, "nis_servers", []);
 	domain = lookup (settings, "nis_domain", "");
 	old_domain = domain;
 	// autofs is not touched in Write if the map does not want it
