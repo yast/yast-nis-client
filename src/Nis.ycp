@@ -82,6 +82,15 @@
 	}
     }
 
+    /**
+     * If no, automounter will not be affected.
+     */
+    global boolean _autofs_allowed = false;
+    /**
+     * Just that. No other setup is done. (Bug 6092)
+     */
+    global boolean _start_autofs = false;
+
     /* ---------------------------------------------------------------- */
 
     /**
@@ -117,6 +126,9 @@
 	servers = lookup (settings, "servers", []);
 	domain = lookup (settings, "domain", "");
 	old_domain = domain;
+	// autofs is not touched in Write if the map does not want it
+	_autofs_allowed = haskey (settings, "autofs");
+	_start_autofs = lookup (settings, "autofs", false);
 	return true;
     }
 
@@ -129,6 +141,7 @@
 	    "start": start,
 	    "servers": servers,
 	    "domain": domain,
+	    "autofs": _start_autofs,
 	    ];
     }
 
@@ -141,6 +154,9 @@
 	SetServers (SCR::Read (.rc.system.YP_SERVER));
 	domain  = SCR::Read (.rc.system.YP_DOMAINNAME);
 	old_domain = domain;
+
+	_autofs_allowed = SCR::Read (.targetpkg.installed, "autofs");
+	_start_autofs = Runlevel::ServiceEnabled ("autofs");
 	return true;
     }
 
@@ -209,6 +225,21 @@ Please check that you are running this as a \"root\"
 		    // error popup message
 		    Report::Error (_("NIS server not found."));
 		    return false;
+		}
+	    }
+
+	    if (_autofs_allowed)
+	    {
+		Runlevel::RunInitScript ("autofs", "stop");
+
+		if (_start_autofs)
+		{
+		    Runlevel::RunInitScript ("autofs", "start");
+		    Runlevel::ServiceAdjust ("autofs", "enable");
+		}
+		else
+		{
+		    Runlevel::ServiceAdjust ("autofs", "disable");
 		}
 	    }
 	}

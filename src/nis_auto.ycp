@@ -49,6 +49,7 @@
     y2milestone("Imported: (%1)", settings);
 
     Nis::Import ( settings );
+    Nis::_autofs_allowed = true;
 
     Wizard::CreateDialog ();
     Wizard::ReplaceAbortButton(`Empty ());

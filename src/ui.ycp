@@ -53,8 +53,10 @@ by separating their addresses with spaces.</p>
 	boolean yp_client = Nis::start;
 	string yp_domain  = Nis::GetDomain ();
 	string yp_address = Nis::GetServers ();
+	boolean autofs = Nis::_start_autofs;
 
-	term con = `HVSquash (
+	term con = nil;
+	term nis_frame =
 	    // frame label
 	    `Frame (_("NIS client"),
 		    `VBox (`VSpacing (0.2),
@@ -74,14 +76,38 @@ by separating their addresses with spaces.</p>
 			   `TextEntry (`id (`ypa), _("&IP addresses of NIS servers"), yp_address),
 			   `VSpacing (0.2)
 			)
-		));
+		);
+
+	term autofs_frame =
+	    `Frame (
+		`opt (`hstretch),
+		// frame label
+		_("Automounter"),
+		`VBox (
+		    `VSpacing (0.2),
+		    // check box label
+		    `CheckBox (`id(`autofs), _("Start &Automounter"), autofs),
+		    `VSpacing (0.2),
+		    `Empty ()
+		    )
+		);
+
+	if (Nis::_autofs_allowed)
+	{
+	    con = `HVSquash (`VBox (nis_frame, `VSpacing (1), autofs_frame));
+	}
+	else
+	{
+	    con = `HVSquash (`VBox (nis_frame, `Empty (`id (`autofs))));
+	}
 
 	Wizard::SetContentsButtons (
 	    // dialog title
-	    _("Configuration of NIS client"), con, help_text, 
+	    _("Configuration of NIS client"), con, help_text,
 	    BackButtonLabel (), FinishButtonLabel ());
 	UI::ChangeWidget (`id (`ypd), `Enabled, yp_client);
 	UI::ChangeWidget (`id (`ypa), `Enabled, yp_client);
+	UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 
 	any result = nil;
 	do
@@ -94,6 +120,7 @@ by separating their addresses with spaces.</p>
 	    {
 		UI::ChangeWidget (`id (`ypd), `Enabled, yp_client);
 		UI::ChangeWidget (`id (`ypa), `Enabled, yp_client);
+		UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 	    }
 
 	    if (result == `next && yp_client)
@@ -135,6 +162,7 @@ by separating their addresses with spaces.</p>
 	    Nis::start = yp_client;
 	    Nis::SetDomain (yp_domain);
 	    Nis::SetServers (yp_address);
+	    Nis::_start_autofs = Nis::_autofs_allowed && UI::QueryWidget (`id (`autofs), `Value);
 	}
 
 	return result;
