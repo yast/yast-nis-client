@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Sep  3 14:43:07 CEST 2001 - mvidner@suse.cz
+
+- Use yast2-config-runlevel.
+- Start portmap only if not running already (Bug #9999).
+- 2.4.7
+
+-------------------------------------------------------------------
 Thu Aug 23 17:35:23 CEST 2001 - mvidner@suse.cz
 
 - Added documentation in a devel subpackage (2.4.6)
