@@ -11,7 +11,7 @@
  * $Id$
  */
 {
-    // testedfiles: Nis.ycp Autologin.ycp Require.ycp Service.ycp Report.ycp Testsuite.ycp Nsswitch.ycp
+    // testedfiles: Nis.ycp Autologin.ycp Service.ycp Report.ycp Testsuite.ycp Nsswitch.ycp PackageSystem.ycp
 
     include "testsuite.ycp";
 
@@ -105,8 +105,11 @@
 		"DISPLAYMANAGER_AUTOLOGIN": "no",
 		"DISPLAYMANAGER_PASSWORD_LESS_LOGIN": "no",
 		],
-	    ],
-	];
+	],
+	"target"	: $[
+	    "size"	: 0,
+	],
+    ];
 
     map WRITE = $[
 	];

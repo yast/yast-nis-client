@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jan 24 10:25:46 CET 2005 - jsuchome@suse.cz
+
+- fixed testusite (new Autologin.ycp)
+- 2.11.4 
+
+-------------------------------------------------------------------
 Thu Dec 16 13:01:24 CET 2004 - jsuchome@suse.cz
 
 - do not ask for 'Abort Installation' when called from users
