@@ -22,7 +22,7 @@
  * @param first a map of NIS settings
  * @return map edited settings or an empty map if canceled
  * @example map mm = $[ "FAIL_DELAY" : "77" ];
- * @example map ret = CallModule ("nis_auto", [ mm ]);
+ * @example map ret = WFM::CallModule ("nis_auto", [ mm ]);
  */
 
 {
@@ -32,23 +32,23 @@
     import "Wizard";
     include "nis/ui.ycp";
     include "wizard/sequencer.ycp";
-    list args = Args ();
+    list args = WFM::Args ();
     if ( size (args) <= 0 )
     {
 	y2error ("Did not get the settings, probably some mistake...");
 	return false;
     }
-    if ( !is ( Args (0), map ) )
+    if ( !is ( WFM::Args (0), map ) )
     {
-	y2error ("Bad argument for nis_auto: %1", Args (0));
+	y2error ("Bad argument for nis_auto: %1", WFM::Args (0));
 	return false;
     }
     map settings = $[];
     {
 	integer i = 0;
-	while (i < size (Args()))
+	while (i < size (WFM::Args()))
 	{
-	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);
+	    if (is (WFM::Args (i), map) && nil != WFM::Args (i))	settings = WFM::Args (i);
 	    i = i + 1;
 	}
     }
