@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Sep  3 15:28:39 CEST 2003 - jsuchome@suse.cz
+
+- Abort Installation button during installation (#29835)
+- 2.8.6
+
+-------------------------------------------------------------------
 Mon Sep  1 17:25:31 CEST 2003 - jsuchome@suse.de
 
 - patched .descktop file
