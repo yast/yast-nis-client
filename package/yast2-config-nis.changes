@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Feb 12 18:15:04 CET 2002 - mvidner@suse.cz
+
+- Flush /etc/nsswitch.conf before using it (#13176).
+- 2.5.14
+
+-------------------------------------------------------------------
 Fri Feb  1 10:46:45 CET 2002 - mvidner@suse.cz
 
 - Set automount in nsswitch.conf.
