@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Sep 16 14:25:12 CEST 2003 - jsuchome@suse.cz
+
+- fix of #30994: broadcast doesn't need IP/hostname
+- fix of #30996: search function returns IP address, not hostname
+- 2.8.8
+
+-------------------------------------------------------------------
 Sun Sep 14 20:47:21 CEST 2003 - adrian@suse.de
 
 - make it working in kcontrol

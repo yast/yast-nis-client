@@ -416,7 +416,7 @@ Change the DHCP server configuration to provide it.
 	    //give a clue to a paranoid admin
 	    y2milestone ("Scanning for NIS servers on this LAN.");
 	    y2milestone ("Keywords: RPC, ypserv");
-	    found_servers = sort (SCR::Read (.net.hostnames.rpc, "ypserv"));
+	    found_servers = sort (SCR::Read (.net.hostnames.ip.rpc, "ypserv"));
 	    UI::CloseDialog ();
 	    if (found_servers == nil)
 	    {
@@ -566,7 +566,7 @@ by separating their addresses with spaces.</p>
 
 		list temp_ad = filter (string a, splitstring (yp_address, " "),
 				       ``(a != ""));
-		if (!dhcp_wanted &&
+		if (!dhcp_wanted && !default_broadcast &&
 		    (size (temp_ad) == 0 ||
 		     find (string a, temp_ad,
 			   ``(!Nis::check_address_nis (a))) != nil))
