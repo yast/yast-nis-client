@@ -33,10 +33,14 @@
 {
     textdomain "nis";
 
+    import "CommandLine";
     import "Nis";
     import "Require";
+    import "RichText";
 
     include "nis/ui.ycp";
+
+    any ret = `auto;
 
     if (!Require::RequireAndConflict (Nis::required_packages, [],
 			     // notification 1/2
@@ -44,8 +48,199 @@
 			     // notification 2/2
 			     _("<p>Do you want to install it now?</p>")))
     {
-	return `auto;
+	return ret;
     }
 
-    return NormalSequence ();
+// --------------------------------------------------------------------------
+// --------------------------------- cmd-line handlers
+
+/**
+ * Change basic configuration of NIS client
+ * @param options  a list of parameters passed as args
+ * @return boolean true on success
+ */
+define boolean NisChangeConfiguration (map options ) {
+
+    boolean ret = false;
+    string server = options["server"]:"";
+    if (server != "")
+    {
+	Nis::SetServers (server);
+	ret = true;
+    }
+    string domain = options["domain"]:"";
+    if (domain != "")
+    {
+	Nis::SetDomain (domain);
+	if (Nis::DomainChanged ())
+	    ret = true;
+    }
+    string auto = options["automounter"]:"";
+    if (auto == "start" || auto == "on" || auto == "enable")
+    {
+	if (!Nis::_start_autofs)
+	{
+	    Nis::_start_autofs	= true;
+	    ret			= true;
+	}
+    }
+    if (auto == "stop" || auto == "off" || auto == "disable")
+    {
+	if (Nis::_start_autofs)
+	{
+	    Nis::_start_autofs	= false;
+	    ret			= true;
+	}
+    }
+    string broadcast	= options["broadcast"]:"";
+    if (broadcast == "start" || broadcast == "on" || broadcast == "enable")
+    {
+	if (!Nis::global_broadcast)
+	{
+	    Nis::global_broadcast	= true;
+	    ret				= true;
+	}
+    }
+    if (broadcast == "stop" || broadcast == "off" || broadcast == "disable")
+    {
+	if (Nis::global_broadcast)
+	{
+	    Nis::global_broadcast	= false;
+	    ret				= true;
+	}
+    }
+    return ret;
+}
+
+
+/**
+ * Enable the NIS client
+ * @param options  a list of parameters passed as args
+ * @return boolean true on success
+ */
+define boolean NisEnableHandler (map options ) {
+
+    boolean ret = NisChangeConfiguration (options);
+    if (!Nis::start)
+    {
+	Nis::start = true;
+	ret = true;
+    }
+    return ret;
+}
+
+/**
+ * Disable the NIS client
+ * @param options  a list of parameters passed as args
+ * @return boolean true on success
+ */
+define boolean NisDisableHandler (map options) {
+    Nis::start = false;
+    return true;
+}
+
+/**
+ * Look for NIS servers in given domain and print them on stdout
+ * @param options  a list of parameters passed as args
+ * @return boolean true on success
+ */
+define boolean NisFindServers (map options ) {
+
+    string domain	= options["domain"]:"";
+    if (domain == "")
+    {
+	domain	= Nis::GetDomain ();
+    }
+    foreach (string server, (list<string>)
+      SCR::Read (add (.net.ypserv.find, domain)), {
+	CommandLine::Print (server);
+    });
+    return false;
+}
+
+
+/**
+ * Print summary of basic options
+ * @return boolean false
+ */
+define boolean NisSummaryHandler (map options ) {
+
+    CommandLine::Print (RichText::Rich2Plain ("<br>" +
+	Nis::ShortSummary () + Nis::BrItem (
+	_("Automounter enabled"), Nis::_start_autofs ?  _("Yes"): _("No"))));
+
+    return false; // do not call Write...
+}
+
+/* the command line description map */
+map cmdline = $[
+    "id"		: "nis",
+    // translators: command line help text for Ldap client module
+    "help"		: _("NIS client configuration module."),
+    "guihandler"	: NormalSequence,
+    "initialize"	: Nis::Read,
+    "finish"		: Nis::Write,
+    "actions"		: $[
+	"enable" :$[
+	    "handler"	: NisEnableHandler,
+	    // command line help text for 'enable' action
+	    "help"	: _("Enable your machine as NIS client")
+	],
+	"disable" :$[
+	    "handler"	: NisDisableHandler,
+	    // command line help text for 'disable' action
+	    "help"	: _("Disable the NIS client")
+	],
+	"summary" :$[
+	    "handler"	: NisSummaryHandler,
+	    // command line help text for 'summary' action
+	    "help"	: _("Configuration summary of NIS client")
+	],
+	"configure"	: $[
+	    "handler"	: NisChangeConfiguration,
+	    // command line help text for 'configure' action
+	    "help"	: _("Change the global settings of NIS client")
+	],
+	"find"	: $[
+	    "handler"	: NisFindServers,
+	    // command line help text for 'find' action
+	    "help"	: _("Show available NIS servers for given domain")
+	],
+    ],
+    "options"		: $[
+	"server"	:$[
+	    // command line help text for the 'server' option
+	    "help"	: _("NIS server name or adress"),
+	    "type"	: "string"
+	],
+	"domain"	:$[
+	    // command line help text for the 'domain' option
+	    "help"	: _("NIS domain"),
+	    "type"	: "string"
+	],
+	"automounter"	:$[
+	    // help text for the 'automounter' option (do not trans. values)
+	    "help"	: _("Start or stop automounter (use on/off values)"),
+	    "type"	: "string"
+	],
+	"broadcast"	:$[
+	    // help text for the 'broadcast' option (do not trans. values)
+	    "help"	: _("Set or unset broadcast search (use on/off values)"),
+	    "type"	: "string"
+	],
+    ],
+    "mappings"		: $[
+	"enable"	: [ "server", "domain", "automounter", "broadcast" ],
+	"disable"	: [],
+	"summary"	: [],
+	"configure"	: [ "server", "domain", "automounter", "broadcast" ],
+	"find"		: [ "domain" ]
+	// TODO:
+	// more domains?
+	// YPBIND_OPTIONS: delimiter??
+    ]
+];
+
+ret = CommandLine::Run (cmdline);
+return ret;
 }
