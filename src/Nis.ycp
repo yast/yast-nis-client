@@ -346,7 +346,7 @@
 	    Runlevel::ServiceAdjust ("portmap", "enable");
 	    Runlevel::ServiceAdjust ("ypbind", "enable");
 
-	    if (SCR::Write (.etc.defaultdomain, domain) == nil)
+	    if (!SCR::Write (.etc.defaultdomain, domain))
 	    {
 		Report::Error (sformat (_("Error writing file %1."), "/etc/defaultdomain"));
 		return false;
