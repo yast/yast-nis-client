@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Feb 13 15:15:35 CET 2003 - jsuchome@suse.de
+
+- 'Next' instead of 'Finish' when Mode::cont is true
+
+-------------------------------------------------------------------
 Mon Feb 10 13:17:48 CET 2003 - jsuchome@suse.de
 
 - Merged proofread texts (3rd round).
