@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Aug 22 08:59:46 CEST 2002 - mvidner@suse.cz
+
+- Provide/Obsolete yast2-config-nis-devel
+
+-------------------------------------------------------------------
 Wed Aug 14 09:32:44 CEST 2002 - mvidner@suse.cz
 
 - Make "yast2 nis-client" invoke "yast2 nis" (#17570).
