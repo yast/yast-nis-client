@@ -76,6 +76,7 @@
 		return false;
 	    }
 	}
+	sleep(1000);	// workaround for bug #10428, ypbind restart
 	if (SCR::Execute(.target.bash, "/etc/init.d/ypbind start") != 0)
 	{
 	    // error popup message
