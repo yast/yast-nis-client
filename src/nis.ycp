@@ -37,8 +37,8 @@
 			     // notification 2/2
 			     _("<p>Do you want to install it now?</p>")))
     {
-	return;
+	return `auto;
     }
 
-    NormalSequence ();
+    return NormalSequence ();
 }
