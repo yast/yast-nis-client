@@ -38,7 +38,7 @@
 
     include "nis/ui.ycp";
 
-    if (!Require::RequireAndConflict (["ypbind"], [],
+    if (!Require::RequireAndConflict (Nis::required_packages, [],
 			     // notification 1/2
 			     _("<p>To access the Network Information Services, the <b>%1</b> package must be installed.</p>") +
 			     // notification 2/2

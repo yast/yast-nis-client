@@ -29,6 +29,12 @@
     include "network/dns.ycp";
 
     /**
+     * Required packages for this module to operate
+     *
+     */
+    global list required_packages = ["ypbind"];
+
+    /**
      * Should ypbind be started at boot?
      * If not, other settings are not touched.
      */
@@ -341,6 +347,8 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	// autofs is not touched in Write if the map does not want it
 	_autofs_allowed = haskey (settings, "start_autofs");
 	_start_autofs = settings["start_autofs"]:false;
+	if (_start_autofs)
+		required_packages = add(required_packages, "autofs");
     }
 
     // TODO update the map keys
