@@ -42,22 +42,22 @@
     {
 	y2error ("Bad argument for nis_auto: %1", Args (0));
 	return false;
-    }    
+    }
     map settings = $[];
     {
 	integer i = 0;
 	while (i < size (Args()))
 	{
-	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);	    
+	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);
 	    i = i + 1;
 	}
-    }    
-    
+    }
+
     Nis::Import ( settings );
     y2milestone("Imported: (%1)", settings);
-    
+
     define set_contents()
-	``{	
+	``{
 	term contents =
 	    `VBox(
 		  `VSpacing(1),
@@ -82,15 +82,15 @@
     repeat {
 	ret = UI::UserInput();
 	if (ret == `configure)
-	{	    
-	        Wizard::CreateDialog ();
+	{
+		Wizard::CreateDialog ();
 		Wizard::ReplaceAbortButton(`Empty ());
-		result = NisDialog ();				
+		result = NisDialog ();
 		UI::CloseDialog ();
 		if (result == `next || result == `finish)
 		{
 		     settings = Nis::Export ();
-		} 
+		}
 		Nis::Set(settings);
 		set_contents();
 	}
@@ -99,11 +99,8 @@
 	    settings= $[];
 	    Nis::Set(settings);
 	    set_contents();
-	}		
-    } until (ret == `back || ret == `next || ret ==`key);   
-  
+	}
+    } until (ret == `back || ret == `next || ret ==`key);
+
     return [ret, settings];
 }
-
-
-
