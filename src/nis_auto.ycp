@@ -44,8 +44,20 @@
 	return false;
     }
 
+    boolean cms_mode = false;
+    map settings = $[];
+    {
+	integer i = 0;
+	while (i < size (Args()))
+	{
+	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);
+	    else if (Args (i) == .cms)			cms_mode=true;	   
+	    i = i + 1;
+	}
+    }
+
     // The settings are in the first argument
-    map settings = select (args, 0, $[]);
+    
     y2milestone("Imported: (%1)", settings);
     Nis::Import ( settings );
      
@@ -70,7 +82,7 @@
     // Create Summary and buttons for launching
     // in auto mode
     
-    if ( select (args, 1, false)) {
+    if ( cms_mode) {
 	import "Wizard"; 
 	set_contents(settings);
 	any ret = nil;
@@ -78,7 +90,7 @@
 	    ret = UI::UserInput();
 	    if (ret == `configure)
 	    {
-		map result = CallModule("nis_auto", [settings, false]);
+		map result = CallModule("nis_auto", [settings]);
 		if (result!=$[])
 		    settings = result;
 
