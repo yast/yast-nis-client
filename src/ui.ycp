@@ -270,7 +270,7 @@ either locally or over NIS.</p>");
 			       ),
 			    `HBox(
 				`VBox(
-				    `Left(`Label(_("Additional NIS domains"))),
+				    `Left(`Label(_("Additional NIS Domains"))),
 				    `HBox(
 					`HSpacing(1),
 					`Label(`id (`adddomains), `opt(`outputField, `hstretch), mergestring(additional_domains, ", "))
@@ -760,7 +760,7 @@ Are you sure?")))
 	term multiple =
 		`VBox (
 		    `VSpacing (0.8),
-		    `Left(`Label(_("Additional domains"))),
+		    `Left(`Label(_("Additional Domains"))),
 		    `Table (
 			`id (`domains),
 			`opt (`notify, `immediate),
@@ -803,7 +803,7 @@ Are you sure?")))
 		     // dialog title
 		     _("Configuration of NIS client"),
 		     // dialog subtitle
-		     _("Additional domains")), contents, help_text,
+		     _("Additional Domains")), contents, help_text,
 	    Label::BackButton (), Mode::cont? Label::NextButton():Label::OKButton ());
 
 	// sh: We don't use "Abort Installation" any more. Stick with the normal "Abort" button.
