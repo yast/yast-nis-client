@@ -27,12 +27,12 @@ public:
     /**
      * Read data
      */
-    virtual YCPValue Read (const YCPPath& path, const YCPValue& arg = YCPNull());
+    virtual YCPValue Read (const YCPPath& path, const YCPValue& arg = YCPNull(), const YCPValue& opt = YCPNull());
 
     /**
      * Write data
      */
-    virtual YCPValue Write (const YCPPath& path, const YCPValue& value,
+    virtual YCPBoolean Write (const YCPPath& path, const YCPValue& value,
 			    const YCPValue& arg = YCPNull());
 
     /**
@@ -45,7 +45,7 @@ public:
     /**
      * Get a list of all subtrees
      */
-    virtual YCPValue Dir (const YCPPath& path);
+    virtual YCPList Dir (const YCPPath& path);
 };
 
 

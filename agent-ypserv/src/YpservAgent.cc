@@ -22,7 +22,7 @@ using std::set;
  * Read function
  */
 YCPValue
-YpservAgent::Read (const YCPPath& path, const YCPValue& arg)
+YpservAgent::Read (const YCPPath& path, const YCPValue& arg, const YCPValue&)
 {
     y2debug ("Read (%s)", path->toString().c_str());
 
@@ -73,14 +73,13 @@ YpservAgent::Read (const YCPPath& path, const YCPValue& arg)
 /**
  * Write function
  */
-YCPValue
+YCPBoolean
 YpservAgent::Write (const YCPPath& path, const YCPValue& value,
 		    const YCPValue& arg)
 {
     y2debug ("Write (%s)", path->toString().c_str());
-
-    return YCPError (string("Undefined subpath for Write (") + path->toString() + ")",
-		     YCPBoolean (false));
+    ycp2error ("Undefined subpath for Write (%s)", path->toString().c_str ());
+    return YCPBoolean (false);
 }
 
 
@@ -99,7 +98,7 @@ YpservAgent::Execute (const YCPPath& path, const YCPValue& value,
 /**
  * Get a list of all subtrees
  */
-YCPValue
+YCPList
 YpservAgent::Dir (const YCPPath& path)
 {
     y2debug ("Dir (%s)", path->toString().c_str());
