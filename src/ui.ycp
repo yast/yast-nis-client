@@ -332,8 +332,9 @@ automatically.</p>");
 	if (!Nis::dhcp_possible)
 	{
 	    // Translators: warning popup
-	    UI::WarningPopup (_("NIS configuration isn't currently provided by DHCP.
-Change the DHCP server configuration to provide it."));
+	    UI::WarningPopup (_("NIS configuration is not currently provided by DHCP.
+Change the DHCP server configuration to provide it.
+"));
 	}
     }
 
@@ -382,9 +383,9 @@ by separating their addresses with spaces.</p>
 			       `id (`dhcpg),
 			       `VBox (
 				   // radio button label
-				   `Left (`RadioButton (`id (`dhcpyes), `opt (`notify), _("&Automatic setup (via DHCP)"), dhcp_wanted)),
+				   `Left (`RadioButton (`id (`dhcpyes), `opt (`notify), _("&Automatic Setup (via DHCP)"), dhcp_wanted)),
 				   // radio button label
-				   `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static setup"), !dhcp_wanted))
+				   `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static Setup"), !dhcp_wanted))
 				   )),
 
 
@@ -670,9 +671,9 @@ This check box only appears if it is turned on.</p>
 			       `id (`dhcpg),
 			       `VBox (
 				   // radio button label
-				   `Left (`RadioButton (`id (`dhcpyes), `opt (`notify), _("&Automatic setup (via DHCP)"), dhcp_wanted)),
+				   `Left (`RadioButton (`id (`dhcpyes), `opt (`notify), _("&Automatic Setup (via DHCP)"), dhcp_wanted)),
 				   // radio button label
-				   `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static setup"), !dhcp_wanted))
+				   `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static Setup"), !dhcp_wanted))
 				   )),
 
 
