@@ -126,7 +126,7 @@
 			UI::WarningPopup (_("The domain has changed.
 You must reboot for the changes to take effect."));
 		    }
-		    else
+		    else if (!Mode::cont) // #23777
 		    {
 			// message popup
 			UI::MessagePopup(_("The configuration of the NIS client
