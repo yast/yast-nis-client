@@ -22,6 +22,7 @@
     textdomain "nis";
 
     import "Runlevel";
+    import "Report";
 
     /**
      * Should ypbind be started at boot?
@@ -132,16 +133,6 @@
     }
 
     /**
-     * Log a message. TODO: let the user know?
-     * Before the conversion to a Module, these messages used to be
-     * UI::MessagePopup.
-     * @param message	a message to log
-     */
-    define void errorNoPopup (string message) ``{
-	y2error (message);
-    }
-
-    /**
      * Reads NIS settings from the SCR
      * @return success
      */
@@ -178,7 +169,7 @@
 	if (!SCR::Write (.rc.system, nil))
 	{
 	    // error popup message
-	    errorNoPopup(_("Error while saving /etc/rc.config.
+	    Report::Error (_("Error while saving /etc/rc.config.
 Please check that you are running this as a \"root\"
 "));
 	    return false;
@@ -187,7 +178,7 @@ Please check that you are running this as a \"root\"
 	if (SCR::Execute (.target.bash, "/sbin/SuSEconfig --nonewpackage --module ypclient") != 0)
 	{
 	    // warning dialog message
-	    errorNoPopup(_("Error while running SuSEconfig"));
+	    Report::Error (_("Error while running SuSEconfig"));
 	    return false;
 	}
 
@@ -199,7 +190,7 @@ Please check that you are running this as a \"root\"
 		if (Runlevel::RunInitScript ("portmap", "start") != 0)
 		{
 		    // error popup message
-		    errorNoPopup(_("Error while running portmapper."));
+		    Report::Error (_("Error while running portmapper."));
 		    return false;
 		}
 	    }
@@ -207,7 +198,7 @@ Please check that you are running this as a \"root\"
 	    if (Runlevel::RunInitScript ("ypbind", "start") != 0)
 	    {
 		// error popup message
-		errorNoPopup(_("Error while running ypclient."));
+		Report::Error (_("Error while running ypclient."));
 		return false;
 	    }
 	    // only test for a server if domain not changed
@@ -216,7 +207,7 @@ Please check that you are running this as a \"root\"
 		if (SCR::Execute(.target.bash, "/usr/bin/ypwhich >/dev/null") != 0)
 		{
 		    // error popup message
-		    errorNoPopup(_("NIS server not found."));
+		    Report::Error (_("NIS server not found."));
 		    return false;
 		}
 	    }
