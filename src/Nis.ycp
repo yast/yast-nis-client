@@ -136,13 +136,13 @@
      * Is yp.conf currently served by DHCP and thus disabled in the UI
      */
     global define boolean ServersByDhcpActual () ``{
-	return auto_mode? servers_by_dhcp_actual : servers_by_dhcp_wanted;
+	return auto_mode? servers_by_dhcp_wanted : servers_by_dhcp_actual;
     }
     /**
      * Is domain currently served by DHCP and thus disabled in the UI
      */
     global define boolean DomainByDhcpActual () ``{
-	return auto_mode? domain_by_dhcp_actual : domain_by_dhcp_wanted;
+	return auto_mode? domain_by_dhcp_wanted : domain_by_dhcp_actual;
     }
     /**
      * If *_by_dhcp_wanted changes, we need to restart the DHCP client
@@ -375,7 +375,13 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    //Provide defaults for autoinstallation editing:
 	    //Leave empty.
 	    old_domain = domain;
-		Set(settings);
+	    // enable _autofs_allowed
+	    // Injecting it into the defaults for the GUI
+	    // but leaving the check in Set makes it possible
+	    // to delete the element manually from the xml profile
+	    // and leave autofs untouched
+	    settings["start_autofs"] = false;
+	    Set(settings);
 	    return true;
 	}
 
