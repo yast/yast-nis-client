@@ -501,7 +501,8 @@ by separating their addresses with spaces.</p>
 			       // check box label
 			       `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Br&oadcast"), default_broadcast)),
 			       // pushbutton label, find nis servers
-			       `Right (`PushButton (`id (`find), _("Fi&nd")))
+			       // Shortcut must not conflict with Finish and Next (#29960)
+			       `Right (`PushButton (`id (`find), _("Fin&d")))
 			       ),
 			   `VSpacing (0.2),
 			   `HBox (
@@ -1090,7 +1091,8 @@ the default domain will be lost.")))
 			       // checkbox label
 			       _("&Broadcast"), broadcast),
 		    // pushbutton label, find nis servers
-		    `PushButton (`id (`find), _("Fi&nd"))
+		    // Shortcut must not conflict with Finish and Next (#29960)
+		    `PushButton (`id (`find), _("Fin&d"))
 		    ),
 		`Empty ()
 		);
