@@ -66,7 +66,8 @@ less frequently used settings.</p>
      */
     define boolean ReallyAbort (boolean touched) ``{
 
-	return (!Stage::cont ())
+	return
+	(!Stage::cont () || contains (WFM::Args (), "from_users"))
 	    ? Popup::ReallyAbort (touched)
 	    : Popup::ConfirmAbort (`incomplete);
     }
@@ -253,7 +254,7 @@ either locally or over NIS.</p>");
 			       `id (`dhcpg),
 			       `VBox (
 				   // radio button label
-				   `Left (`RadioButton (`id (`dhcpyes), `opt (`notify), _("&Automatic Setup (via DHCP)"), dhcp_wanted)),
+				   `Left (`RadioButton (`id (`dhcpyes), `opt (`notify), _("Au&tomatic Setup (via DHCP)"), dhcp_wanted)),
 				   // radio button label
 				   `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static Setup"), !dhcp_wanted))
 				   )),
@@ -261,7 +262,7 @@ either locally or over NIS.</p>");
 
 			   `VSpacing (0.2),
 			   // text entry label
-			   `TextEntry (`id (`domain), _("NIS &domain"), domain),
+			   `TextEntry (`id (`domain), _("N&IS domain"), domain),
 			   `VSpacing (0.2),
 			   // text entry label
 			   `TextEntry (`id (`servers), _("&Addresses of NIS servers"), servers),
@@ -304,12 +305,12 @@ either locally or over NIS.</p>");
 		`VSpacing (1.2),
 		nis_frame,
 		`VSpacing (0.5),
-		`CheckBox (`id(`autofs), _("Start &Automounter"), autofs),
+		`CheckBox (`id(`autofs), _("Start Auto&mounter"), autofs),
 		`VSpacing (0.5),
 		`PushButton (`id (`expert), `opt (`key_F7),
 		    // button label
 		    // (short for Expert settings)
-		    _("&Expert ...")
+		    _("E&xpert ...")
 		),
 		`VSpacing (0.5)
 	    );
@@ -321,7 +322,7 @@ either locally or over NIS.</p>");
 	Wizard::RestoreAbortButton ();
 
 	// during installation, only enabling makes sence
-	if (Stage::cont ())
+	if (Stage::cont () && !contains (WFM::Args (), "from_users"))
 	{
 	    UI::ChangeWidget (`id (`nisno), `Enabled, false);
 	}
@@ -495,7 +496,7 @@ This option is only available if the firewall is enabled.</p>
 		    `VBox (
 			`VSpacing (0.2),
 			// check box label
-			`Left (`CheckBox (`id (`remote), _("&Answer to the remote hosts"), !local_only)),
+			`Left (`CheckBox (`id (`remote), _("Ans&wer to the remote hosts"), !local_only)),
 			// check box label
 			`Left (`CheckBox (`id (`broken_server), _("Br&oken server"), broken_server)),
 			`VSpacing (0.2),
@@ -512,7 +513,7 @@ This option is only available if the firewall is enabled.</p>
 	Wizard::SetContentsButtons (
 	    // dialog title
 	    _("Expert settings"), contents, help_text,
-	    Label::CancelButton (), Label::OKButton ());
+	    Label::CancelButton (), Label::AcceptButton ());
 	Wizard::HideAbortButton ();
 
 	CWMFirewallInterfaces::OpenFirewallInit (firewall_widget, "");
@@ -781,34 +782,32 @@ This option is only available if the firewall is enabled.</p>
 	string current_d = "";
 
 	// build the dialog contents
-	term multiple =
-		`VBox (
-		    `VSpacing (0.8),
-		    `Left(`Label(_("Additional Domains"))),
-		    `Table (
-			`id (`domains),
-			`opt (`notify, `immediate),
-			`header (
-			    // table header
-			    _("Domain"),
-			    // table header
-			    `Center (_("Broadcast")),
-			    // table header - Service Location Protocol
-			    `Center (_("SLP")),
-			    // table header
-			    _("Servers")),
-			DomainTableItems (nil, all_servers)
-			),
-		    `HBox (
-			// button label
-			`PushButton (`id (`add_d), `opt (`key_F3), _("&Add")),
-			// button label
-			`PushButton (`id (`edit_d), `opt (`key_F4), _("&Edit")),
-			// button label
-			`PushButton (`id (`del_d), `opt (`key_F5), _("De&lete"))
-			),
-		    `VSpacing (1)
-		    );
+	term multiple = `VBox (
+	    `VSpacing (0.8),
+	    // dialog label
+	    `Left (`Label(_("Additional Domains"))),
+	    `Table (
+		`id (`domains),
+		`opt (`notify, `immediate),
+		`header (
+		    // table header
+		    _("Domain"),
+		    // table header
+		    `Center (_("Broadcast")),
+		    // table header - Service Location Protocol
+		    `Center (_("SLP")),
+		    // table header
+		    _("Servers")),
+		    DomainTableItems (nil, all_servers)
+	    ),
+	    `HBox (
+		// button label
+		`PushButton (`id (`add_d), `opt (`key_F3), _("A&dd")),
+		`PushButton (`id (`edit_d),`opt(`key_F4), Label::EditButton ()),
+		`PushButton (`id (`del_d), `opt(`key_F5), Label::DeleteButton())
+	    ),
+	    `VSpacing (1)
+	);
 
 	term nis_vbox =
 	    `VBox (`VSpacing (0.2),
@@ -828,7 +827,7 @@ This option is only available if the firewall is enabled.</p>
 		     _("Configuration of NIS client"),
 		     // dialog subtitle
 		     _("Additional Domains")), contents, help_text,
-	    Label::CancelButton (), Label::OKButton ());
+	    Label::CancelButton (), Label::AcceptButton ());
 	Wizard::HideAbortButton ();
 
 	any result = nil;

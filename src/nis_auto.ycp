@@ -1,7 +1,7 @@
 /**
- * File:	clients/lan_proposal.ycp
- * Package:	Network configuration
- * Summary:	Lan configuration proposal
+ * File:	clients/nis_auto.ycp
+ * Package:	nis-client configuration
+ * Summary:	client for autoinstallation
  * Authors:	Michal Svec <msvec@suse.cz>
  *
  * $Id$
