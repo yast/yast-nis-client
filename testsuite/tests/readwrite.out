@@ -1,10 +1,13 @@
+Dump	DHCP off
 Read	.init.scripts.exists "ypbind" true
 Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.etc.yp_conf.servers ["10.20.30.40", "10.20.30.80"]
 Read	.etc.yp_conf.defaultbroadcast false
 Read	.etc.yp_conf.domainservers $["otherdomain":["1.2.3.4"]]
 Read	.etc.yp_conf.broadcast $["otherdomain":true]
-Read	.etc.defaultdomain "mydomain"
+Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
+Read	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "no"
+Read	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "no"
 Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
 Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
 Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
@@ -32,6 +35,9 @@ Write	.sysconfig.ypbind.YPBIND_BROADCAST "no" true
 Write	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no" true
 Write	.sysconfig.ypbind.YPBIND_OPTIONS "" true
 Write	.sysconfig.ypbind nil true
+Write	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "no" true
+Write	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "no" true
+Write	.sysconfig.dhcp nil true
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
 Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."group" "compat"
@@ -51,7 +57,70 @@ Read	.init.scripts.comment "autofs" $["autofs":$[], "portmap":$[], "ypbind":$[]]
 Execute	.target.bash "/etc/init.d/ypbind stop" $["TERM":"raw"] 0
 Read	.init.scripts.exists "portmap" true
 Execute	.target.bash "/etc/init.d/portmap status" $["TERM":"raw"] 0
-Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":""]
+Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
+Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
+Read	.init.scripts.exists "nscd" true
+Execute	.target.bash "/etc/init.d/nscd status" $["TERM":"raw"] 0
+Execute	.target.bash "/etc/init.d/nscd restart" $["TERM":"raw"] 0
+Execute	.target.bash "/etc/init.d/autofs stop" $["TERM":"raw"] 0
+Execute	.target.bash "/etc/init.d/autofs start" $["TERM":"raw"] 0
+Return	true
+Dump	DHCP on
+Read	.init.scripts.exists "ypbind" true
+Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.etc.yp_conf.servers ["10.20.30.40", "10.20.30.80"]
+Read	.etc.yp_conf.defaultbroadcast false
+Read	.etc.yp_conf.domainservers $["otherdomain":["1.2.3.4"]]
+Read	.etc.yp_conf.broadcast $["otherdomain":true]
+Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
+Read	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes"
+Read	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "yes"
+Execute	.target.bash "/bin/grep -qs '^NISSERVERS' /var/lib/dhcpcd/dhcpcd-*.info" 0
+Execute	.target.bash "/bin/grep -qs '^NISDOMAIN' /var/lib/dhcpcd/dhcpcd-*.info" 0
+Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
+Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
+Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
+Read	.sysconfig.ypbind.YPBIND_OPTIONS ""
+Read	.init.scripts.exists "autofs" true
+Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.etc.nsswitch_conf."hosts" "files dns6"
+Return	true
+Read	.init.scripts.exists "portmap" true
+Read	.init.scripts.exists "portmap" true
+Read	.init.scripts.runlevel "portmap" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "portmap" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Read	.init.scripts.exists "ypbind" true
+Read	.init.scripts.exists "ypbind" true
+Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "ypbind" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Write	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no" true
+Write	.sysconfig.ypbind.YPBIND_BROADCAST "no" true
+Write	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no" true
+Write	.sysconfig.ypbind.YPBIND_OPTIONS "" true
+Write	.sysconfig.ypbind nil true
+Write	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "yes" true
+Write	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes" true
+Write	.sysconfig.dhcp nil true
+Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
+Read	.etc.nsswitch_conf."passwd" "compat"
+Read	.etc.nsswitch_conf."group" "compat"
+Read	.etc.nsswitch_conf."shadow" nil
+Write	.etc.nsswitch_conf."shadow" "compat" true
+Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
+Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/shadow" 0
+Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/group" 0
+Write	.etc.nsswitch_conf nil true
+Read	.etc.nsswitch_conf."automount" "files"
+Write	.etc.nsswitch_conf."automount" "files nis" true
+Write	.etc.nsswitch_conf nil true
+Read	.init.scripts.exists "autofs" true
+Read	.init.scripts.exists "autofs" true
+Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "autofs" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Execute	.target.bash "/etc/init.d/ypbind stop" $["TERM":"raw"] 0
+Read	.init.scripts.exists "portmap" true
+Execute	.target.bash "/etc/init.d/portmap status" $["TERM":"raw"] 0
+Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
 Read	.init.scripts.exists "nscd" true
 Execute	.target.bash "/etc/init.d/nscd status" $["TERM":"raw"] 0

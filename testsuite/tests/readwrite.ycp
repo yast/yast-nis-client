@@ -15,6 +15,15 @@
     import "Pkg"; // override
     import "Nis";
 
+    map dhcp_yes = $[
+	"DHCLIENT_MODIFY_NIS_CONF": "yes",
+	"DHCLIENT_SET_DOMAINNAME": "yes",
+	];
+    map dhcp_no = $[
+	"DHCLIENT_MODIFY_NIS_CONF": "no",
+	"DHCLIENT_SET_DOMAINNAME": "no",
+	];
+
     map READ = $[
 	// Runlevel:
 	"init": $[
@@ -54,7 +63,7 @@
 		    "otherdomain": true,
 		    ],
 		],
-	    "defaultdomain": "mydomain",
+//	    "defaultdomain": "mydomain",
 	    "nsswitch_conf": $[
 		"passwd": "compat",
 		"group": "compat",
@@ -69,6 +78,7 @@
 		"YPBIND_BROKEN_SERVER": "no",
 		"YPBIND_OPTIONS": "",
 		],
+	    "dhcp": dhcp_no,
 	    ],
 	];
 
@@ -77,14 +87,21 @@
 
     map EXECUTE = $[
 	"target": $[
+	    // ok if used both for `domainname` and `rcypbind start`
 	    "bash_output": $[
 		"exit": 0,
-		"stdout": "",
+		"stdout": "mydomain\n",
 		"stderr": "",
 		],
 	    ],
 	];
 
+    DUMP ("DHCP off");
+    TEST (``(Nis::Read ()), [READ, WRITE, EXECUTE], nil);
+    TEST (``(Nis::Write ()), [READ, WRITE, EXECUTE], nil);
+
+    DUMP ("DHCP on");
+    READ["sysconfig", "dhcp"] = dhcp_yes;
     TEST (``(Nis::Read ()), [READ, WRITE, EXECUTE], nil);
     TEST (``(Nis::Write ()), [READ, WRITE, EXECUTE], nil);
 }
