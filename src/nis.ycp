@@ -23,6 +23,13 @@
  * <h3>Configuration of the nis</h3>
  */
 
+/**
+ * @param flag "<b>screenshots</b>"<br>
+ *  <dl>
+ *   <dd>uses faked data (see Nis::Fake), enables running the module
+ *    as non-root. (Uses Mode::screen_shot.)
+ *  </dl>
+ */
 {
     textdomain "nis";
 

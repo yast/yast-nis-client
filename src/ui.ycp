@@ -98,7 +98,16 @@
 	    ];
 
 	Wizard::CreateDialog ();
-	Nis::Read ();
+
+	if (Mode::screen_shot)
+	{
+	    Nis::Fake ();
+	}
+	else
+	{
+	    Nis::Read ();
+	}
+
 	FitIntoSingle ();
 
 	// the second map must override the first!
@@ -394,6 +403,11 @@ Change the DHCP server configuration to provide it.
      * @return space separated list of servers or ""
      */
     global define string SelectNisServers () ``{
+	if (Mode::screen_shot)
+	{
+	    found_servers = ["nis.example.com", "10.42.1.1", "10.42.1.2"];
+	}
+
 	if (found_servers == nil)
 	{
 	    // popup window
