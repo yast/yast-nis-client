@@ -64,7 +64,7 @@ by separating their addresses by spaces.</p>");
  Telecommunications plc, and may not be used without
  permission.</p>");
 
-    boolean yp_client = (tolower(SCR::Read (.rc.system.START_YPBIND)) == "yes");
+    boolean yp_client = CallFunction (`runlevel_adjust ("ypbind", "ask")) == `enabled;
     string yp_domain  = SCR::Read (.rc.system.YP_DOMAINNAME);
     string old_yp_domain = yp_domain;
     string yp_address = SCR::Read (.rc.system.YP_SERVER);

@@ -16,7 +16,7 @@ Copyright:	(c) 2000 SuSE GmbH
 Group:		System Environment/YaST
 Requires:	yast2 yast2-trans-nis yast2-lib-wizard yast2-lib-sequencer yast2-lib-network
 Requires:	yast2-config-package-manager
-Requires:       yast2-config-runlevel
+Requires:       yast2-config-runlevel >= 2.4.12
 Provides:	yast2-config-network:/usr/lib/YaST2/clients/lan_ypclient.ycp
 BuildArchitectures:	noarch
 
