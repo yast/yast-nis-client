@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep  8 16:18:53 CEST 2003 - jsuchome@suse.cz
+
+- return needed packages list (nashif)
+
+-------------------------------------------------------------------
 Wed Sep  3 15:28:39 CEST 2003 - jsuchome@suse.cz
 
 - Abort Installation button during installation (#29835)
