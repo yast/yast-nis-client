@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Dec  7 14:59:58 CET 2004 - jsuchome@suse.cz
+
+- fixed helptext to not include foo.com address (#48112)
+- 2.11.1 
+
+-------------------------------------------------------------------
 Fri Oct 29 09:04:36 CEST 2004 - jsuchome@suse.cz
 
 - adapted for new Mode:: interface
