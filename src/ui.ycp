@@ -369,6 +369,14 @@ Change the DHCP server configuration to provide it.
 		    `VSpacing(10)
 		    ),
 		`HBox (
+		    // pushbutton label
+		    // Select all items (in this case NIS servers) of a list
+		    `PushButton (`id (`all), _("Select &All")),
+		    // pushbutton label
+		    // Deselect all items (in this case NIS servers) of a list
+		    `PushButton (`id (`none), _("Select &None"))
+		    ),
+		`HBox (
 		    `PushButton (`id (`ok), `opt (`default, `key_F10),
 				 Label::OKButton ()),
 		    `PushButton (`id (`cancel), `opt (`key_F9),
@@ -380,6 +388,14 @@ Change the DHCP server configuration to provide it.
 	do
 	{
 	    ret = UI::UserInput();
+	    if (ret == `all)
+	    {
+		UI::ChangeWidget (`id (`items), `SelectedItems, items);
+	    }
+	    else if (ret == `none)
+	    {
+		UI::ChangeWidget (`id (`items), `SelectedItems, []);
+	    }
 	}
 	while (ret != `cancel && ret != `ok);
 
@@ -397,41 +413,40 @@ Change the DHCP server configuration to provide it.
     }
 
     /**
-     * A cache of NIS servers found on the LAN.
+     * A cache of NIS servers found on the LAN for each domain.
      * @see SelectNisServers
      */
-    global list (string) found_servers = nil;
+    global map found_servers = $[]; // map <string, list <string> >
 
     /**
      * Scan the network for NIS servers and let the user select among them.
+     * @param domain which domain
      * @return space separated list of servers or ""
      */
-    global define string SelectNisServers () ``{
+    global define string SelectNisServers (string domain) ``{
 	Wizard::SetScreenShotName ("nis-client-2a1-servers");
 	if (Mode::screen_shot)
 	{
-	    found_servers = ["nis.example.com", "10.42.1.1", "10.42.1.2"];
+	    found_servers[domain] = ["nis.example.com", "10.42.1.1", "10.42.1.2"];
 	}
 
-	if (found_servers == nil)
+	if (!haskey (found_servers, domain))
 	{
 	    // popup window
 	    // LAN: local area network
-	    UI::OpenDialog (`Label (_("Scanning for NIS servers on this LAN...")));
-	    //give a clue to a paranoid admin
-	    y2milestone ("Scanning for NIS servers on this LAN.");
-	    y2milestone ("Keywords: RPC, ypserv");
-	    found_servers = sort (SCR::Read (.net.hostnames.ip.rpc, "ypserv"));
+	    UI::OpenDialog (`Label (sformat (_("Scanning for NIS servers in domain %1 on this LAN..."), domain)));
+	    found_servers[domain] = SCR::Read (add (.net.ypserv.find, domain));
 	    UI::CloseDialog ();
-	    if (found_servers == nil)
+	    if (found_servers[domain]:nil == nil)
 	    {
-		found_servers = ["internal-error"];
+		found_servers[domain] = ["internal-error"];
 	    }
 	}
 
 	list (string) selected_servers =
 	    // selection box label
-	    ChooseItems (_("&NIS Servers"), found_servers);
+	    ChooseItems (sformat (_("&NIS Servers in domain %1"), domain),
+			 found_servers[domain]:[]);
 	y2milestone ("selected_servers: %1", selected_servers);
 	if (selected_servers == nil)
 	{
@@ -549,10 +564,21 @@ by separating their addresses with spaces.</p>
 	    }
 	    else if (result == `find)
 	    {
-		string servers = SelectNisServers ();
-		if (servers != "")
+		yp_domain =  UI::QueryWidget (`id (`ypd), `Value);
+		if (yp_domain == "")
 		{
-		    UI::ChangeWidget (`id (`ypa), `Value, servers);
+		    // Message popup. The user wants to Find servers
+		    // but the domain is unknown.
+		    Popup::Message (_("Finding servers works only when the domain is known."));
+		    UI::SetFocus (`id (`ypd));
+		}
+		else
+		{
+		    string servers = SelectNisServers (yp_domain);
+		    if (servers != "")
+		    {
+			UI::ChangeWidget (`id (`ypa), `Value, servers);
+		    }
 		}
 	    }
 	    else if (contains ([`next, `expert, `multiple], result))
@@ -1132,10 +1158,21 @@ the default domain will be lost.")))
 	    }
 	    else if (ui == `find)
 	    {
-		string servers = SelectNisServers ();
-		if (servers != "")
+		domain =  UI::QueryWidget (`id (`domain), `Value);
+		if (domain == "")
 		{
-		    UI::ChangeWidget (`id (`servers), `Value, servers);
+		    // Message popup. The user wants to Find servers
+		    // but the domain is unknown.
+		    Popup::Message (_("Finding servers works only when the domain is known."));
+		    UI::SetFocus (`id (`domain));
+		}
+		else
+		{
+		    string servers = SelectNisServers (domain);
+		    if (servers != "")
+		    {
+			UI::ChangeWidget (`id (`servers), `Value, servers);
+		    }
 		}
 	    }
 	    else if (ui == `ok)
