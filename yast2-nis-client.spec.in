@@ -32,6 +32,7 @@ Summary:	Configuration of NIS client
 @yncludedir@/nis/ui.ycp
 %dir @clientdir@
 @clientdir@/nis.ycp
+@clientdir@/nis-client.ycp
 @clientdir@/nis_auto.ycp
 @clientdir@/nis_write.ycp
 %dir @moduledir@
