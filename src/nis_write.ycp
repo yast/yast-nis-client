@@ -36,35 +36,48 @@
 
     SCR::Execute(.target.bash, "/etc/init.d/ypbind stop", $[]);
 
-    if (start_yp) {
-	SCR::Write(.rc.system.START_YPBIND, "yes");
-	SCR::Write(.rc.system.CREATE_YP_CONF, "yes");
-	SCR::Write(.rc.system.START_PORTMAP, "yes"); // write portmapper as well
+    if (start_yp)
+    {
+	CallFunction (`runlevel_adjust ("portmap", "enable"));
+	CallFunction (`runlevel_adjust ("ypbind", "enable"));
 
+	SCR::Write(.rc.system.CREATE_YP_CONF, "yes");
 	SCR::Write(.rc.system.YP_DOMAINNAME, lookup(yp_conf, "yp_domain", ""));
 	SCR::Write(.rc.system.YP_SERVER, lookup(yp_conf, "yp_address", ""));
-    } else
-	SCR::Write(.rc.system.START_YPBIND, "no");
+    }
+    else
+    {
+	CallFunction (`runlevel_adjust ("ypbind", "disable"));
+    }
 
-    if (!SCR::Write(.rc.system, nil)) {
+    if (!SCR::Write(.rc.system, nil))
+    {
 	// error popup message
 	UI::MessagePopup(_("Error while saving /etc/rc.config.\nPlease check out that you are running this as a \"root\""));
 	return false;
     }
 
-    if (SCR::Execute(.target.bash, "/sbin/SuSEconfig --nonewpackage --module ypclient", $[]) != 0) {
+    if (SCR::Execute(.target.bash, "/sbin/SuSEconfig --nonewpackage --module ypclient") != 0)
+    {
 	// warning dialog message
 	UI::MessagePopup(_("Error while running SuSEconfig"));
 	return false;
     }
 
-    if (start_yp) {
-	if (SCR::Execute(.target.bash, "/etc/init.d/portmap start", $[]) != 0) {
-	    // error popup message
-	    UI::MessagePopup(_("Error while running portmapper."));
-	    return false;
+    if (start_yp)
+    {
+	if (SCR::Execute(.target.bash, "/etc/init.d/portmap status") != 0)
+	{
+	    // portmap must not be started if it is running already (see bug # 9999)
+	    if (SCR::Execute(.target.bash, "/etc/init.d/portmap start") != 0)
+	    {
+		// error popup message
+		UI::MessagePopup(_("Error while running portmapper."));
+		return false;
+	    }
 	}
-	if (SCR::Execute(.target.bash, "/etc/init.d/ypbind start", $[]) != 0) {
+	if (SCR::Execute(.target.bash, "/etc/init.d/ypbind start") != 0)
+	{
 	    // error popup message
 	    UI::MessagePopup(_("Error while running ypclient."));
 	    return false;
@@ -72,7 +85,8 @@
 	// only test for a server if domain not changed
 	if (! lookup (yp_conf, "yp_domain_changed", false))
 	{
-	    if (SCR::Execute(.target.bash, "/usr/bin/ypwhich >/dev/null", $[]) != 0) {
+	    if (SCR::Execute(.target.bash, "/usr/bin/ypwhich >/dev/null") != 0)
+	    {
 		// error popup message
 		UI::MessagePopup(_("NIS server not found."));
 		return false;
