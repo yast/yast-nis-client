@@ -1,7 +1,13 @@
 -------------------------------------------------------------------
+Fri Aug 22 02:42:02 CEST 2003 - nashif@suse.de
+
+- Add variable for required packages and return them in auto client
+- 2.8.5
+
+-------------------------------------------------------------------
 Thu Aug 14 15:49:24 CEST 2003 - jsuchome@suse.cz
 
-- Removed "succes popup" and added writing progress dialog (#28729)
+- Removed "success popup" and added writing progress dialog (#28729)
 - 2.8.4
 
 -------------------------------------------------------------------
