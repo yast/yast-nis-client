@@ -1,6 +1,6 @@
 @HEADER-COMMENT@
 
-# neededforbuild  yast2-devel-packages yast2-runlevel
+# neededforbuild  yast2-devel-packages yast2-runlevel yast2-network
 
 @HEADER@
 Requires:	yast2 yast2-network yast2-runlevel yast2-packager
