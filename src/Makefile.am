@@ -15,6 +15,10 @@ module_DATA =		\
 
 desktop_DATA = nis.desktop
 
+nis:
+	ln -sf . $@
+ycpchook = nis
+
 EXTRA_DIST = $(client_DATA) $(myynclude_DATA) $(module_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common
