@@ -12,6 +12,7 @@
  */
 {
     include "testsuite.ycp";
+    import "Pkg"; // override
     import "Nis";
 
     map READ = $[
