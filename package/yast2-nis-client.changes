@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Jan 15 15:45:52 CET 2003 - mvidner@suse.de
+
+- Added function key shortcuts (try F1 in text mode).
+- Prevent agent from returning strings as integers/booleans (~#21804).
+- Using the new *_auto dispatcher (nashif).
+
+-------------------------------------------------------------------
 Fri Dec 20 10:52:46 CET 2002 - mvidner@suse.de
 
 - Easier editing of the server list.
