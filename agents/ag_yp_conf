@@ -9,7 +9,7 @@
 #  they will be written to the beginning of file
 # @servers: a list of ypservers (for the local domain)
 # %domainservers:  keys are domains, values are lists of servers
-# %broadcast: keys are domains, values booleans
+# %broadcast: keys are domains, values boolean refs
 #  if true, broadcast will be used as fallback.
 #  The maps must have the same set of keys!
 # $defaultbroadcast: boolean
@@ -30,8 +30,20 @@ my $defaultbroadcast;
 my $filename;
 my $modified;
 
+# br stands for boolean reference
+# convert a perl boolean to a value that ycp::Return(foo, 1) will recognize
+sub perl_to_br ($)
+{
+    return $_[0]? \ "true" : \ "false";
+}
+
+sub br_to_perl ($)
+{
+    my $br = shift;
+    return (ref ($br) eq "SCALAR" && $$br eq "true");
+}
+
 # fill in default values for missing entries
-# and normalize booleans (yuck).
 sub complete_maps ()
 {
     my $domain;
@@ -39,7 +51,7 @@ sub complete_maps ()
     {
 	if (!defined $broadcast{$domain})
 	{
-	    $broadcast{$domain} = "false";
+	    $broadcast{$domain} = perl_to_br (0);
 	}
     }
     foreach $domain (keys %broadcast)
@@ -48,24 +60,6 @@ sub complete_maps ()
 	{
 	    $domainservers{$domain} = [];
 	}
-	# TODO: workaround for broken boolean handling in ycp.pm
-	if ($broadcast{$domain} eq 0)
-	{
-	    $broadcast{$domain} = "false";
-	}
-	elsif ($broadcast{$domain} eq 1)
-	{
-	    $broadcast{$domain} = "true";
-	}
-    }
-
-    if ($defaultbroadcast eq 0)
-    {
-	$defaultbroadcast = "false";
-    }
-    elsif ($defaultbroadcast eq 1)
-    {
-	$defaultbroadcast = "true";
     }
 }
 
@@ -75,7 +69,7 @@ sub parse_file ()
     $comment = "";
     @servers = ();
     %domainservers = ();
-    $defaultbroadcast = "false";
+    $defaultbroadcast = 0;
 
     if (!open (FILE, $filename))
     {
@@ -103,11 +97,11 @@ sub parse_file ()
 	}
 	elsif (/^domain\s+(\S+)\s+broadcast\b/)
 	{
-	    $broadcast{$1} = "true";
+	    $broadcast{$1} = perl_to_br (1);
 	}
 	elsif (/^broadcast\b/)
 	{
-	    $defaultbroadcast = "true";
+	    $defaultbroadcast = 1;
 	}
 	else
 	{
@@ -136,7 +130,7 @@ sub write_file ()
     {
 	print FILE "ypserver $_\n";
     }
-    if ($defaultbroadcast eq "true")
+    if ($defaultbroadcast)
     {
 	print FILE "broadcast\n";
     }
@@ -146,7 +140,7 @@ sub write_file ()
 	{
 	    print FILE "domain $domain server $server\n";
 	}
-	if ($broadcast{$domain} eq "true")
+	if (br_to_perl ($broadcast{$domain}))
 	{
 	    print FILE "domain $domain broadcast\n";
 	}
@@ -241,7 +235,7 @@ while ( <STDIN> )
 	}
 	elsif ($path eq ".broadcast" && ref ($argument) eq "HASH")
 	{
-	    %broadcast = %{$argument};
+	    %broadcast = perl_to_br (%{$argument});
 	    $modified = 1;
 	}
 	elsif ($path eq ".defaultbroadcast" && !ref ($argument))
@@ -264,7 +258,13 @@ while ( <STDIN> )
 	    $comment = $argument->{"comment"};
 	    @servers = @{$argument->{"servers"}};
 	    %domainservers = %{$argument->{"domainservers"}};
-	    %broadcast = %{$argument->{"broadcast"}};
+	    # broadcast must be maintained as boolean references
+	    my %broadcast_norefs = %{$argument->{"broadcast"}};
+	    %broadcast = ();
+	    while (my ($k, $v) = each %broadcast_norefs)
+	    {
+		$broadcast{$k} = perl_to_br ($v);
+	    }
 	    $defaultbroadcast = $argument->{"defaultbroadcast"};
 	    $modified = 1;
 	}
@@ -281,23 +281,23 @@ while ( <STDIN> )
     {
 	if ($path eq ".servers")
 	{
-	    ycp::Return (\@servers);
+	    ycp::Return (\@servers, 1);
 	}
 	elsif ($path eq ".domainservers")
 	{
-	    ycp::Return (\%domainservers);
+	    ycp::Return (\%domainservers, 1);
 	}
 	elsif ($path eq ".broadcast")
 	{
-	    ycp::Return (\%broadcast);
+	    ycp::Return (\%broadcast, 1);
 	}
 	elsif ($path eq ".defaultbroadcast")
 	{
-	    ycp::Return ($defaultbroadcast);
+	    ycp::Return (perl_to_br ($defaultbroadcast), 1);
 	}
 	elsif ($path eq ".comment")
 	{
-	    ycp::Return ($comment);
+	    ycp::Return ($comment, 1);
 	}
 	elsif ($path eq ".")
 	{
@@ -306,9 +306,9 @@ while ( <STDIN> )
 			  "comment" => $comment,
 			  "domainservers" => \%domainservers,
 			  "broadcast" => \%broadcast,
-			  "defaultbroadcast" => $defaultbroadcast,
+			  "defaultbroadcast" => perl_to_br ($defaultbroadcast),
 			  "servers" => \@servers,
-			  });
+			  }, 1);
 	}
 	else
 	{
