@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Feb 18 15:27:44 CET 2003 - mvidner@suse.de
+
+- Preselect to start the service if run during the installation
+  (from the user module, #23733).
+
+-------------------------------------------------------------------
 Mon Feb 17 16:01:32 CET 2003 - mvidner@suse.de
 
 - Check whether dhcpcd is running (test -f /var/run/dhcpcd-*.pid, #23591).
