@@ -75,6 +75,7 @@ Read	.etc.yp_conf.broadcast $["otherdomain":true]
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Read	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes"
 Read	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "yes"
+Execute	.target.bash "test -f /var/run/dhcpcd-*.pid" 0
 Execute	.target.bash "/bin/grep -qs '^NISSERVERS' /var/lib/dhcpcd/dhcpcd-*.info" 0
 Execute	.target.bash "/bin/grep -qs '^NISDOMAIN' /var/lib/dhcpcd/dhcpcd-*.info" 0
 Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
