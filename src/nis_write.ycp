@@ -53,7 +53,7 @@
     return false;
   }
 
-  if (SCR::Execute(.target.bash, "/sbin/SuSEconfig -quick -nonewpackage", $[]) != 0) {
+  if (SCR::Execute(.target.bash, "/sbin/SuSEconfig --nonewpackage --module ypclient", $[]) != 0) {
 	    // warning dialog message
     UI::MessagePopup(_("Error while running SuSEconfig"));
     return false;
