@@ -1,5 +1,5 @@
 -------------------------------------------------------------------
-Thu Aug 22 11:23:21 CEST 2002 - mvidner@suse.cz
+Thu Aug 22 13:23:34 CEST 2002 - mvidner@suse.cz
 
 - Use not only /etc/defaultdomain but also `ypdomainname`,
   because dhcpcd may use it. (~#14232)
