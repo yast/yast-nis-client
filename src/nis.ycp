@@ -50,7 +50,7 @@
 
     if (result == `next)
     {
-	if (Nis::Write ())
+	if (Nis::Write (false))
 	{
 	    if (Nis::start)
 	    {

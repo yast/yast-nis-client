@@ -159,14 +159,23 @@
 	_start_autofs = Runlevel::ServiceEnabled ("autofs");
 	return true;
     }
-
+    
+    /**
+     * Only write new configuration w/o starting any scripts
+     * @return true on success
+     */
+    global define boolean WriteOnly()``{
+	return (Write(true));
+    }
+    
     /**
      * Saves NIS configuration.
      * (No parameters because it is too short to abort)
      * @return true on success
      */
-    global define boolean Write () ``{
-	Runlevel::RunInitScript ("ypbind", "stop");
+    global define boolean Write (boolean writeonly) ``{
+	if (!writeonly)
+	    Runlevel::RunInitScript ("ypbind", "stop");
 
 	if (start)
 	{
@@ -186,8 +195,8 @@
 	if (start)
 	{
 	    WritePluses ();
-
-	    if (Runlevel::ServiceStatus ("portmap") != 0)
+	    SCR::Execute(.target.bash, "/bin/ypdomainname $DOMAIN", $["DOMAIN" : domain]);
+	    if (!writeonly && Runlevel::ServiceStatus ("portmap") != 0 )
 	    {
 		// portmap must not be started if it is running already (see bug # 9999)
 		if (Runlevel::RunInitScript ("portmap", "start") != 0)
@@ -198,14 +207,14 @@
 		}
 	    }
 	    sleep(1000);	// workaround for bug #10428, ypbind restart
-	    if (Runlevel::RunInitScript ("ypbind", "start") != 0)
+	    if (!writeonly && Runlevel::RunInitScript ("ypbind", "start") != 0)
 	    {
 		// error popup message
 		Report::Error (_("Error while running ypclient."));
 		return false;
 	    }
 	    // only test for a server if domain not changed
-	    if (! domain_changed)
+	    if (! domain_changed && !writeonly)
 	    {
 		if (SCR::Execute(.target.bash, "/usr/bin/ypwhich >/dev/null") != 0)
 		{
@@ -217,11 +226,14 @@
 
 	    if (_autofs_allowed)
 	    {
-		Runlevel::RunInitScript ("autofs", "stop");
+		if (!writeonly)
+		    Runlevel::RunInitScript ("autofs", "stop");
+
+		if (_start_autofs && !writeonly)
+		    Runlevel::RunInitScript ("autofs", "start");
 
 		if (_start_autofs)
-		{
-		    Runlevel::RunInitScript ("autofs", "start");
+		{		    
 		    Runlevel::ServiceAdjust ("autofs", "enable");
 		}
 		else
