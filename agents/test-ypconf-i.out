@@ -1,0 +1,27 @@
+$[".servers":
+["192.168.0.1",
+"192.168.0.2",
+"192.168.0.3",
+"192.168.0.4",
+] ,
+".comment":
+" This is a comment
+Another comment
+that continues
+ lots of servers
+ broadcast will override specific servers
+",
+".domainservers":
+$["bad-domain":
+[] ,
+"other-domain.test":
+["yp.other-domain.test",
+"yp2.other-domain.test",
+] ,
+"yourdomain":
+["10.0.0.1",
+] ,
+"mydomain":
+[] ,
+] ,
+] 
