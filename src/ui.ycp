@@ -225,7 +225,8 @@ less frequently used settings.</p>
  permission.</p>");
 
 	// help text 4/3
-	string autofs_help_text = _("<p>Automounter is a daemon that mounts directories automatically.
+	string autofs_help_text = _("<p>Automounter is a daemon that mounts directories automatically,
+such as users' home directories.
 It is assumed that its configuration files (auto.*) already exist,
 either locally or over NIS.<br>
 If it is not installed and you want to use it, it will be installed
