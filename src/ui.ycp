@@ -26,6 +26,7 @@
     import "Require";
     import "Label";
     import "Popup";
+    import "Autologin";
 
     include "wizard/sequencer.ycp";
     include "network/ip.ycp";
@@ -128,6 +129,10 @@
 
 	if (result == `next)
 	{
+	    if (Nis::start)
+		// popup text FIXME better...
+		Autologin::AskForDisabling(_("Now you have enabled NIS."));
+
 	    // Install packages if needed.
 	    // Cannot do it in Write, autoinstall does it differently.
 	    if (size (Nis::install_packages) > 0 ||

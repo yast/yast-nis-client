@@ -18,6 +18,7 @@ Read	.sysconfig.ypbind.YPBIND_OPTIONS ""
 Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.etc.nsswitch_conf."hosts" "files dns6"
+Read	.sysconfig.displaymanager.DISPLAYMANAGER nil
 Return	true
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true
@@ -42,7 +43,6 @@ Write	.sysconfig.ypbind nil true
 Write	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "no" true
 Write	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "no" true
 Write	.sysconfig.network.dhcp nil true
-Read	.sysconfig.displaymanager.DISPLAYMANAGER nil
 Read	.etc.nsswitch_conf."passwd" "compat"
 Write	.etc.nsswitch_conf."passwd_compat" nil true
 Read	.etc.nsswitch_conf."group" "compat"
@@ -92,6 +92,7 @@ Read	.sysconfig.ypbind.YPBIND_OPTIONS ""
 Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.etc.nsswitch_conf."hosts" "files dns6"
+Read	.sysconfig.displaymanager.DISPLAYMANAGER nil
 Return	true
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true
@@ -109,7 +110,6 @@ Write	.sysconfig.ypbind nil true
 Write	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "yes" true
 Write	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes" true
 Write	.sysconfig.network.dhcp nil true
-Read	.sysconfig.displaymanager.DISPLAYMANAGER nil
 Read	.etc.nsswitch_conf."passwd" "compat"
 Write	.etc.nsswitch_conf."passwd_compat" nil true
 Read	.etc.nsswitch_conf."group" "compat"
