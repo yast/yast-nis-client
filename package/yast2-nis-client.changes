@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jul 31 05:57:04 CEST 2003 - nashif@suse.de
+
+- Use correct SCR path for writing dhcp options
+
+-------------------------------------------------------------------
 Tue Jul 29 17:22:13 CEST 2003 - mvidner@suse.cz
 
 - Cancel in the server selection popup now works.
