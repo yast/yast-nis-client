@@ -40,5 +40,5 @@
     }
 
     // The write is a simple one so we don't use Progress
-    return Nis::Import (Args (0)) && Nis::Write ();
+    return Nis::Import (Args (0)) && Nis::WriteOnly ();
 }
