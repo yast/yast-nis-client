@@ -40,7 +40,8 @@ else if(func == "Summary") {
     ret =  Nis::Summary();
 }
 else if (func == "Reset") {
-	ret = Nis::Import($[]);
+	Nis::Import($[]);
+	ret = $[];
 }
 else if (func == "Change") {
 	ret = AutoSequence();
