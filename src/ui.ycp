@@ -29,8 +29,6 @@
     import "Autologin";
 
     include "wizard/sequencer.ycp";
-    include "network/ip.ycp";
-    include "network/dns.ycp";
 
     /**
      * A Wizard Sequencer helper
@@ -426,8 +424,8 @@ by separating their addresses with spaces.</p>
 
 	    if (result == `next)
 	    {
-		local_only =  UI::QueryWidget (`id (`local_only), `Value);
-		broken_server = UI::QueryWidget (`id (`broken_server), `Value);
+		local_only =  (boolean) UI::QueryWidget (`id (`local_only), `Value);
+		broken_server = (boolean) UI::QueryWidget (`id (`broken_server), `Value);
 		// TODO: disallow " in options
 		options = (string) UI::QueryWidget (`id (`options), `Value);
 
@@ -823,7 +821,7 @@ This check box only appears if it is turned on.</p>
 
 	    // only query if the widget is there
 	    global_broadcast = global_broadcast_allowed &&
-		UI::QueryWidget (`id (`global_broadcast), `Value);
+		(boolean) UI::QueryWidget (`id (`global_broadcast), `Value);
 
 	    if (result == `domain)
 	    {
@@ -1112,7 +1110,7 @@ automatically.</p>");
 	if (result == `next)
 	{
 	    Nis::start = yp_client;
-	    Nis::_start_autofs = Nis::_autofs_allowed && UI::QueryWidget (`id (`autofs), `Value);
+	    Nis::_start_autofs = Nis::_autofs_allowed && (boolean) UI::QueryWidget (`id (`autofs), `Value);
 	    result = yp_client? result: `finish;
 	}
 
