@@ -511,13 +511,13 @@ by separating their addresses with spaces.</p>
 		`VSpacing (1),
 		`Frame (
 		    // frame label
-		    _("DHCP settings"),
+		    _("DHCP Settings"),
 		    `VBox (
 			`VSpacing (0.2),
 			// check box label
-			`Left (`CheckBox (`id (`domain_dhcp), _("Get the &domain by DHCP"), domain_dhcp)),
+			`Left (`CheckBox (`id (`domain_dhcp), _("Get the &Domain by DHCP"), domain_dhcp)),
 			// check box label
-			`Left (`CheckBox (`id (`servers_dhcp), _("Get the &servers by DHCP"), servers_dhcp)),
+			`Left (`CheckBox (`id (`servers_dhcp), _("Get the &Servers by DHCP"), servers_dhcp)),
 
 			`VSpacing (0.2)
 			)
