@@ -1,27 +1,18 @@
 @HEADER-COMMENT@
-
-# neededforbuild  yast2-devel-packages yast2-runlevel
+# neededforbuild yast2-devel-packages yast2-runlevel
 
 @HEADER@
+Requires:	yast2 yast2-network yast2-runlevel yast2-packager
 
-Summary:	Configuration of nis
 Provides:	yast2-config-nis
 Obsoletes:	yast2-config-nis
-Requires:	yast2-lib-network >= 2.5.3
-Requires:	yast2-config-package-manager
-Requires:       yast2-config-runlevel >= 2.4.12
-Requires:       yast2-agent-targetpkg
 Provides:	yast2-config-network:/usr/lib/YaST2/clients/lan_ypclient.ycp
+
 BuildArchitectures:	noarch
 
+Summary:	Configuration of NIS client
+
 %description
--
-
-%package devel
-Summary:	YaST2 - Configuration of NIS, developer documentation
-Group:		System Environment/YaST
-
-%description devel
 -
 
 @PREP@
@@ -44,4 +35,4 @@ Group:		System Environment/YaST
 @agentdir@/ag_yp_conf
 @scrconfdir@/cfg_ypbind.scr
 @scrconfdir@/yp_conf.scr
-@docdir@/*
+%doc @docdir@
