@@ -553,7 +553,10 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    {
 		return false;
 	    }
+	}
 
+	if (true) // autofs no longer depends on nis, #19769
+	{
 	    if (_autofs_allowed)
 	    {
 		// nsswitch automount:
@@ -562,12 +565,14 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		list(string) automount_l = filter (`s, splitstring (automount_s, " \t"), ``(s != ""));
 		boolean enabled = find (string s, automount_l, ``(s == "nis")) != nil;
 		boolean ok = true;
-		if (_start_autofs && !enabled)
+		// enable it if it is not enabled yet and both services run
+		if (start && _start_autofs && !enabled)
 		{
 		    ok = SCR::Write (.etc.nsswitch_conf.automount, automount_s + " nis");
 		    ok = ok && SCR::Write (.etc.nsswitch_conf, nil);
 		}
-		else if (!_start_autofs && enabled)
+		// disable it if it is enabled and either service does not run
+		else if (!(start && _start_autofs) && enabled)
 		{
 		    automount_l = filter (string s, automount_l, ``(s != "nis"));
 		    ok = SCR::Write (.etc.nsswitch_conf.automount, mergestring (automount_l, " "));
@@ -643,7 +648,10 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		    return false;
 		}
 	    }
+	}
 
+	if (true) // autofs no longer depends on nis, #19769
+	{
 	    if (_autofs_allowed)
 	    {
 		Runlevel::RunInitScript ("autofs", "stop");

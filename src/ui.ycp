@@ -243,7 +243,6 @@ automatically.</p>");
 	    _("Configuration of NIS client"), con, help_text,
 	    BackButtonLabel (),
 	    yp_client? NextButtonLabel (): FinishButtonLabel ());
-	UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 
 	any result = nil;
 	repeat
@@ -261,7 +260,6 @@ automatically.</p>");
 		UI::ChangeWidget (
 		    `id (`next), `Label,
 		    yp_client? NextButtonLabel (): FinishButtonLabel ());
-		UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 	    }
 	}
 	until (result == `back || result == `next ||
