@@ -9,7 +9,7 @@ Read	.etc.yp_conf.slp $["slpdomain":true]
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Read	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "no"
 Read	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "no"
-Execute	.target.bash "test -f /var/run/dhcpcd-*.pid" 0
+Execute	.target.bash "ls /var/run/dhcpcd-*.pid" 0
 Execute	.target.bash "/bin/grep -qs '^NISSERVERS' /var/lib/dhcpcd/dhcpcd-*.info" 0
 Execute	.target.bash "/bin/grep -qs '^NISDOMAIN' /var/lib/dhcpcd/dhcpcd-*.info" 0
 Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
@@ -27,6 +27,8 @@ Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Read	.init.scripts.exists "SuSEfirewall2_init" true
 Read	.init.scripts.runlevel "SuSEfirewall2_init" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.exists "SuSEfirewall2_init" true
+Execute	.target.bash "/etc/init.d/SuSEfirewall2_init status" $["TERM":"raw"] 0
 Return	true
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true
@@ -105,7 +107,7 @@ Read	.etc.yp_conf.slp $["slpdomain":true]
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Read	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes"
 Read	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "yes"
-Execute	.target.bash "test -f /var/run/dhcpcd-*.pid" 0
+Execute	.target.bash "ls /var/run/dhcpcd-*.pid" 0
 Execute	.target.bash "/bin/grep -qs '^NISSERVERS' /var/lib/dhcpcd/dhcpcd-*.info" 0
 Execute	.target.bash "/bin/grep -qs '^NISDOMAIN' /var/lib/dhcpcd/dhcpcd-*.info" 0
 Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
@@ -123,6 +125,8 @@ Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Read	.init.scripts.exists "SuSEfirewall2_init" true
 Read	.init.scripts.runlevel "SuSEfirewall2_init" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.exists "SuSEfirewall2_init" true
+Execute	.target.bash "/etc/init.d/SuSEfirewall2_init status" $["TERM":"raw"] 0
 Return	true
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true
