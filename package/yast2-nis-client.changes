@@ -1,7 +1,8 @@
 -------------------------------------------------------------------
-Fri Mar 28 16:24:27 CET 2003 - mvidner@suse.de
+Thu Apr 24 12:54:34 CEST 2003 - mvidner@suse.de
 
 - Added a button to find NIS servers.
+- Clear {passwd,group,shadow}_compat: nisplus (#16168).
 - 2.8.0
 
 -------------------------------------------------------------------
