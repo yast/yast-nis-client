@@ -29,7 +29,8 @@
     import "Wizard";
     import "Autologin";
 
-    include "network/dns.ycp";
+    import "IP";
+    import "Address";
 
     /**
      * Required packages for this module to operate
@@ -233,11 +234,11 @@ and it must be at most 64 characters long.
 	{
 	    // message popup
 	    return _("Only an IP address can be used
-because host names are resolved using NIS.\n\n") + valid_ip4 ();
+because host names are resolved using NIS.\n\n") + IP::Valid4();
 	}
 	else
 	{
-	    return valid_address ();
+	    return Address::Valid4();
 	}
     }
 
@@ -251,11 +252,11 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	y2debug ("hosts_by_nis %1", hosts_by_nis);
 	if (hosts_by_nis)
 	{
-	    return check_ip4 (a);
+	    return IP::Check4(a);
 	}
 	else
 	{
-	    return check_address (a);
+	    return Address::Check(a);
 	}
     }
 
