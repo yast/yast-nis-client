@@ -176,6 +176,7 @@
 	    // TODO: report errors
 	    SCR::Write (.etc.defaultdomain, domain);
 	    SCR::Write (.etc.yp_conf.servers, servers);
+	    SCR::Write (.etc.yp_conf, nil);
 	}
 	else
 	{
