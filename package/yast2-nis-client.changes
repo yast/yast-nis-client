@@ -1,7 +1,10 @@
 -------------------------------------------------------------------
-Thu Aug 22 08:59:46 CEST 2002 - mvidner@suse.cz
+Thu Aug 22 11:23:21 CEST 2002 - mvidner@suse.cz
 
-- Provide/Obsolete yast2-config-nis-devel
+- Use not only /etc/defaultdomain but also `ypdomainname`,
+  because dhcpcd may use it. (~#14232)
+- Provide/Obsolete yast2-config-nis-devel.
+- 2.6.13
 
 -------------------------------------------------------------------
 Wed Aug 14 09:32:44 CEST 2002 - mvidner@suse.cz
