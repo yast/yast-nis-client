@@ -578,10 +578,15 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    .sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF) == "yes";
 	domain_by_dhcp_wanted = SCR::Read (
 	    .sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME) == "yes";
+	boolean dhcpcd_running =
+	    (servers_by_dhcp_wanted || domain_by_dhcp_wanted) &&
+	    SCR::Execute (.target.bash, "test -f /var/run/dhcpcd-*.pid") == 0;
 	string di = "/var/lib/dhcpcd/dhcpcd-*.info";
-	servers_by_dhcp_actual = servers_by_dhcp_wanted && SCR::Execute (
+	servers_by_dhcp_actual = servers_by_dhcp_wanted && dhcpcd_running &&
+	    SCR::Execute (
 	    .target.bash, "/bin/grep -qs '^NISSERVERS' " + di) == 0;
-	domain_by_dhcp_actual = domain_by_dhcp_wanted && SCR::Execute (
+	domain_by_dhcp_actual = domain_by_dhcp_wanted && dhcpcd_running &&
+	    SCR::Execute (
 	    .target.bash, "/bin/grep -qs '^NISDOMAIN' " + di) == 0;
 
 	local_only = SCR::Read (.sysconfig.ypbind.YPBIND_LOCAL_ONLY) == "yes";
