@@ -627,6 +627,13 @@ This check box therefore only appears if it is turned on.</p>
 
 	    UI::ChangeWidget (`id (`multiple), `Enabled, !global_broadcast);
 
+	    // Kludge, because a `Table still does not have a shortcut.
+	    // exclude textentry-notify
+	    if (result != `domain)
+	    {
+		UI::SetFocus (`id (`domains));
+	    }
+
 	    result = UI::UserInput ();
 	    if (result == `cancel)
 	    {
