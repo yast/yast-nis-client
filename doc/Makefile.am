@@ -12,7 +12,7 @@ screenshots = \
 	$(wildcard nis*.png)
 
 workflow.png: workflow.dia $(screenshots)
-	dia --export=$@ $<
+	dia -n --export=$@ $<
 MAINTAINERCLEANFILES = workflow.png
 
 html_DATA = index.html ypdomainname.txt workflow.dia workflow.png $(screenshots)
