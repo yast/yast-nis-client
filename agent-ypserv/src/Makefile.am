@@ -12,7 +12,7 @@ libpy2ag_ypserv_la_SOURCES =			\
 	YpservAgent.cc YpservAgent.h
 
 libpy2ag_ypserv_la_LDFLAGS = -version-info 2:0
-libpy2ag_ypserv_la_LIBADD = -lnsl
+libpy2ag_ypserv_la_LIBADD = @AGENT_LIBADD@ -lnsl
 
 noinst_PROGRAMS = findypserv
 findypserv_SOURCES =				\
@@ -21,7 +21,4 @@ findypserv_SOURCES =				\
 findypserv_LDADD = -lnsl
 
 INCLUDES =					\
-	-I$(srcdir)/../../libycp/src/include	\
-	-I$(srcdir)/../../liby2/src/include	\
-	-I$(srcdir)/../../libscr/src/include	\
 	-I$(includedir)
