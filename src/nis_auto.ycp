@@ -52,6 +52,9 @@ else if (func == "Read") {
 else if (func == "Export") {
 	ret = Nis::Export();
 }
+else if (func == "Packages") {
+	ret = Nis::required_packages;
+}
 else if (func == "Write") {
     import "Progress";
     Progress::off();
