@@ -40,158 +40,6 @@
 	return `next;
     }
 
-    global map Dialogs = $[
-	"switch":	``(SwitchDialog ()),
-	"ismultiple":	[ ``(IsMultiple ()), true ],
-	"single":	``(NisDialog ()),
-	"multiple":	``(MultipleDialog ()),
-	"expert":	``(ExpertDialog ()),
-	"end":		``(SaveDialog ()),
-	"common-next":	[ ``( JustNext () ), true ],
-	];
-
-    global map Sequence = $[
-	"ws_start"  : "switch",
-	"switch"    : $[
-	    `next   : "ismultiple",
-	    `finish : "common-next",
-	    `abort  : `abort,
-	    ],
-	"ismultiple": $[
-	    `no     : "single",
-	    `yes    : "multiple",
-	    ],
-	"single"       : $[
-	    `next   : "common-next",
-	    `multiple: "multiple",
-	    `expert : "expert",
-	    `abort  : `abort
-	    ],
-	"multiple"  : $[
-	    `next   : "common-next",
-	    `single : "single",
-	    `expert : "expert",
-	    `abort  : `abort
-	    ],
-	"expert"       : $[
-	    `next   : "ismultiple",
-	    `abort  : `abort
-	    ],
-	// This is will make AutoSequence finish without
-	// confirmation. NormalSequence overrides it.
-	"common-next" : $[
-	    `next	: `next,
-	    ],
-	"end"       : $[
-	    `next    : `next
-	    ]
-	];
-
-    /**
-     * The dialog that appears when the [Abort] button is pressed.
-     * @param touched data modified?
-     * @return `abort if user really wants to abort, `back otherwise
-     */
-    global define boolean ReallyAbort (boolean touched) ``{
-
-	return (!Mode::cont)
-	    ? Popup::ReallyAbort (touched)
-	    : Popup::ConfirmAbort (`incomplete);
-    }
-
-    /**
-     * The normal workflow
-     * @return `back, `abort or `next
-     */
-    global define symbol NormalSequence() ``{
-	map normal_override = $[
-	    "common-next": $[
-		`next: "end",
-		],
-	    ];
-
-	Wizard::CreateDialog ();
-
-	if (Mode::screen_shot)
-	{
-	    Nis::Fake ();
-	}
-	else
-	{
-	    Nis::Read ();
-	}
-
-	FitIntoSingle ();
-
-	// the second map must override the first!
-	symbol result = WizardSequencer (Dialogs,
-					 union (Sequence, normal_override));
-
-	if (result == `next)
-	{
-	    if (Nis::start)
-		// popup text FIXME better...
-		Autologin::AskForDisabling(_("Now you have enabled NIS."));
-
-	    // Install packages if needed.
-	    // Cannot do it in Write, autoinstall does it differently.
-	    if (size (Nis::install_packages) > 0 ||
-		size (Nis::remove_packages) > 0)
-	    {
-		Require::DoInstallAndRemove (Nis::install_packages,
-					     Nis::remove_packages);
-	    }
-
-	    if (Nis::Write ())
-	    {
-		if (Nis::start && Nis::DomainChanged ())
-		{
-		    // waring popup
-		    Popup::Warning (_("The domain has changed.
-You must reboot for the changes to take effect."));
-		}
-	    }
-	}
-	UI::CloseDialog();
-	return result;
-    }
-
-    /**
-     * Dhcpcd writes yp.conf in the multidomain form.
-     * Let's try rewriting it so that it fits into the simple dialog.
-     * It is done only after read.
-     */
-    global define void FitIntoSingle () ``{
-	if (Nis::dhcp_wanted && Nis::dhcp_possible)
-	{
-	    string d = Nis::GetDomain ();
-	    if (size (Nis::multidomain_servers) == 1)
-	    {
-		list s = Nis::multidomain_servers[d]:[];
-		// if there's only one entry, for the correct domain
-		if (size (s) > 0)
-		{
-		    y2milestone ("Fitting into the simple dialog");
-		    Nis::servers = s;
-		    Nis::multidomain_servers = $[];
-		    Nis::default_broadcast = Nis::multidomain_broadcast[d]:false;
-		    Nis::multidomain_broadcast = $[];
-		}
-	    }
-	}
-    }
-
-    /**
-     * The autoinstallation workflow
-     * @return `back, `abort or `next
-     */
-    global define symbol AutoSequence() ``{
-	Wizard::CreateDialog ();
-	symbol ret = WizardSequencer (Dialogs, Sequence);
-	UI::CloseDialog ();
-	return ret;
-    }
-
     global /*const*/ string broadcast_help =
 	// Translators: network broadcast address
 	_("<p>The <b>Broadcast</b> option enables searching
@@ -211,131 +59,15 @@ less frequently used settings.</p>
 ");
 
     /**
-     * The switch dialog.
-     * Selects NIS: off/on, Automount off/on
-     * @return	`back, `abort, `next, `finish
+     * The dialog that appears when the [Abort] button is pressed.
+     * @param touched data modified?
+     * @return `abort if user really wants to abort, `back otherwise
      */
-    global define symbol SwitchDialog () ``{
-	Wizard::SetScreenShotName ("nis-client-1-start");
+    global define boolean ReallyAbort (boolean touched) ``{
 
-	// help text 1/3
-	string help_text = _("<p>Here, your machine can be set up as an
- <b>NIS client</b>.</p>
-");
-
-	// help text 3/3
-	help_text = help_text + _("<p>The Network Information Service (NIS)
- was formerly known as Sun <b>Yellow Pages</b> (YP). The name Yellow
- Pages is a registered trademark in the United Kingdom by British
- Telecommunications plc and may not be used without
- permission.</p>");
-
-	// help text 4/3
-	string autofs_help_text = _("<p>Automounter is a daemon that mounts directories automatically,
-such as users' home directories.
-It is assumed that its configuration files (auto.*) already exist,
-either locally or over NIS.<br>
-If it is not installed and you want to use it, it will be installed
-automatically.</p>");
-
-	boolean yp_client = Mode::cont || Nis::start; // #23733
-	boolean autofs = Nis::_start_autofs;
-
-	term con = nil;
-	term nis_frame =
-	    // frame label
-	    `Frame (_("NIS client"),
-		    `VBox (`VSpacing (0.2),
-			   `RadioButtonGroup (
-			       `id (`rd),
-			       `Left (
-				   `HVSquash (
-				       `VBox (
-					   // radio button label
-					   `Left (`RadioButton (`id (`nisno), `opt (`notify), _("Do &not use NIS"), !yp_client)),
-					   // radio button label
-					   `Left (`RadioButton (`id (`nisyes), `opt (`notify), _("&Use NIS"), yp_client))
-					   )))),
-			   `VSpacing (0.2)
-			)
-		);
-
-	term autofs_frame =
-	    `Frame (
-		`opt (`hstretch),
-		// frame label
-		_("Automounter"),
-		`VBox (
-		    `VSpacing (0.2),
-		    // check box label
-		    `CheckBox (`id(`autofs), _("Start &Automounter"), autofs),
-		    `VSpacing (0.2),
-		    `Empty ()
-		    )
-		);
-
-	if (Nis::_autofs_allowed)
-	{
-	    con = `HVSquash (`VBox (nis_frame, `VSpacing (1), autofs_frame));
-	    help_text = help_text + autofs_help_text;
-	}
-	else
-	{
-	    con = `HVSquash (`VBox (nis_frame, `Empty (`id (`autofs))));
-	}
-
-	Wizard::SetContentsButtons (
-	    // dialog title
-	    _("Configuration of NIS client"), con, help_text,
-	    Label::BackButton (),
-	    (yp_client || Mode::cont)? Label::NextButton (): Label::FinishButton ());
-
-	// during installation, only enabling makes sence (#23831)
-	if (Mode::cont)
-	{
-	    UI::ChangeWidget (`id(`nisno), `Enabled, false);
-	    Wizard::ReplaceAbortButton (
-		`PushButton(`id(`abort), Label::AbortInstallationButton()));
-	}
-
-	any result = nil;
-	repeat
-	{
-	    result = UI::UserInput ();
-	    if (result == `cancel)
-	    {
-		result = `abort;
-	    }
-
-	    yp_client = (UI::QueryWidget (`id (`rd), `CurrentButton) != `nisno);
-
-	    if (result == `nisyes || result == `nisno || result == `nisdhcp)
-	    {
-		UI::ChangeWidget (
-		    `id (`next), `Label,
-		    (yp_client || Mode::cont)? Label::NextButton(): Label::FinishButton ());
-	    }
-	}
-	until (result == `back || result == `next ||
-	       (result == `abort && ReallyAbort (Nis::touched)));
-
-	if (result == `next)
-	{
-	    Nis::start = yp_client;
-	    Nis::_start_autofs = Nis::_autofs_allowed && UI::QueryWidget (`id (`autofs), `Value);
-	    result = yp_client? result: `finish;
-	}
-
-	Wizard::RestoreScreenShotName ();
-	return result;
-    }
-
-    /**
-     * Decide whether a complex dialog for multiple domains will be displayed
-     * @return `yes or `no
-     */
-    global define symbol IsMultiple () ``{
-	return size (Nis::multidomain_servers) > 0 ? `yes: `no;
+	return (!Mode::cont)
+	    ? Popup::ReallyAbort (touched)
+	    : Popup::ConfirmAbort (`incomplete);
     }
 
     /**
@@ -351,15 +83,14 @@ Change the DHCP server configuration to provide it.
 	}
     }
 
-
     /**
      * Let the user choose some of a list of items
      * @param title	selectionbox title
      * @param items	a list of items
      * @return		items or nil on cancel
      */
-    global define list(string) ChooseItems (string title, list(string) items) ``{
-	list (term) msb_items = maplist (string entry, items,
+    global define list<string> ChooseItems (string title, list<string> items) ``{
+	list<term> msb_items = maplist (string entry, items,
 					 ``( `item (`id (entry), entry)));
 	UI::OpenDialog (
 	    `VBox (
@@ -401,7 +132,7 @@ Change the DHCP server configuration to provide it.
 
 	if (ret == `ok)
 	{
-	    items = UI::QueryWidget (`id (`items), `SelectedItems);
+	    items = (list<string>) UI::QueryWidget (`id (`items), `SelectedItems);
 	}
 	else
 	{
@@ -443,7 +174,7 @@ Change the DHCP server configuration to provide it.
 	    }
 	}
 
-	list (string) selected_servers =
+	list <string> selected_servers =
 	    // selection box label
 	    ChooseItems (sformat (_("&NIS Servers in domain %1"), domain),
 			 found_servers[domain]:[]);
@@ -455,6 +186,7 @@ Change the DHCP server configuration to provide it.
 	Wizard::RestoreScreenShotName ();
 	return mergestring (selected_servers, " ");
     }
+
 
     /**
      * The simple dialog
@@ -545,7 +277,7 @@ by separating their addresses with spaces.</p>
 	any result = nil;
 	repeat
 	{
-	    dhcp_wanted = UI::QueryWidget (`id (`dhcpg), `CurrentButton) == `dhcpyes;
+	    dhcp_wanted = (symbol) UI::QueryWidget (`id (`dhcpg), `CurrentButton) == `dhcpyes;
 	    UI::ChangeWidget (`id (`domain), `Enabled, !dhcp_wanted);
 	    UI::ChangeWidget (`id (`servers), `Enabled, !dhcp_wanted);
 	    UI::ChangeWidget (`id (`broadcast), `Enabled, !dhcp_wanted);
@@ -564,7 +296,7 @@ by separating their addresses with spaces.</p>
 	    }
 	    else if (result == `find)
 	    {
-		domain =  UI::QueryWidget (`id (`domain), `Value);
+		domain =  (string) UI::QueryWidget (`id (`domain), `Value);
 		if (domain == "")
 		{
 		    // Message popup. The user wants to Find servers
@@ -583,9 +315,9 @@ by separating their addresses with spaces.</p>
 	    }
 	    else if (contains ([`next, `expert, `multiple], result))
 	    {
-		domain =  UI::QueryWidget (`id (`domain), `Value);
-		servers = UI::QueryWidget (`id (`servers), `Value);
-		default_broadcast = UI::QueryWidget (`id (`broadcast), `Value);
+		domain = (string) UI::QueryWidget (`id (`domain), `Value);
+		servers = (string) UI::QueryWidget (`id (`servers), `Value);
+		default_broadcast = (boolean) UI::QueryWidget (`id (`broadcast), `Value);
 
 		if (!dhcp_wanted &&
 		    !Nis::check_nisdomainname (domain))
@@ -630,7 +362,7 @@ by separating their addresses with spaces.</p>
 	}
 
 	Wizard::RestoreScreenShotName ();
-	return result;
+	return (symbol) result;
     }
 
 
@@ -697,14 +429,14 @@ by separating their addresses with spaces.</p>
 		local_only =  UI::QueryWidget (`id (`local_only), `Value);
 		broken_server = UI::QueryWidget (`id (`broken_server), `Value);
 		// TODO: disallow " in options
-		options = UI::QueryWidget (`id (`options), `Value);
+		options = (string) UI::QueryWidget (`id (`options), `Value);
 
-		if (false && some_error)
+/*		if (false && some_error)
 		{
 		    // error popup label
 		    Popup::Message (_("The domain name is not correct."));
 		    result = nil;
-		}
+		}*/
 	    }
 	}
 	until (result == `back || result == `next ||
@@ -721,7 +453,201 @@ by separating their addresses with spaces.</p>
 	}
 
 	Wizard::RestoreScreenShotName ();
-	return result;
+	return (symbol) result;
+    }
+
+    /**
+     * @param default_d the default domain
+     * @return "Default: default_d"
+     */
+    global define string DefaultCell (string default_d) ``{
+	// Translators: the default NIS domain
+	return sformat (_("Default: %1"), default_d);
+    }
+
+    global string check_g = nil;
+    /**
+     * Constructs items for the domain table
+     * @param	default_d	the default domain
+     * @param	all_servers	map of @ref server_sp
+     * @return a list of items
+     * @see Nis#multidomain_servers TODO
+     */
+    global define list DomainTableItems (string default_d, map all_servers) ``{
+	if (check_g == nil)
+	{
+	    check_g = UI::Glyph (`CheckMark);
+	}
+	// maps are sorted, so the default domain, "", comes first
+	return maplist (string d, list server_sp, all_servers, ``(
+			    `item (
+				`id (d),
+				(d == "")? DefaultCell (default_d): d,
+				// this would be a priority example x ]:
+				(server_sp[1]:false)? check_g: "",
+				mergestring (server_sp[0]:[], ", ")
+				)
+			    ));
+    }
+
+    /**
+     * @param	default_d	the default domain
+     * @param	all_servers show these items
+     * @param	d	the selected item
+     */
+    global define void UpdateDomainTable (string default_d, map all_servers,
+					  string d) ``{
+	UI::ChangeWidget (`id (`domains), `Items,
+			  DomainTableItems (default_d, all_servers));
+	UI::ChangeWidget (`id (`domains), `CurrentItem, d);
+    }
+
+    /**
+     * @param	m	a map
+     * @return		keys of the map
+     */
+    global define list mapkeys (map m) ``{
+	return maplist (any k, any v, m, ``( k ));
+    }
+
+    /**
+     * @tuple server_sp
+     * 0 list(string)	server list
+     * 1 boolean	broadcast
+     */
+
+    /**
+     * Add/Edit a domain, including its name and servers
+     * @param	init		currently selected domain: nil=add, ""=default
+     * @param	default_d	the default domain
+     * @param	server_sp	@ref server_sp
+     * @param	existing	existing domains
+     * @return [name, [ [server1, server2], broadcast? ]]
+     */
+    global define list DomainPopup (string init, string default_d,
+				    list server_sp, list<string> existing) ``{
+	Wizard::SetScreenShotName ("nis-client-2b1-domain");
+
+	string domain = (init == nil)? "": ((init == "") ? default_d: init);
+	list servers = server_sp[0]:[];
+	string servers_s = mergestring (servers, "\n");
+	boolean broadcast = server_sp[1]:false;
+
+	term t_servers =
+	    `VBox (
+		`MultiLineEdit(`id (`servers),
+			       // Translators: multilineedit label
+			       // comma: ","
+			       _("&Servers (separated by spaces or commas)"),
+			       servers_s),
+		`HBox (
+		    `CheckBox (`id (`local_broadcast),
+			       // checkbox label
+			       _("&Broadcast"), broadcast),
+		    // pushbutton label, find nis servers
+		    // Shortcut must not conflict with Finish and Next (#29960)
+		    `PushButton (`id (`find), _("Fin&d"))
+		    ),
+		`Empty ()
+		);
+
+	term contents =
+	    `HBox(
+		`HSpacing(1),
+		`VBox(
+		    `VSpacing(0.2),
+		    // Translators: popup dialog heading
+		    `Heading (_("Domain Settings")),
+		    // Add a domain, Adding a domain? Edit...
+		    // Translators: text entry label
+		    `Left (`TextEntry (`id (`domain), _("&Domain name"), domain)),
+		    `VSpacing(0.5),
+		    t_servers,
+		    `VSpacing(0.2),
+		    `HBox (`PushButton (`id (`ok), `opt (`default, `key_F10),
+					Label::OKButton ()),
+			   `PushButton (`id (`cancel), `opt (`key_F9),
+					Label::CancelButton ())),
+		    `VSpacing(0.2)
+		    ),
+		`HSpacing(1)
+		);
+
+	UI::OpenDialog (`opt(`decorated), contents);
+	UI::SetFocus (`id (`domain));
+
+	any ui = nil;
+	while (true)
+	{
+	    ui = UI::UserInput ();
+	    if (ui == `cancel)
+	    {
+		break;
+	    }
+	    else if (ui == `find)
+	    {
+		domain = (string) UI::QueryWidget (`id (`domain), `Value);
+		if (domain == "")
+		{
+		    // Message popup. The user wants to Find servers
+		    // but the domain is unknown.
+		    Popup::Message (_("Finding servers works only when the domain is known."));
+		    UI::SetFocus (`id (`domain));
+		}
+		else
+		{
+		    string servers = SelectNisServers (domain);
+		    if (servers != "")
+		    {
+			UI::ChangeWidget (`id (`servers), `Value, servers);
+		    }
+		}
+	    }
+	    else if (ui == `ok)
+	    {
+		// Input validation
+		// all querywidgets done now for consistency
+		domain = (string) UI::QueryWidget (`id (`domain), `Value);
+		servers_s = (string) UI::QueryWidget (`id (`servers), `Value);
+		broadcast = (boolean) UI::QueryWidget (`id (`local_broadcast), `Value);
+
+		servers = splitstring (servers_s, ", \n");
+		servers = filter (string s, servers, ``( s != "" ));
+		string bad_server = (string) find (string s, servers, ``(
+					      !Nis::check_address_nis (s)
+					      ));
+
+		if (!Nis::check_nisdomainname (domain)) //also disallows ""
+		{
+		    UI::SetFocus (`id (`domain));
+		    Popup::Error (Nis::valid_nisdomainname ());
+		}
+		else if (init != "" && domain != init &&
+			 contains (existing, domain))
+		{
+		    UI::SetFocus (`id (`domain));
+		    // Translators: error message
+		    Popup::Error (_("This domain is already defined."));
+		}
+		else if (bad_server != nil)
+		{
+		    UI::SetFocus (`id (`servers));
+		    string msg = sformat (
+			// Translators: error message
+			_("The format of server address '%1' is not correct."), bad_server);
+		    Popup::Error (msg + "\n\n" + Nis::valid_address_nis ());
+		}
+		else
+		{
+		    // all checks OK, break the input loop
+		    break;
+		}
+	    }
+	}
+
+	UI::CloseDialog ();
+	Wizard::RestoreScreenShotName ();
+	return (ui == `ok)? [domain, [servers, broadcast]] : nil;
     }
 
     /**
@@ -736,7 +662,7 @@ by separating their addresses with spaces.</p>
 	string default_d = Nis::GetDomain ();
 	boolean global_broadcast = Nis::global_broadcast;
 	map all_servers = mapmap (string d, list s, Nis::multidomain_servers,
-				  ``( [d, [s, Nis::multidomain_broadcast[d]:false]] ));
+				  ``( $[d: [s, Nis::multidomain_broadcast[d]:false]] ));
 	all_servers = add (all_servers, "",
 			   [Nis::servers, Nis::default_broadcast]);
 
@@ -868,8 +794,8 @@ This check box only appears if it is turned on.</p>
 
 	while (true)
 	{
-	    dhcp_wanted = UI::QueryWidget (`id (`dhcpg), `CurrentButton) == `dhcpyes;
-	    current_d = UI::QueryWidget (`id (`domains), `CurrentItem);
+	    dhcp_wanted = (symbol) UI::QueryWidget (`id (`dhcpg), `CurrentButton) == `dhcpyes;
+	    current_d = (string) UI::QueryWidget (`id (`domains), `CurrentItem);
 	    boolean any_d = current_d != nil;
 
 	    UI::ChangeWidget (`id (`edit_d), `Enabled, any_d);
@@ -901,7 +827,7 @@ This check box only appears if it is turned on.</p>
 
 	    if (result == `domain)
 	    {
-		default_d = UI::QueryWidget (`id (`domain), `Value);
+		default_d = (string) UI::QueryWidget (`id (`domain), `Value);
 		// update the Default: item
 		UI::ChangeWidget (`id (`domains), `Item ("", 0),
 				  DefaultCell (default_d));
@@ -922,7 +848,7 @@ This check box only appears if it is turned on.</p>
 	    }
 	    else if (result == `edit_d)
 	    {
-		string d0 = UI::QueryWidget (`id (`domains), `CurrentItem);
+		string d0 = (string) UI::QueryWidget (`id (`domains), `CurrentItem);
 
 		if (d0 != nil)
 		{
@@ -937,8 +863,8 @@ This check box only appears if it is turned on.</p>
 			string newkey = (d0=="")? "": d;
 			all_servers = mapmap (string k, list v, all_servers,``(
 						  (k == d0) ?
-						  [ newkey, s_sp ] :
-						  [ k, v]
+						  $[ newkey: s_sp ] :
+						  $[ k: v]
 						  ));
 			// update the default domain box
 			if (d0 == "")
@@ -955,7 +881,7 @@ This check box only appears if it is turned on.</p>
 	    }
 	    else if (result == `del_d)
 	    {
-		string d0 = UI::QueryWidget (`id (`domains), `CurrentItem);
+		string d0 = (string) UI::QueryWidget (`id (`domains), `CurrentItem);
 		if (d0 == "")
 		{
 		    Wizard::SetScreenShotName ("nis-client-2b-del-dfl");
@@ -991,7 +917,7 @@ for the default domain?")))
 	    else if (contains ([`next, `expert, `single], result))
 	    {
 		// Input validation
-		default_d = UI::QueryWidget (`id (`domain), `Value);
+		default_d = (string) UI::QueryWidget (`id (`domain), `Value);
 
 		if (!dhcp_wanted &&
 		    !Nis::check_nisdomainname (default_d))
@@ -1036,7 +962,7 @@ the default domain will be lost.")))
 	    Nis::global_broadcast = global_broadcast;
 
 	    map only_servers = mapmap (string d, list v, all_servers, ``(
-					   [d, v[0]:[]]
+					   $[d: v[0]:[]]
 					   ));
 	    list servers = only_servers[""]:[];
 	    boolean default_broadcast = nil;
@@ -1052,7 +978,7 @@ the default domain will be lost.")))
 	    else
 	    {
 		map only_broadcast = mapmap (string d, list v, all_servers, ``(
-						 [d, v[1]:false]
+						 $[d: v[1]:false]
 						 ));
 		default_broadcast = only_broadcast[""]:false;
 		multidomain_servers = filter (string d, list v,
@@ -1071,201 +997,135 @@ the default domain will be lost.")))
 	}
 
 	Wizard::RestoreScreenShotName ();
-	return result;
+	return (symbol) result;
     }
 
     /**
-     * @param	m	a map
-     * @return		keys of the map
+     * The switch dialog.
+     * Selects NIS: off/on, Automount off/on
+     * @return	`back, `abort, `next, `finish
      */
-    global define list mapkeys (map m) ``{
-	return maplist (any k, any v, m, ``( k ));
-    }
+    global define symbol SwitchDialog () ``{
+	Wizard::SetScreenShotName ("nis-client-1-start");
 
-    /**
-     * @tuple server_sp
-     * 0 list(string)	server list
-     * 1 boolean	broadcast
-     */
+	// help text 1/3
+	string help_text = _("<p>Here, your machine can be set up as an
+ <b>NIS client</b>.</p>
+");
 
-    /**
-     * Add/Edit a domain, including its name and servers
-     * @param	init		currently selected domain: nil=add, ""=default
-     * @param	default_d	the default domain
-     * @param	server_sp	@ref server_sp
-     * @param	existing	existing domains
-     * @return [name, [ [server1, server2], broadcast? ]]
-     */
-    global define list DomainPopup (string init, string default_d,
-				    list server_sp, list(string) existing) ``{
-	Wizard::SetScreenShotName ("nis-client-2b1-domain");
+	// help text 3/3
+	help_text = help_text + _("<p>The Network Information Service (NIS)
+ was formerly known as Sun <b>Yellow Pages</b> (YP). The name Yellow
+ Pages is a registered trademark in the United Kingdom by British
+ Telecommunications plc and may not be used without
+ permission.</p>");
 
-	string domain = (init == nil)? "": (init == "")? default_d: init;
-	list servers = server_sp[0]:[];
-	string servers_s = mergestring (servers, "\n");
-	boolean broadcast = server_sp[1]:false;
+	// help text 4/3
+	string autofs_help_text = _("<p>Automounter is a daemon that mounts directories automatically,
+such as users' home directories.
+It is assumed that its configuration files (auto.*) already exist,
+either locally or over NIS.<br>
+If it is not installed and you want to use it, it will be installed
+automatically.</p>");
 
-	term t_servers =
-	    `VBox (
-		`MultiLineEdit(`id (`servers),
-			       // Translators: multilineedit label
-			       // comma: ","
-			       _("&Servers (separated by spaces or commas)"),
-			       servers_s),
-		`HBox (
-		    `CheckBox (`id (`local_broadcast),
-			       // checkbox label
-			       _("&Broadcast"), broadcast),
-		    // pushbutton label, find nis servers
-		    // Shortcut must not conflict with Finish and Next (#29960)
-		    `PushButton (`id (`find), _("Fin&d"))
-		    ),
-		`Empty ()
+	boolean yp_client = Mode::cont || Nis::start; // #23733
+	boolean autofs = Nis::_start_autofs;
+
+	term con = nil;
+	term nis_frame =
+	    // frame label
+	    `Frame (_("NIS client"),
+		    `VBox (`VSpacing (0.2),
+			   `RadioButtonGroup (
+			       `id (`rd),
+			       `Left (
+				   `HVSquash (
+				       `VBox (
+					   // radio button label
+					   `Left (`RadioButton (`id (`nisno), `opt (`notify), _("Do &not use NIS"), !yp_client)),
+					   // radio button label
+					   `Left (`RadioButton (`id (`nisyes), `opt (`notify), _("&Use NIS"), yp_client))
+					   )))),
+			   `VSpacing (0.2)
+			)
 		);
 
-	term contents =
-	    `HBox(
-		`HSpacing(1),
-		`VBox(
-		    `VSpacing(0.2),
-		    // Translators: popup dialog heading
-		    `Heading (_("Domain Settings")),
-		    // Add a domain, Adding a domain? Edit...
-		    // Translators: text entry label
-		    `Left (`TextEntry (`id (`domain), _("&Domain name"), domain)),
-		    `VSpacing(0.5),
-		    t_servers,
-		    `VSpacing(0.2),
-		    `HBox (`PushButton (`id (`ok), `opt (`default, `key_F10),
-					Label::OKButton ()),
-			   `PushButton (`id (`cancel), `opt (`key_F9),
-					Label::CancelButton ())),
-		    `VSpacing(0.2)
-		    ),
-		`HSpacing(1)
+	term autofs_frame =
+	    `Frame (
+		`opt (`hstretch),
+		// frame label
+		_("Automounter"),
+		`VBox (
+		    `VSpacing (0.2),
+		    // check box label
+		    `CheckBox (`id(`autofs), _("Start &Automounter"), autofs),
+		    `VSpacing (0.2),
+		    `Empty ()
+		    )
 		);
 
-	UI::OpenDialog (`opt(`decorated), contents);
-	UI::SetFocus (`id (`domain));
-
-	any ui = nil;
-	while (true)
+	if (Nis::_autofs_allowed)
 	{
-	    ui = UI::UserInput ();
-	    if (ui == `cancel)
-	    {
-		break;
-	    }
-	    else if (ui == `find)
-	    {
-		domain =  UI::QueryWidget (`id (`domain), `Value);
-		if (domain == "")
-		{
-		    // Message popup. The user wants to Find servers
-		    // but the domain is unknown.
-		    Popup::Message (_("Finding servers works only when the domain is known."));
-		    UI::SetFocus (`id (`domain));
-		}
-		else
-		{
-		    string servers = SelectNisServers (domain);
-		    if (servers != "")
-		    {
-			UI::ChangeWidget (`id (`servers), `Value, servers);
-		    }
-		}
-	    }
-	    else if (ui == `ok)
-	    {
-		// Input validation
-		// all querywidgets done now for consistency
-		domain = UI::QueryWidget (`id (`domain), `Value);
-		servers_s = UI::QueryWidget (`id (`servers), `Value);
-		broadcast = UI::QueryWidget (`id (`local_broadcast), `Value);
-
-		servers = splitstring (servers_s, ", \n");
-		servers = filter (string s, servers, ``( s != "" ));
-		string bad_server = find (string s, servers, ``(
-					      !Nis::check_address_nis (s)
-					      ));
-
-		if (!Nis::check_nisdomainname (domain)) //also disallows ""
-		{
-		    UI::SetFocus (`id (`domain));
-		    Popup::Error (Nis::valid_nisdomainname ());
-		}
-		else if (init != "" && domain != init &&
-			 contains (existing, domain))
-		{
-		    UI::SetFocus (`id (`domain));
-		    // Translators: error message
-		    Popup::Error (_("This domain is already defined."));
-		}
-		else if (bad_server != nil)
-		{
-		    UI::SetFocus (`id (`servers));
-		    string msg = sformat (
-			// Translators: error message
-			_("The format of server address '%1' is not correct."), bad_server);
-		    Popup::Error (msg + "\n\n" + Nis::valid_address_nis ());
-		}
-		else
-		{
-		    // all checks OK, break the input loop
-		    break;
-		}
-	    }
+	    con = `HVSquash (`VBox (nis_frame, `VSpacing (1), autofs_frame));
+	    help_text = help_text + autofs_help_text;
+	}
+	else
+	{
+	    con = `HVSquash (`VBox (nis_frame, `Empty (`id (`autofs))));
 	}
 
-	UI::CloseDialog ();
+	Wizard::SetContentsButtons (
+	    // dialog title
+	    _("Configuration of NIS client"), con, help_text,
+	    Label::BackButton (),
+	    (yp_client || Mode::cont)? Label::NextButton (): Label::FinishButton ());
+
+	// during installation, only enabling makes sence (#23831)
+	if (Mode::cont)
+	{
+	    UI::ChangeWidget (`id(`nisno), `Enabled, false);
+	    Wizard::ReplaceAbortButton (
+		`PushButton(`id(`abort), Label::AbortInstallationButton()));
+	}
+
+	any result = nil;
+	repeat
+	{
+	    result = UI::UserInput ();
+	    if (result == `cancel)
+	    {
+		result = `abort;
+	    }
+
+	    yp_client = ((symbol) UI::QueryWidget (`id (`rd), `CurrentButton) != `nisno);
+
+	    if (result == `nisyes || result == `nisno || result == `nisdhcp)
+	    {
+		UI::ChangeWidget (
+		    `id (`next), `Label,
+		    (yp_client || Mode::cont)? Label::NextButton(): Label::FinishButton ());
+	    }
+	}
+	until (result == `back || result == `next ||
+	       (result == `abort && ReallyAbort (Nis::touched)));
+
+	if (result == `next)
+	{
+	    Nis::start = yp_client;
+	    Nis::_start_autofs = Nis::_autofs_allowed && UI::QueryWidget (`id (`autofs), `Value);
+	    result = yp_client? result: `finish;
+	}
+
 	Wizard::RestoreScreenShotName ();
-	return (ui == `ok)? [domain, [servers, broadcast]] : nil;
+	return (symbol) result;
     }
 
     /**
-     * @param default_d the default domain
-     * @return "Default: default_d"
+     * Decide whether a complex dialog for multiple domains will be displayed
+     * @return `yes or `no
      */
-    global define string DefaultCell (string default_d) ``{
-	// Translators: the default NIS domain
-	return sformat (_("Default: %1"), default_d);
-    }
-
-    global string check_g = nil;
-    /**
-     * Constructs items for the domain table
-     * @param	default_d	the default domain
-     * @param	all_servers	map of @ref server_sp
-     * @return a list of items
-     * @see Nis#multidomain_servers TODO
-     */
-    global define list DomainTableItems (string default_d, map all_servers) ``{
-	if (check_g == nil)
-	{
-	    check_g = UI::Glyph (`CheckMark);
-	}
-	// maps are sorted, so the default domain, "", comes first
-	return maplist (string d, list server_sp, all_servers, ``(
-			    `item (
-				`id (d),
-				(d == "")? DefaultCell (default_d): d,
-				// this would be a priority example x ]:
-				(server_sp[1]:false)? check_g: "",
-				mergestring (server_sp[0]:[], ", ")
-				)
-			    ));
-    }
-
-    /**
-     * @param	default_d	the default domain
-     * @param	all_servers show these items
-     * @param	d	the selected item
-     */
-    global define void UpdateDomainTable (string default_d, map all_servers,
-					  string d) ``{
-	UI::ChangeWidget (`id (`domains), `Items,
-			  DomainTableItems (default_d, all_servers));
-	UI::ChangeWidget (`id (`domains), `CurrentItem, d);
+    global define symbol IsMultiple () ``{
+	return size (Nis::multidomain_servers) > 0 ? `yes: `no;
     }
 
     /**
@@ -1285,4 +1145,145 @@ the default domain will be lost.")))
 	Wizard::RestoreScreenShotName ();
 	return ret ? `next : `back;
     }
+
+    global map Dialogs = $[
+	"switch":	``(SwitchDialog ()),
+	"ismultiple":	[ ``(IsMultiple ()), true ],
+	"single":	``(NisDialog ()),
+	"multiple":	``(MultipleDialog ()),
+	"expert":	``(ExpertDialog ()),
+	"end":		``(SaveDialog ()),
+	"common-next":	[ ``( JustNext () ), true ],
+	];
+
+    global map Sequence = $[
+	"ws_start"  : "switch",
+	"switch"    : $[
+	    `next   : "ismultiple",
+	    `finish : "common-next",
+	    `abort  : `abort,
+	    ],
+	"ismultiple": $[
+	    `no     : "single",
+	    `yes    : "multiple",
+	    ],
+	"single"       : $[
+	    `next   : "common-next",
+	    `multiple: "multiple",
+	    `expert : "expert",
+	    `abort  : `abort
+	    ],
+	"multiple"  : $[
+	    `next   : "common-next",
+	    `single : "single",
+	    `expert : "expert",
+	    `abort  : `abort
+	    ],
+	"expert"       : $[
+	    `next   : "ismultiple",
+	    `abort  : `abort
+	    ],
+	// This is will make AutoSequence finish without
+	// confirmation. NormalSequence overrides it.
+	"common-next" : $[
+	    `next	: `next,
+	    ],
+	"end"       : $[
+	    `next    : `next
+	    ]
+	];
+
+    /**
+     * Dhcpcd writes yp.conf in the multidomain form.
+     * Let's try rewriting it so that it fits into the simple dialog.
+     * It is done only after read.
+     */
+    global define void FitIntoSingle () ``{
+	if (Nis::dhcp_wanted && Nis::dhcp_possible)
+	{
+	    string d = Nis::GetDomain ();
+	    if (size (Nis::multidomain_servers) == 1)
+	    {
+		list s = Nis::multidomain_servers[d]:[];
+		// if there's only one entry, for the correct domain
+		if (size (s) > 0)
+		{
+		    y2milestone ("Fitting into the simple dialog");
+		    Nis::servers = s;
+		    Nis::multidomain_servers = $[];
+		    Nis::default_broadcast = Nis::multidomain_broadcast[d]:false;
+		    Nis::multidomain_broadcast = $[];
+		}
+	    }
+	}
+    }
+
+    /**
+     * The normal workflow
+     * @return `back, `abort or `next
+     */
+    global define symbol NormalSequence() ``{
+	map normal_override = $[
+	    "common-next": $[
+		`next: "end",
+		],
+	    ];
+
+	Wizard::CreateDialog ();
+
+	if (Mode::screen_shot)
+	{
+	    Nis::Fake ();
+	}
+	else
+	{
+	    Nis::Read ();
+	}
+
+	FitIntoSingle ();
+
+	// the second map must override the first!
+	symbol result = WizardSequencer (Dialogs,
+					 union (Sequence, normal_override));
+
+	if (result == `next)
+	{
+	    if (Nis::start)
+		// popup text FIXME better...
+		Autologin::AskForDisabling(_("Now you have enabled NIS."));
+
+	    // Install packages if needed.
+	    // Cannot do it in Write, autoinstall does it differently.
+	    if (size (Nis::install_packages) > 0 ||
+		size (Nis::remove_packages) > 0)
+	    {
+		Require::DoInstallAndRemove (Nis::install_packages,
+					     Nis::remove_packages);
+	    }
+
+	    if (Nis::Write ())
+	    {
+		if (Nis::start && Nis::DomainChanged ())
+		{
+		    // waring popup
+		    Popup::Warning (_("The domain has changed.
+You must reboot for the changes to take effect."));
+		}
+	    }
+	}
+	UI::CloseDialog();
+	return result;
+    }
+
+    /**
+     * The autoinstallation workflow
+     * @return `back, `abort or `next
+     */
+    global define symbol AutoSequence() ``{
+	Wizard::CreateDialog ();
+	symbol ret = WizardSequencer (Dialogs, Sequence);
+	UI::CloseDialog ();
+	return ret;
+    }
+
 }
