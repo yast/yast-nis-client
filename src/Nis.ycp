@@ -293,7 +293,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	domain = settings["nis_domain"]:"";
 	old_domain = domain;
 
-	list other_domains = settings["nis_other_domains"]:$[];
+	list other_domains = settings["nis_other_domains"]:[];
 	foreach (map other_domain, other_domains, ``{
 	    string d = other_domain["nis_domain"]:"";
 	    list(string) s = other_domain["nis_servers"]:[];
