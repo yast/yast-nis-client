@@ -27,6 +27,7 @@
     import "Require";
     import "Progress";
     import "Wizard";
+    import "Autologin";
 
     include "network/dns.ycp";
 
@@ -89,8 +90,6 @@
     string domain = "";
     string old_domain = nil;
     boolean domain_changed = false;
-    // autologin feature was set off now (-> run suseconfig)
-    boolean autologin_changed = false;
 
     /**
      * If the domain has changed from a nonempty one, it may only be
@@ -643,6 +642,8 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 
 	hosts_by_nis = contains (ReadNssDb ("hosts"), "nis");
 
+	Autologin::Read ();
+
 	return true;
     }
 
@@ -674,22 +675,6 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	_autofs_allowed = true;
 	_start_autofs = true;
 	hosts_by_nis = false;
-    }
-
-    /**
-     * Disable autologin feature when nis is started
-     */
-    global define boolean DisableAutologin () ``{
-
-	if (SCR::Read (.sysconfig.displaymanager.DISPLAYMANAGER) == "kdm" &&
-	    SCR::Read (.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN)!="")
-	{
-	    SCR::Write (.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN, "");
-	    SCR::Write (.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN, "no");
-	    SCR::Write(.sysconfig.displaymanager, nil);
-	    autologin_changed = true;
-	}
-	return true;
     }
 
     /**
@@ -861,7 +846,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 					"/etc/sysconfig/network/dhcp"));
 		return false;
 	    }
-	    DisableAutologin ();
+	    Autologin::Write (false);
 	}
 	else
 	{
@@ -973,7 +958,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		    return false;
 		}
 	    }
-	    if (autologin_changed)
+	    if (Autologin::modified)
 		SCR::Execute (.target.bash, "/sbin/SuSEconfig --module kdm3");
 	}
 
