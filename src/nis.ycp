@@ -36,7 +36,7 @@
 			     // notification 1/2
 			     _("<p>To access the Network Information Services, the <b>%1</b> package must be installed.</p>") +
 			     // notification 2/2
-			     _("<p>Do you wish to install it now?</p>")))
+			     _("<p>Do you want to install it now?</p>")))
     {
 	return;
     }
@@ -55,14 +55,16 @@
 
 // help text 2/3
     help_text = help_text + _("<p>You can specify multiple servers
-by separating their addresses by spaces.</p>");
+by separating their addresses with spaces.</p>
+");
 
 // help text 3/3
     help_text = help_text + _("<p>The Network Information Service (NIS)
  was formerly known as Sun <b>Yellow Pages</b> (YP). The name Yellow
  Pages is a registered trademark in the United Kingdom of British
- Telecommunications plc, and may not be used without
- permission.</p>");
+ Telecommunications plc and may not be used without
+ permission.</p>
+");
 
     boolean yp_client = CallFunction (`runlevel_adjust ("ypbind", "ask")) == `enabled;
     string yp_domain  = SCR::Read (.rc.system.YP_DOMAINNAME);

@@ -48,11 +48,19 @@
 				//
 				_("Launch this module to configure the NIS client.")
 				+
-				_("<p>You need to be logged in as <i>root</i> in order to do this.</p>")),
+				_("<p>You need to be logged in as <i>root</i> to do this.</p>")),
 
       ////////////////////////////////////////////////////////////////////////////////
       // explanation in YaST2 Control Center                                         //
-      `helptext     : _("Configure your NIS client (the same as YP client)"),
+      `helptext     : _("Project-Id-Version: YaST2 (nis_server)
+POT-Creation-Date: 2001-09-28 15:55:15+0200
+PO-Revision-Date: 2001-09-14 15:00+0200
+Last-Translator: Martin Vidner <mvidner@suse.cz>
+Language-Team: English_US <i18n@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8bit
+"),
 
       ////////////////////////////////////////////////////////////////////////////////
       // leaf nil, experts only ;-)
