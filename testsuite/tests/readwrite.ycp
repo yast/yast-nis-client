@@ -57,7 +57,15 @@
 		"group": "compat",
 		"automount": "files"
 		],
-	    ]
+	    ],
+	"sysconfig": $[
+	    "ypbind": $[
+		"YPBIND_LOCAL_ONLY": "no",
+		"YPBIND_BROADCAST": "no",
+		"YPBIND_BROKEN_SERVER": "no",
+		"YPBIND_OPTIONS": "",
+		],
+	    ],
 	];
 
     map WRITE = $[
@@ -72,7 +80,7 @@
 		],
 	    ],
 	];
-			     
+
     TEST (``(Nis::Read ()), [READ, WRITE, EXECUTE], nil);
-    TEST (``(Nis::Write (false)), [READ, WRITE, EXECUTE], nil);
+    TEST (``(Nis::Write ()), [READ, WRITE, EXECUTE], nil);
 }

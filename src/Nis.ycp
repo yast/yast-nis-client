@@ -220,6 +220,25 @@
 	}
 
     /**
+     * @return Html formatted configuration summary
+     */
+    global define string Summary () ``{
+	string summary = "";
+	string nc = Summary::NotConfigured ();
+	summary = Summary::AddHeader(summary, _("NIS Client enabled"));
+	summary = Summary::AddLine(summary, (start) ? _("Yes") : nc);
+	summary = Summary::AddHeader(summary, _("NIS Domain"));
+	summary = Summary::AddLine(summary, (domain != "") ? domain : nc);
+	summary = Summary::AddHeader(summary, _("NIS Server"));
+	summary = Summary::AddLine(summary,(servers !=[]) ? mergestring(servers,"<br>") : nc);
+	summary = Summary::AddHeader(summary, _("Auto-mounter enabled"));
+	summary = Summary::AddLine(summary, (_start_autofs) ? _("Yes") : nc);
+
+	return summary;
+    }
+
+
+    /**
      * Reads NIS settings from the SCR
      * @return success
      */
@@ -245,40 +264,6 @@
      * @return true on success
      */
     global define boolean WriteOnly()``{
-	return (Write(true));
-    }
-
-
-    /**
-     * @return Html formatted configuration summary
-     */
-    global define string Summary () ``{
-	string summary = "";
-	string nc = Summary::NotConfigured ();
-	summary = Summary::AddHeader(summary, _("NIS Client enabled"));
-	summary = Summary::AddLine(summary, (start) ? _("Yes") : nc);
-	summary = Summary::AddHeader(summary, _("NIS Domain"));
-	summary = Summary::AddLine(summary, (domain != "") ? domain : nc);
-	summary = Summary::AddHeader(summary, _("NIS Server"));
-	summary = Summary::AddLine(summary,(servers !=[]) ? mergestring(servers,"<br>") : nc);
-	summary = Summary::AddHeader(summary, _("Auto-mounter enabled"));
-	summary = Summary::AddLine(summary, (_start_autofs) ? _("Yes") : nc);
-
-	return summary;
-    }
-
-
-    /**
-     * Saves NIS configuration.
-     * @param writeonly	 true for autoinstal - don't start the service yet
-     * @return true on success
-     */
-    global define boolean Write (boolean writeonly) ``{
-	if (!writeonly)
-	{
-	    Runlevel::RunInitScript ("ypbind", "stop");
-	}
-
 	if (start)
 	{
 	    Runlevel::ServiceAdjust ("portmap", "enable");
@@ -295,9 +280,9 @@
 		Report::Error (sformat (_("Error writing file %1."), "/etc/yp.conf"));
 		return false;
 	    }
-	    SCR::Write (.sysconfig.ypbind.YPBIND_LOCAL_ONLY, local_only);
-	    SCR::Write (.sysconfig.ypbind.YPBIND_BROADCAST, broadcast);
-	    SCR::Write (.sysconfig.ypbind.YPBIND_BROKEN_SERVER, broken_server);
+	    SCR::Write (.sysconfig.ypbind.YPBIND_LOCAL_ONLY, local_only? "yes":"no");
+	    SCR::Write (.sysconfig.ypbind.YPBIND_BROADCAST, broadcast? "yes":"no");
+	    SCR::Write (.sysconfig.ypbind.YPBIND_BROKEN_SERVER, broken_server? "yes":"no");
 	    SCR::Write (.sysconfig.ypbind.YPBIND_OPTIONS, options);
 	    if (! SCR::Write (.sysconfig.ypbind, nil))
 	    {
@@ -317,50 +302,8 @@
 		return false;
 	    }
 
-	    if (!writeonly && Runlevel::ServiceStatus ("portmap") != 0 )
-	    {
-		// portmap must not be started if it is running already (see bug # 9999)
-		if (Runlevel::RunInitScript ("portmap", "start") != 0)
-		{
-		    // error popup message
-		    Report::Error (_("Error while running portmapper."));
-		    return false;
-		}
-	    }
-	    sleep(1000);	// workaround for bug #10428, ypbind restart
-	    if (!writeonly)
-	    {
-		map out = SCR::Execute (.target.bash_output, "/etc/init.d/ypbind start", $["TERM": "raw"]);
-		if (out["exit"]:1 == 0)
-		{
-		    YpbindErrors = "";
-		}
-		else
-		{
-		    YpbindErrors = out["stdout"]:"internal error";
-		    // error popup message
-		    Report::Error (_("Error while running ypclient."));
-		    return false;
-		}
-	    }
-	    // only test for a server if domain not changed
-	    if (! domain_changed && !writeonly)
-	    {
-		if (SCR::Execute(.target.bash, "/usr/bin/ypwhich >/dev/null") != 0)
-		{
-		    // error popup message
-		    Report::Error (_("NIS server not found."));
-		    return false;
-		}
-	    }
-
 	    if (_autofs_allowed)
 	    {
-		if (!writeonly)
-		{
-		    Runlevel::RunInitScript ("autofs", "stop");
-		}
-
 		// nsswitch automount:
 		// bracket options not allowed, order does not matter
 		string automount_s = SCR::Read (.etc.nsswitch_conf.automount);
@@ -384,9 +327,6 @@
 		    return false;
 		}
 
-		if (_start_autofs && !writeonly)
-		    Runlevel::RunInitScript ("autofs", "start");
-
 		if (_start_autofs)
 		{
 		    Runlevel::ServiceAdjust ("autofs", "enable");
@@ -394,6 +334,70 @@
 		else
 		{
 		    Runlevel::ServiceAdjust ("autofs", "disable");
+		}
+	    }
+	}
+	return true;
+    }
+
+
+    /**
+     * Saves NIS configuration.
+     * @return true on success
+     */
+    global define boolean Write () ``{
+	if (!WriteOnly ())
+	{
+	    return false;
+	}
+
+	Runlevel::RunInitScript ("ypbind", "stop");
+
+	if (start)
+	{
+	    if (Runlevel::ServiceStatus ("portmap") != 0 )
+	    {
+		// portmap must not be started if it is running already (see bug # 9999)
+		if (Runlevel::RunInitScript ("portmap", "start") != 0)
+		{
+		    // error popup message
+		    Report::Error (_("Error while running portmapper."));
+		    return false;
+		}
+	    }
+	    sleep(1000);	// workaround for bug #10428, ypbind restart
+
+	    map out = SCR::Execute (.target.bash_output, "/etc/init.d/ypbind start", $["TERM": "raw"]);
+	    if (out["exit"]:1 == 0)
+	    {
+		YpbindErrors = "";
+	    }
+	    else
+	    {
+		YpbindErrors = out["stdout"]:"internal error";
+		// error popup message
+		Report::Error (_("Error while running ypclient."));
+		return false;
+	    }
+
+	    // only test for a server if domain not changed
+	    if (! domain_changed)
+	    {
+		if (SCR::Execute(.target.bash, "/usr/bin/ypwhich >/dev/null") != 0)
+		{
+		    // error popup message
+		    Report::Error (_("NIS server not found."));
+		    return false;
+		}
+	    }
+
+	    if (_autofs_allowed)
+	    {
+		Runlevel::RunInitScript ("autofs", "stop");
+
+		if (_start_autofs)
+		{
+		    Runlevel::RunInitScript ("autofs", "start");
 		}
 	    }
 	}
