@@ -40,6 +40,8 @@ Summary:	Configuration of NIS client
 @moduledir@/Nis.ycp
 %dir @configdir@
 @configdir@/nis.y2cc
+%dir @desktopdir@
+@desktopdir@/nis.desktop
 %dir @agentdir@
 @agentdir@/ag_yp_conf
 %dir @scrconfdir@
