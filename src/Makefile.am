@@ -19,4 +19,6 @@ module_DATA =		\
 
 config_DATA = nis.y2cc
 
-EXTRA_DIST = $(client_DATA) $(myynclude_DATA) $(module_DATA) $(config_DATA) 
+desktop_DATA = nis.desktop
+
+EXTRA_DIST = $(client_DATA) $(myynclude_DATA) $(module_DATA) $(config_DATA) $(desktop_DATA)
