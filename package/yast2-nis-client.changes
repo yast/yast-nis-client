@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Aug 10 09:06:13 CEST 2004 - jsuchome@suse.cz
+
+- merged proofread texts
+
+-------------------------------------------------------------------
 Tue Jul 27 15:55:37 CEST 2004 - jsuchome@suse.cz
 
 - use Package module instead of Require
