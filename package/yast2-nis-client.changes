@@ -1,4 +1,23 @@
 -------------------------------------------------------------------
+Tue May 18 16:03:35 CEST 2004 - mvidner@suse.cz
+
+- The last change would do more harm than good, reverted (#40571).
+- 2.9.20
+
+-------------------------------------------------------------------
+Mon May 17 15:38:27 CEST 2004 - mvidner@suse.cz
+
+- Reset compat entries in /etc/passwd and co. to defaults
+  to handle nologin written by LDAP client (#40571).
+- 2.9.19
+
+-------------------------------------------------------------------
+Tue May  4 09:53:01 CEST 2004 - mvidner@suse.cz
+
+- merged proofread messages
+- 2.9.18
+
+-------------------------------------------------------------------
 Tue Apr 27 13:07:37 CEST 2004 - mvidner@suse.cz
 
 - fix parallel build by making a convenience library
