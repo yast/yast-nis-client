@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Dec 20 10:52:46 CET 2002 - mvidner@suse.de
+
+- Easier editing of the server list.
+- Made autofs independent of NIS (#19769).
+- 2.7.2
+
+-------------------------------------------------------------------
 Thu Dec  5 12:51:04 CET 2002 - mvidner@suse.cz
 
 - Use the faked Pkg instead of the real one to prevent testsuite failures.
