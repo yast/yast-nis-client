@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Sep  9 16:19:11 CEST 2004 - jsuchome@suse.cz
+
+- get rid of Require module (#30872)
+- show a message when autofs package should be installed (#44863)
+- 2.10.7
+
+-------------------------------------------------------------------
 Mon Sep  6 17:41:12 CEST 2004 - jsuchome@suse.cz
 
 - fixed testsuite (firewall is not restarted when not touched)
