@@ -1086,6 +1086,8 @@ the default domain will be lost.")))
 
     /**
      * Confirmation dialog
+     * Also probes for packages that need to be installed (autofs)
+     * #23050 don't display the dialog
      * @return `back or `next
      */
     global define symbol SaveDialog () ``{
@@ -1093,7 +1095,8 @@ the default domain will be lost.")))
 	// continue-cancel popup
 	string message1 = _("The configuration of the NIS client will be saved.\n");
 	string message2 = Nis::ProbePackages ();
-	boolean ret = UI::ContinueCancelPopup (message1 + message2);
+	//boolean ret = UI::ContinueCancelPopup (message1 + message2);
+	boolean ret = true;
 
 	Wizard::RestoreScreenShotName ();
 	return ret ? `next : `back;
