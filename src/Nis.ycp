@@ -571,14 +571,13 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		    if (!contains (db_l, "nis"))
 		    {
 			// remove "compat" if there;
-			db_l = filter (string s, db_l, ``(s != "compat"));
+			// put "files", "nis" and the rest
+			db_l = filter (string s, db_l, ``(
+					   s != "compat" && s != "files"));
 			// put "nis", we know it's not there
 			db_l = prepend (db_l, "nis");
-			// put "files" if not there - before nis
-			if (!contains (db_l, "files"))
-			{
-			    db_l = prepend (db_l, "files");
-			}
+			// put "files" - before nis
+			db_l = prepend (db_l, "files");
 			WriteNssDb (db, db_l);
 		    }
 		});
