@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Dec 18 15:09:02 CET 2001 - mvidner@suse.cz
+
+- Added an autoinstallation client.
+- Using Report and Wizard.
+- 2.5.4
+
+-------------------------------------------------------------------
 Tue Dec 11 13:43:07 CET 2001 - mvidner@suse.cz
 
 - Preserve the case of the domain name (bug 12546).
