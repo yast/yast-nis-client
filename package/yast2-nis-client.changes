@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Sep 14 09:00:24 CEST 2004 - jsuchome@suse.cz
+
+- adapted testsuite to changes in yast2-firewall
+- 2.10.8
+
+-------------------------------------------------------------------
 Thu Sep  9 16:19:11 CEST 2004 - jsuchome@suse.cz
 
 - get rid of Require module (#30872)
