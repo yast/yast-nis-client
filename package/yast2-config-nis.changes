@@ -1,3 +1,12 @@
+-------------------------------------------------------------------
+Mon Jul 23 17:11:05 CEST 2001 - mvidner@suse.cz
+
+- Requires ypbind.
+- version 2.4.2
+
+-------------------------------------------------------------------
+Thu Jul 19 17:00:00 CEST 2001 - msvec@suse.cz
+
 - correct provides
 - minor function name fix
 - fixed textdomain
