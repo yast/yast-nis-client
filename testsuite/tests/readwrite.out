@@ -21,7 +21,10 @@ Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3
 Read	.etc.nsswitch_conf."hosts" "files dns6"
 Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."passwd_compat" nil
-Read	.sysconfig.displaymanager.DISPLAYMANAGER nil
+Read	.sysconfig.displaymanager.DISPLAYMANAGER "kdm"
+Execute	.target.bash "rpm -q kdebase3-kdm" 0
+Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
+Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Return	true
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true
@@ -106,7 +109,10 @@ Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3
 Read	.etc.nsswitch_conf."hosts" "files dns6"
 Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."passwd_compat" nil
-Read	.sysconfig.displaymanager.DISPLAYMANAGER nil
+Read	.sysconfig.displaymanager.DISPLAYMANAGER "kdm"
+Execute	.target.bash "rpm -q kdebase3-kdm" 0
+Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
+Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Return	true
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true
