@@ -474,7 +474,13 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	multidomain_servers = SCR::Read (.etc.yp_conf.domainservers);
 	multidomain_broadcast = SCR::Read (.etc.yp_conf.broadcast);
 	domain  = SCR::Read (.etc.defaultdomain);
-	//TODO: ypdomainname (dhcpcd does not use defaultdomain)
+	if (domain == "")
+	{
+	    // a DHCP client may set the domainname too:
+	    // /etc/sysconfig/network/dhcp:DHCLIENT_SET_DOMAINNAME
+	    map out = SCR::Execute (.target.bash_output, "/bin/ypdomainname");
+	    domain = filterchars (out["stdout"]:"", "\n");
+	}
 	old_domain = domain;
 	local_only = SCR::Read (.sysconfig.ypbind.YPBIND_LOCAL_ONLY) == "yes";
 	global_broadcast = SCR::Read (.sysconfig.ypbind.YPBIND_BROADCAST) == "yes";
