@@ -24,6 +24,7 @@
     import "Runlevel";
     import "Report";
     import "Summary";
+    include "network/dns.ycp";
 
     /**
      * Should ypbind be started at boot?
@@ -180,6 +181,48 @@
 "A NIS domain name must not be empty,
 it must not be \"(none)\"
 and it must be at most 64 characters long.");
+    }
+
+    /**
+     * If the hostname resolution is done over NIS,
+     * names cannot be used to specify servers.
+     */
+    boolean hosts_by_nis = false;
+
+    /**
+     * Describe a valid address - ip4 or name, names only if
+     * nsswitch.conf does not have hosts: nis
+     * @return a description
+     */
+    global define string valid_address_nis () ``{
+	y2debug ("hosts_by_nis %1", hosts_by_nis);
+	if (hosts_by_nis)
+	{
+	    return _("Only an IP address can be used
+because host names are resolved using NIS.\n\n") + valid_ip4 ();
+	}
+	else
+	{
+	    return valid_address ();
+	}
+    }
+
+    /**
+     * Check syntax of a network address (ip4 or name), names only if
+     * nsswitch.conf does not have hosts: nis
+     * @param a an address
+     * @return true if correct
+     */
+    global define boolean check_address_nis (string a) ``{
+	y2debug ("hosts_by_nis %1", hosts_by_nis);
+	if (hosts_by_nis)
+	{
+	    return check_ip4 (a);
+	}
+	else
+	{
+	    return check_address (a);
+	}
     }
 
     /* ---------------------------------------------------------------- */
@@ -432,6 +475,11 @@ and it must be at most 64 characters long.");
 	    SCR::Read (.targetpkg.installed, "autofs4");
 	*/
 	_start_autofs = _autofs_allowed && Runlevel::ServiceEnabled ("autofs");
+
+	string hosts_s = SCR::Read (.etc.nsswitch_conf.hosts);
+	list(string) hosts_l = filter (`s, splitstring (hosts_s, " \t"), ``(s != ""));
+	hosts_by_nis = find (string s, hosts_l, ``(s == "nis")) != nil;
+
 	return true;
     }
 
