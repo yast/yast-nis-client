@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Feb  1 10:46:45 CET 2002 - mvidner@suse.cz
+
+- Set automount in nsswitch.conf.
+- Don't set ypdomainname, the init script does it.
+- Had the English texts proofread.
+- 2.5.13
+
+-------------------------------------------------------------------
 Mon Jan 28 17:39:40 EST 2002 - nashif@suse.de
 
 - Adapted for automatic installation (2.5.12)
