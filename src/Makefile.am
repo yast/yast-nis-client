@@ -4,22 +4,19 @@
 # $Id$
 #
 
-clientsdir = $(YAST2DIR)/clients
-yincludedir = $(YAST2DIR)/include/nis
-modulesdir = $(YAST2DIR)/modules
-menudir = $(YAST2DIR)/menuentries
+myyncludedir = $(yncludedir)/nis
 
-clients_DATA =		\
+client_DATA =		\
 	nis.ycp		\
 	nis_auto.ycp	\
 	nis_write.ycp
 
-yinclude_DATA =		\
+myynclude_DATA =		\
 	ui.ycp
 
-modules_DATA =		\
+module_DATA =		\
 	Nis.ycp
 
-menu_DATA = menuentry_nis.y2cc
+config_DATA = nis.y2cc
 
-EXTRA_DIST = $(clients_DATA) $(yinclude_DATA) $(modules_DATA) $(menu_DATA) 
+EXTRA_DIST = $(client_DATA) $(myynclude_DATA) $(module_DATA) $(config_DATA) 

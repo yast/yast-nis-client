@@ -38,17 +38,17 @@ Group:		System Environment/YaST
 
 %files
 %defattr(-,root,root)
-%dir @YAST2DIR@/include/nis
-@YAST2DIR@/include/nis/ui.ycp
-@YAST2DIR@/clients/nis.ycp
-@YAST2DIR@/clients/nis_auto.ycp
-@YAST2DIR@/clients/nis_write.ycp
-@YAST2DIR@/modules/Nis.ycp
-@YAST2DIR@/menuentries/menuentry_nis.y2cc
-@YAST2DIR@/servers_non_y2/ag_yp_conf
-@YAST2DIR@/scrconf/cfg_ypbind.scr
-@YAST2DIR@/scrconf/yp_conf.scr
+%dir @yncludedir@/nis
+@yncludedir@/nis/ui.ycp
+@clientdir@/nis.ycp
+@clientdir@/nis_auto.ycp
+@clientdir@/nis_write.ycp
+@moduledir@/Nis.ycp
+@configdir@/nis.y2cc
+@agentdir@/ag_yp_conf
+@scrconfdir@/cfg_ypbind.scr
+@scrconfdir@/yp_conf.scr
 
 %files devel
 %defattr(-,root,root)
-%doc @DOCDIR@
+%doc @docdir@
