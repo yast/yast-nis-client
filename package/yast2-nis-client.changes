@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr  2 15:11:40 CEST 2004 - mvidner@suse.cz
+
+- changed license to GPL
+- 2.9.15
+
+-------------------------------------------------------------------
 Thu Apr  1 16:08:59 CEST 2004 - mvidner@suse.cz
 
 - only validate input if service is on, fixes disabling it (#37728).
