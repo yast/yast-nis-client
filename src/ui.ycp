@@ -403,6 +403,7 @@ Change the DHCP server configuration to provide it.
      * @return space separated list of servers or ""
      */
     global define string SelectNisServers () ``{
+	Wizard::SetScreenShotName ("nis-client-2a1-servers");
 	if (Mode::screen_shot)
 	{
 	    found_servers = ["nis.example.com", "10.42.1.1", "10.42.1.2"];
@@ -432,6 +433,7 @@ Change the DHCP server configuration to provide it.
 	{
 	    selected_servers = [];
 	}
+	Wizard::RestoreScreenShotName ();
 	return mergestring (selected_servers, " ");
     }
 
