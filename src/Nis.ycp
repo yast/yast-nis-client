@@ -580,9 +580,9 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	old_domain = domain;
 
 	boolean servers_by_dhcp_wanted = SCR::Read (
-	    .sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF) == "yes";
+	    .sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF) == "yes";
 	boolean domain_by_dhcp_wanted = SCR::Read (
-	    .sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME) == "yes";
+	    .sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME) == "yes";
 	dhcp_wanted = servers_by_dhcp_wanted && domain_by_dhcp_wanted;
 
 	boolean dhcpcd_running =
@@ -805,11 +805,11 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		return false;
 	    }
 
-	    SCR::Write (.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME,
+	    SCR::Write (.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME,
 			dhcp_wanted? "yes":"no");
-	    SCR::Write (.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF,
+	    SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF,
 			dhcp_wanted? "yes":"no");
-	    if (! SCR::Write (.sysconfig.dhcp, nil))
+	    if (! SCR::Write (.sysconfig.network.dhcp, nil))
 	    {
 		// error popup
 		Report::Error (sformat (_("Error writing file %1."),
