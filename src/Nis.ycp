@@ -103,6 +103,21 @@
     /* ---------------------------------------------------------------- */
 
     /**
+     * Set module data
+     * @return void
+     */
+
+    global define void Set (map settings) ``{
+	start = lookup (settings, "start_nis", false);
+	servers = lookup (settings, "nis_servers", []);
+	domain = lookup (settings, "nis_domain", "");
+	old_domain = domain;
+	// autofs is not touched in Write if the map does not want it
+	_autofs_allowed = haskey (settings, "start_autofs");
+	_start_autofs = lookup (settings, "start_autofs", false);
+    }
+
+    /**
      * Get all the NIS configuration from a map.
      * When called by nis_auto (preparing autoinstallation data)
      * the map may be empty.
@@ -117,7 +132,7 @@
 	    old_domain = domain;
 	    return true;
 	}
-
+	
 	boolean missing = false;
 	foreach (`k, ["start_nis", "nis_domain", "nis_servers"], ``{
 	    if (! haskey (settings, k))
@@ -131,13 +146,7 @@
 	    return false;
 	}
 
-	start = lookup (settings, "start_nis", false);
-	servers = lookup (settings, "nis_servers", []);
-	domain = lookup (settings, "nis_domain", "");
-	old_domain = domain;
-	// autofs is not touched in Write if the map does not want it
-	_autofs_allowed = haskey (settings, "start_autofs");
-	_start_autofs = lookup (settings, "start_autofs", false);
+	Set(settings);
 	return true;
     }
 
@@ -145,14 +154,14 @@
      * Dump the NIS settings to a map, for autoinstallation use.
      * @return $["start":, "servers":[...], "domain":]
      */
-    global define map Export () ``{
-	return $[
-	    "start_nis": start,
-	    "nis_servers": servers,
-	    "nis_domain": domain,
-	    "start_autofs": _start_autofs,
-	    ];
-    }
+	global define map Export () ``{
+		return $[
+			"start_nis": start,
+			"nis_servers": servers,
+			"nis_domain": domain,
+			"start_autofs": _start_autofs,
+		];
+	}
 
     /**
      * Reads NIS settings from the SCR

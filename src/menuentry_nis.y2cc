@@ -35,4 +35,10 @@ SortKey =
 ; which textdomain to use for translations (important!)
 Textdomain = nis
 
+; use this module in yast2-config-autoinst (write|configure|all)
+; write: can only write (during auto-installation)
+; configure: no write features available
+; all: configure and write features implemented
+Autoinst = all
+
 ; vim:syntax=dosini
