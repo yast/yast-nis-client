@@ -28,6 +28,7 @@
 
     import "Nis";
     import "Wizard";
+    include "wizard/sequencer.ycp";
     include "require.ycp";
 
     include "nis/ui.ycp";
@@ -46,7 +47,8 @@
 
     Nis::Read ();
 
-    symbol result = NisDialog ();
+    // Dialogs and Sequence are in ui.ycp
+    symbol result = WizardSequencer (Dialogs, Sequence);
 
     if (result == `next)
     {

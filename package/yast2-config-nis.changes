@@ -1,4 +1,29 @@
 -------------------------------------------------------------------
+Mon Mar 11 12:44:14 CET 2002 - mvidner@suse.cz
+
+- Report the error message from init.d/ypbind to the server module (#14706).
+- 2.5.18
+
+-------------------------------------------------------------------
+Tue Mar  5 17:00:08 CET 2002 - mvidner@suse.cz
+
+- Removed a misleading confirmation popup in Autoyast. (#14484)
+- 2.5.17
+
+-------------------------------------------------------------------
+Mon Feb 25 14:54:16 CET 2002 - mvidner@suse.cz
+
+- Added a help text for autofs (#13701).
+- Don't log an error when yp.conf or init.d/amavis is missing.
+- 2.5.16
+
+-------------------------------------------------------------------
+Mon Feb 18 12:03:11 CET 2002 - mvidner@suse.cz
+
+- Replace the checkIP builtin obsoleted in libycp-2.5.29.
+- 2.5.15
+
+-------------------------------------------------------------------
 Tue Feb 12 18:15:04 CET 2002 - mvidner@suse.cz
 
 - Flush /etc/nsswitch.conf before using it (#13176).
