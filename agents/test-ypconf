@@ -13,11 +13,10 @@ echo "$AGPROG" | $AGENT | sed -e 1d >$CASE.ycp.tmp
 sed -e "$S3" $CASE.ycp.tmp > $CASE-i.out.tmp
 diff -u $CASE-i.out $CASE-i.out.tmp
 
-# the output contains newlines...
-# cannot cope yet
-exit
+NORMALIZE="/home/mvidner/yast2/source/libycp/testsuite/parseycp -n"
+#NORMALIZE="parseycp -n"
 
-echo -n 'YpConf ("'$CASE'-o.out.tmp")
-Write (.,' `cat $CASE.ycp.tmp` ')' \
+echo 'YpConf ("'$CASE'-o.out.tmp")
+Write (.,' `$NORMALIZE $CASE.ycp.tmp` ')' \
     | $AGENT >/dev/null
 diff -u $CASE-o.out $CASE-o.out.tmp
