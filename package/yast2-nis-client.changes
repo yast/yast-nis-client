@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Feb 10 13:53:27 CET 2005 - jsuchome@suse.cz
+
+- fixed testsuite (firewall initialization)
+- 2.11.7 
+
+-------------------------------------------------------------------
 Mon Feb  7 16:17:47 CET 2005 - jsuchome@suse.cz
 
 - merged texts from proofread
