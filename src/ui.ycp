@@ -426,7 +426,8 @@ by separating their addresses with spaces.</p>
 		yp_address = UI::QueryWidget (`id (`ypa), `Value);
 		default_broadcast = UI::QueryWidget (`id (`broadcast), `Value);
 
-		if (!Nis::check_nisdomainname (yp_domain))
+		if (!Nis::DomainByDhcpActual () &&
+		    !Nis::check_nisdomainname (yp_domain))
 		{
 		    UI::SetFocus (`id (`ypd));
 		    UI::ErrorPopup (Nis::valid_nisdomainname ());
@@ -436,9 +437,10 @@ by separating their addresses with spaces.</p>
 
 		list temp_ad = filter (string a, splitstring (yp_address, " "),
 				       ``(a != ""));
-		if (size (temp_ad) == 0 ||
-		    find (string a, temp_ad,
-			  ``(!Nis::check_address_nis (a))) != nil)
+		if (!Nis::ServersByDhcpActual () &&
+		    (size (temp_ad) == 0 ||
+		     find (string a, temp_ad,
+			   ``(!Nis::check_address_nis (a))) != nil))
 		{
 		    UI::SetFocus (`id (`ypa));
 		    UI::MessagePopup (Nis::valid_address_nis ());
@@ -850,7 +852,8 @@ for the default domain?")))
 		// Input validation
 		default_d = UI::QueryWidget (`id (`domain), `Value);
 
-		if (!Nis::check_nisdomainname (default_d))
+		if (!Nis::DomainByDhcpActual () &&
+		    !Nis::check_nisdomainname (default_d))
 		{
 		    UI::SetFocus (`id (`domain));
 		    Wizard::SetScreenShotName ("nis-client-2b1-err");
