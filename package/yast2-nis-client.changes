@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Mar  5 16:51:08 CET 2004 - mvidner@suse.cz
+
+- fixed enabling/disabling, broken in 2.9.6 (#35297)
+- in nsswitch.conf, the default is compat, not files (#35299)
+- added type information (lslezak)
+- 2.9.7
+
+-------------------------------------------------------------------
 Fri Feb 27 15:44:29 CET 2004 - lslezak@suse.cz
 
 - yp.conf agent: SLP option support
