@@ -47,7 +47,7 @@ by separating their addresses with spaces.</p>
  was formerly known as Sun <b>Yellow Pages</b> (YP). The name Yellow
  Pages is a registered trademark in the United Kingdom by British
  Telecommunications plc and may not be used without
- permission.</p>\n");
+ permission.</p>");
 
 	boolean yp_client = Nis::start;
 	string yp_domain  = Nis::GetDomain ();
