@@ -479,7 +479,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    // a DHCP client may set the domainname too:
 	    // /etc/sysconfig/network/dhcp:DHCLIENT_SET_DOMAINNAME
 	    map out = SCR::Execute (.target.bash_output, "/bin/ypdomainname");
-	    domain = filterchars (out["stdout"]:"", "\n");
+	    domain = deletechars (out["stdout"]:"", "\n");
 	}
 	old_domain = domain;
 	local_only = SCR::Read (.sysconfig.ypbind.YPBIND_LOCAL_ONLY) == "yes";
