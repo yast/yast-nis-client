@@ -22,16 +22,16 @@
     textdomain "nis";
 
     import "Address";
-    import "IP";
-    import "Nsswitch";
-    import "Message";
-    import "Service";
-    import "Report";
-    import "Summary";
-    import "Require";
-    import "Progress";
-    import "Wizard";
     import "Autologin";
+    import "IP";
+    import "Message";
+    import "Nsswitch";
+    import "Package";
+    import "Progress";
+    import "Report";
+    import "Service";
+    import "Summary";
+    import "Wizard";
 
     /**
      * Required packages for this module to operate
@@ -303,12 +303,12 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 
     /**
      * Read only, set by ProbePackages.
-     * Use as an argument to Require::DoInstallAndRemove
+     * Use as an argument to DoInstallAndRemove
      */
     global list<string> install_packages = [];
     /**
      * Read only, set by ProbePackages.
-     * Use as an argument to Require::DoInstallAndRemove
+     * Use as an argument to DoInstallAndRemove
      */
     global list<string> remove_packages = [];
 
@@ -325,8 +325,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	if (_autofs_allowed && _start_autofs)
 	{
 	    string pkg = "autofs";
-	    if (! Require::IsPackageInstalled (pkg) &&
-		! Require::IsPackageInstalled ("autofs4"))
+	    if (! Package::Installed (pkg) && ! Package::Installed ("autofs4"))
 	    {
 		install_packages = add (install_packages, pkg);
 		// Translators: popup message part, ends with a newline
@@ -630,11 +629,6 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 
 	// install on demand
 	_autofs_allowed = true;
-	/*
-	_autofs_allowed =
-	    Require::IsPackageInstalled ("autofs") ||
-	    Require::IsPackageInstalled ("autofs4");
-	*/
 	_start_autofs = _autofs_allowed && Service::Enabled("autofs");
 
 	hosts_by_nis = contains (Nsswitch::ReadDb ("hosts"), "nis");
