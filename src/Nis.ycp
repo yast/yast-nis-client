@@ -708,10 +708,13 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		    string db_c = db + "_compat";
 		    WriteNssDb (db_c, []);
 		});
+		y2milestone("Writing pulses");
 		WritePluses ();
 	}
 	else // not start
 	{
+
+		y2milestone("not writing pluses");
 	    boolean have_plus = HavePlus ();
 	    if (have_plus)
 	    {
@@ -983,6 +986,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
      */
     define boolean HasPlus (string file) ``{
 	// does the file have a plus?
+	y2milestone("file %1 has pluses", file);
 	return (0 == SCR::Execute (.target.bash, "/usr/bin/grep -q '^[+-]' " + file));
     }
 
@@ -1014,6 +1018,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    "shadow":	"+",
 	    ];
 	foreach (string f, files, ``{
+		y2milestone("Writing pluses to %1", f );
 	    if (! WritePlusesTo (sformat ("/etc/%1", f), what_to_write[f]:""))
 	    {
 		return false;
@@ -1042,4 +1047,18 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	}
 	return true;
     }
+    /**
+     * Return needed packages and packages to be removed 
+     * during autoinstallation.
+     * @return map of lists.
+     *
+     **/
+
+    global  define map AutoPackages() ``{
+      list install_pkgs = required_packages;
+      list remove_pkgs = [];
+      return ($["install": install_pkgs, "remove": remove_pkgs]);
+    }
+
+
 }

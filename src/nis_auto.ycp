@@ -53,8 +53,7 @@ else if (func == "Export") {
 	ret = Nis::Export();
 }
 else if (func == "Packages") {
-	ret = Nis::required_packages;
-y2internal ("ret: %1", ret);
+	ret = Nis::AutoPackages();
 }
 else if (func == "Write") {
     import "Progress";
