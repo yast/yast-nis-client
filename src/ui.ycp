@@ -314,8 +314,9 @@ either locally or over NIS.</p>");
 	    // dialog title
 	    _("Configuration of NIS client"), con, help_text,
 	    Label::BackButton (), Mode::cont? Label::NextButton():Label::FinishButton ());
-	if (Mode::cont) Wizard::ReplaceAbortButton (
-	    `PushButton(`id(`abort), Label::AbortInstallationButton()));
+	// sh: We don't use "Abort Installation" any more. Stick with the normal "Abort" button.
+	// if (Mode::cont)
+	//     Wizard::SetAbortButton(`abort, Label::AbortInstallationButton() );
 
 	UI::ChangeWidget (`id (`autofs), `Enabled, Nis::_autofs_allowed);
 
@@ -471,8 +472,10 @@ either locally or over NIS.</p>");
 	    // dialog title
 	    _("Expert settings"), contents, help_text,
 	    Label::BackButton (), Label::OKButton ());
-	if (Mode::cont) Wizard::ReplaceAbortButton (
-	    `PushButton(`id(`abort), Label::AbortInstallationButton()));
+
+	// sh: We don't use "Abort Installation" any more. Stick with the normal "Abort" button.
+	// if (Mode::cont)
+	//     Wizard::SetAbortButton(`abort, Label::AbortInstallationButton() );
 
 	any result = nil;
 	repeat
@@ -787,8 +790,10 @@ either locally or over NIS.</p>");
 		     // dialog subtitle
 		     _("Additional domains")), contents, help_text,
 	    Label::BackButton (), Mode::cont? Label::NextButton():Label::OKButton ());
-	if (Mode::cont) Wizard::ReplaceAbortButton (
-	    `PushButton(`id(`abort), Label::AbortInstallationButton()));
+
+	// sh: We don't use "Abort Installation" any more. Stick with the normal "Abort" button.
+	// if (Mode::cont)
+	//     Wizard::SetAbortButton(`abort, Label::AbortInstallationButton() );
 
 	any result = nil;
 
@@ -1007,8 +1012,9 @@ automatically.</p>");
 	if (Mode::cont)
 	{
 	    UI::ChangeWidget (`id(`nisno), `Enabled, false);
-	    Wizard::ReplaceAbortButton (
-		`PushButton(`id(`abort), Label::AbortInstallationButton()));
+
+	    // sh: We don't use "Abort Installation" any more. Stick with the normal "Abort" button.
+	    // Wizard::SetAbortButton(`abort, Label::AbortInstallationButton() );
 	}
 
 	any result = nil;
