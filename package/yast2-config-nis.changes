@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Oct 11 10:52:33 CEST 2001 - mvidner@suse.cz
+
+- Don't report to start the client when stopping it. (#11614)
+- 2.5.1
+
+-------------------------------------------------------------------
 Fri Sep 14 17:50:44 CEST 2001 - mvidner@suse.cz
 
 - Delay when restarting ypbind (bug #10428). (2.4.10)
