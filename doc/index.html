@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<!-- $Id$ -->
+<meta name="generator" content="HTML Tidy, see www.w3.org">
+<title>Network Information Services Client (NIS, aka YP) -
+YaST2 configuration module</title>
+<style type="text/css">
+    .type {color: #c05000}
+</style>
+</head>
+<body bgcolor="white">
+<h1>Network Information Services Client (NIS, aka YP) -
+YaST2 configuration module</h1>
+
+<h2>Features</h2>
+
+<p>The NIS client config module manages relevant variables in
+/erc/rc.config and starts and stops the necessary init scripts: ypbind
+and portmap. Runs SuSEconfig module ypclient.
+
+<h2>Background Documentation</h2>
+
+<ul>
+<li><a href="http://www.suse.de/~kukuk/nis/">Linux NIS(YP) Server and Tools</a>
+<li><a
+href="http://www.linuxbase.org/spec/gLSB/gLSB/iniscrptact.html">Linux
+Standard Base, Init Script Actions</a>
+<li><a href="ypdomainname.txt">Why a reboot is needed after a change
+of ypdomainname</a> <i>FIXME:</i> put it into ypdomainname man page.
+</ul>
+
+<h2>Workflow</h2>
+
+<h3>Changes since SL 7.2</h3>
+
+<p>The help text and the input box label mention multiple servers.
+See <a href="http://bugzilla.suse.de/show_bug.cgi?id=9559">bug #9559</a>.
+
+<h3>Individual dialogs</h3>
+
+<p><img src="nis1-h.png">
+
+<p><img src="nis2.png">
+
+<p>An older version, not mentioning multiple servers:
+<p><img src="nis1.png">
+
+<p>Another variant: Multiple servers in a list box.
+Should they be in a separate dialog?
+(PushButton "More servers...")
+<p><img src="nis1-l.png">
+
+<h2>Implementation</h2>
+
+<p><a href="autodocs/">Autodocs</a>
+
+<hr>
+<address><a href="mailto:mvidner@suse.cz">Martin Vidner</a></address>
+</body>
+</html>

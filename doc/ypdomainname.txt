@@ -1,0 +1,37 @@
+Email conversation on 2001-08-08 between
+Thorsten Kukuk <kukuk@suse.de>, ypbind maintainer
+Martin Vidner <mvidner@suse.cz>, yast2-config-nis maintainer
+
+kukuk:
+SuSEconfig should not set the domainname. This is done at boottime
+(the only place where it is really safe to set it) and in
+/etc/init.d/ypbind, if it is not already set. Changing the domainname at
+runtime is as bad as changing the hostname with running X11.
+
+mvidner:
+I have thought a bit more about this. If I change the NIS domain, I should
+naturally take care that the old and new maps are consistent, eg. uids and
+usernames, passwords...
+
+But it does not matter when the switch happens, does it? What will break
+if I change yp.conf, domainname and restart ypbind?
+
+kukuk:
+The problem is: a program caches at first his domainname and uses this,
+independent if you change the domainname or not. So, if you change
+the domainname, all already running programs will continue using
+the old one. If you restart ypbind with a new domainname, all already
+running programs will fail to lookup anything over NIS because ypbind
+does not know any longer the data for the old domainname.
+
+mvidner:
+In the future, can this be fixed? I assume that the cache is somewhere in
+libc. Or perhaps in nscd. Otherwise if any program just caches
+configuration data and refuses to reload it, then the program should be
+fixed.
+
+kukuk:
+No, this is the design Sun made about 12 years ago. This will not be
+changed. One reason is, that getdomainname() is a syscall, and syscalls
+are very expensive.
+I will not change common, well known behaviour. All Unix behave so.
