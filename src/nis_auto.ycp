@@ -47,8 +47,59 @@
     // The settings are in the first argument
     map settings = select (args, 0, $[]);
     y2milestone("Imported: (%1)", settings);
-
     Nis::Import ( settings );
+     
+    define set_contents(map settings) ``{
+	Nis::Import ( settings );
+        term contents =
+	    `VBox(
+		  `VSpacing(1),
+		  `RichText( `id(`summary), Nis::Summary()),
+		  `VSpacing(),
+		  `HBox(
+			`PushButton(`id(`configure), _("&Configure NIS")),
+			`HStretch(),
+			`PushButton(`id(`reset), _("&Reset Configuration"))
+			)
+		  );
+
+	Wizard::SetContents(_("NIS Configuration"),
+			    contents, "", true, true);
+    }
+
+    // Create Summary and buttons for launching
+    // in auto mode
+    
+    if ( select (args, 1, false)) {
+	import "Wizard"; 
+	set_contents(settings);
+	any ret = nil;
+	repeat {
+	    ret = UI::UserInput();
+	    if (ret == `configure)
+	    {
+		map result = CallModule("nis_auto", [settings, false]);
+		if (result!=$[])
+		    settings = result;
+
+		set_contents(settings);
+	    }
+	    else if (ret == `reset) {
+		settings = $[];
+		set_contents(settings);
+	    }
+	    else if (ret == `help)
+	    {
+		UI::LongTextPopup (_("Help"), `RichText (_("Help")), 50, 15);
+	    }
+	} until ( ret == `key || ret ==`next || ret == `back);
+
+
+	return [ret,settings];
+
+    }
+
+   
     Nis::_autofs_allowed = true;
 
     Wizard::CreateDialog ();
