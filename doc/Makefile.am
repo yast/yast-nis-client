@@ -6,14 +6,10 @@
 
 SUBDIRS = autodocs
 
-docdir = @DOCDIR@
 htmldir = $(docdir)
 
 screenshots = \
-	nis1.png \
-	nis2.png \
-	nis1-h.png \
-	nis1-l.png
+	$(wildcard nis*.png)
 
 html_DATA = index.html ypdomainname.txt $(screenshots)
 EXTRA_DIST = $(html_DATA)
