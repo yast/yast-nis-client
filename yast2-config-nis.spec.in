@@ -14,7 +14,7 @@ Name:		@RPMNAME@
 Release:	1
 Copyright:	(c) 2000 SuSE GmbH
 Group:		System Environment/YaST
-Requires:	yast2 yast2-trans-nis yast2-lib-wizard yast2-lib-sequencer
+Requires:	yast2 yast2-trans-nis yast2-lib-wizard yast2-lib-sequencer yast2-lib-network
 BuildArchitectures:	noarch
 
 Packager:	@MAINTAINER@
@@ -39,8 +39,8 @@ make check
 %{?suse_check}
 
 %files
-%dir @YAST2DIR@/include/nis
-@YAST2DIR@/include/nis/*
+# %dir @YAST2DIR@/include/nis
+# @YAST2DIR@/include/nis/*
 @YAST2DIR@/clients/nis.ycp
 @YAST2DIR@/clients/nis_write.ycp
 @YAST2DIR@/menuentries/menuentry_nis.ycp
