@@ -11,7 +11,7 @@ Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
 Read	.sysconfig.ypbind.YPBIND_OPTIONS ""
 Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.etc.nsswitch_conf.hosts "files dns6"
+Read	.etc.nsswitch_conf."hosts" "files dns6"
 Return	true
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true
@@ -32,13 +32,17 @@ Write	.sysconfig.ypbind.YPBIND_BROADCAST "no" true
 Write	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no" true
 Write	.sysconfig.ypbind.YPBIND_OPTIONS "" true
 Write	.sysconfig.ypbind nil true
-Read	.etc.nsswitch_conf.passwd "compat"
-Read	.etc.nsswitch_conf.group "compat"
+Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
+Read	.etc.nsswitch_conf."passwd" "compat"
+Read	.etc.nsswitch_conf."group" "compat"
+Read	.etc.nsswitch_conf."shadow" nil
+Write	.etc.nsswitch_conf."shadow" "compat" true
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/shadow" 0
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/group" 0
-Read	.etc.nsswitch_conf.automount "files"
-Write	.etc.nsswitch_conf.automount "files nis" true
+Write	.etc.nsswitch_conf nil true
+Read	.etc.nsswitch_conf."automount" "files"
+Write	.etc.nsswitch_conf."automount" "files nis" true
 Write	.etc.nsswitch_conf nil true
 Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.exists "autofs" true
@@ -49,6 +53,9 @@ Read	.init.scripts.exists "portmap" true
 Execute	.target.bash "/etc/init.d/portmap status" $["TERM":"raw"] 0
 Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":""]
 Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
+Read	.init.scripts.exists "nscd" true
+Execute	.target.bash "/etc/init.d/nscd status" $["TERM":"raw"] 0
+Execute	.target.bash "/etc/init.d/nscd restart" $["TERM":"raw"] 0
 Execute	.target.bash "/etc/init.d/autofs stop" $["TERM":"raw"] 0
 Execute	.target.bash "/etc/init.d/autofs start" $["TERM":"raw"] 0
 Return	true

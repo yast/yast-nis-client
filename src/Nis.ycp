@@ -467,6 +467,31 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
     }
 
     /**
+     * Reads a database entry from nsswitch_conf and returns it as a list
+     * @param db eg. "passwd"
+     * @return   eg. ["files", "nis"]
+     */
+    define list(string) ReadNssDb (string db) ``{
+	string db_s = SCR::Read (add (.etc.nsswitch_conf, db));
+	if (db_s == nil)
+	{
+	    db_s = "";
+	}
+	return filter (string s, splitstring (db_s, " \t"), ``(s != ""));
+    }
+
+    /**
+     * Writes a database entry as a list to nsswitch_conf
+     * @param db eg. "passwd"
+     * @param entries eg. ["files", "nis"]
+     * @return success?
+     */
+    define boolean WriteNssDb (string db, list(string) entries) ``{
+	return SCR::Write (add (.etc.nsswitch_conf, db),
+			   mergestring (entries, " "));
+    }
+
+    /**
      * Reads NIS settings from the SCR
      * @return success
      */
@@ -499,11 +524,135 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	*/
 	_start_autofs = _autofs_allowed && Runlevel::ServiceEnabled ("autofs");
 
-	string hosts_s = SCR::Read (.etc.nsswitch_conf.hosts);
-	list(string) hosts_l = filter (`s, splitstring (hosts_s, " \t"), ``(s != ""));
-	hosts_by_nis = find (string s, hosts_l, ``(s == "nis")) != nil;
+	hosts_by_nis = contains (ReadNssDb ("hosts"), "nis");
 
 	return true;
+    }
+
+    /**
+     * Configures the name service switch for the user databases
+     * according to chosen settings
+     * @return success?
+     */
+    global define boolean WriteNssUsers () ``{
+	list(string) dbs = ["passwd", "group", "shadow"];
+	// Why bother with both compat and nis?
+	// If there's no plus, we don't have to write passwd etc.
+	// And it's supposed to be faster.
+	boolean have_plus = HavePlus ();
+	if (start)
+	{
+	    // watch out for failures :))
+	    if (have_plus)
+	    {
+		// we want to switch to "compat"
+		foreach (string db, dbs, ``{
+		    // what if a db is not mentioned?
+		    // We get [] meaning compat, so it's ok to make it explicit
+		    list(string) db_l = ReadNssDb (db);
+
+		    if (!contains (db_l, "compat"))
+		    {
+			// remove "files" and "nis", if there;
+			db_l = filter (string s, db_l, ``(
+					   s != "files" && s != "nis"));
+			// put "compat" and the rest;
+			db_l = prepend (db_l, "compat");
+			WriteNssDb (db, db_l);
+		    }
+		});
+		WritePluses ();
+	    }
+	    else // no plus - can add files nis
+	    {
+		foreach (string db, dbs, ``{
+		    list(string) db_l = ReadNssDb (db);
+
+		    if (!contains (db_l, "nis"))
+		    {
+			// remove "compat" if there;
+			db_l = filter (string s, db_l, ``(s != "compat"));
+			// put "nis", we know it's not there
+			db_l = prepend (db_l, "nis");
+			// put "files" if not there - before nis
+			if (!contains (db_l, "files"))
+			{
+			    db_l = prepend (db_l, "files");
+			}
+			WriteNssDb (db, db_l);
+		    }
+		});
+	    }
+	}
+	else // not start
+	{
+	    if (have_plus)
+	    {
+		// Do nothing - it is ok to leave the pluses in with compat
+		// (if there's plus and nis, it's inconsistent -
+		//  resolve manually)
+	    }
+	    else
+	    {
+		foreach (string db, dbs, ``{
+		    list(string) db_l = ReadNssDb (db);
+
+		    // remove "nis" if there;
+		    db_l = filter (string s, db_l, ``(s != "nis"));
+		    // if nothing left, put "files";
+		    if (db_l == [])
+		    {
+			db_l = ["files"];
+		    }
+		    WriteNssDb (db, db_l);
+		});
+	    }
+	}
+
+	if (!SCR::Write (.etc.nsswitch_conf, nil))
+	{
+	    // error popup
+	    Report::Error (sformat (_("Error writing file %1."),
+				    "/etc/nsswitch.conf"));
+	    return false;
+	}
+	return true;
+    }
+
+    /**
+     * Configures the name service switch for autofs
+     * according to chosen settings
+     * @return success?
+     */
+    global define boolean WriteNssAutofs () ``{
+	boolean ok = true;
+
+	// nsswitch automount:
+	// bracket options not allowed, order does not matter
+	list(string) automount_l = ReadNssDb ("automount");
+	boolean enabled = contains (automount_l, "nis");
+	// enable it if it is not enabled yet and both services run
+	if (start && _start_autofs && !enabled)
+	{
+	    automount_l = add (automount_l, "nis");
+	    ok = WriteNssDb ("automount", automount_l);
+	    ok = ok && SCR::Write (.etc.nsswitch_conf, nil);
+	}
+	// disable it if it is enabled and either service does not run
+	else if (!(start && _start_autofs) && enabled)
+	{
+	    automount_l = filter (string s, automount_l, ``(s != "nis"));
+	    ok = WriteNssDb ("automount", automount_l);
+	    ok = ok && SCR::Write (.etc.nsswitch_conf, nil);
+	}
+
+	if (!ok)
+	{
+	    // error popup
+	    Report::Error (sformat (_("Error writing file %1."),
+				    "/etc/nsswitch.conf"));
+	}
+	return ok;
     }
 
     /**
@@ -548,41 +697,17 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    Runlevel::ServiceAdjust ("ypbind", "disable");
 	}
 
-	if (start)
-	{
-	    if (! WritePluses ())
-	    {
-		return false;
-	    }
-	}
+	// TODO do as much as possible if one thing fails
+	// especially WRT nis/autofs independence
+	WriteNssUsers ();
 
 	if (true) // autofs no longer depends on nis, #19769
 	{
 	    if (_autofs_allowed)
 	    {
-		// nsswitch automount:
-		// bracket options not allowed, order does not matter
-		string automount_s = SCR::Read (.etc.nsswitch_conf.automount);
-		list(string) automount_l = filter (`s, splitstring (automount_s, " \t"), ``(s != ""));
-		boolean enabled = find (string s, automount_l, ``(s == "nis")) != nil;
-		boolean ok = true;
-		// enable it if it is not enabled yet and both services run
-		if (start && _start_autofs && !enabled)
-		{
-		    ok = SCR::Write (.etc.nsswitch_conf.automount, automount_s + " nis");
-		    ok = ok && SCR::Write (.etc.nsswitch_conf, nil);
-		}
-		// disable it if it is enabled and either service does not run
-		else if (!(start && _start_autofs) && enabled)
-		{
-		    automount_l = filter (string s, automount_l, ``(s != "nis"));
-		    ok = SCR::Write (.etc.nsswitch_conf.automount, mergestring (automount_l, " "));
-		    ok = ok && SCR::Write (.etc.nsswitch_conf, nil);
-		}
+		boolean ok = WriteNssAutofs ();
 		if (!ok)
 		{
-		// error popup
-		    Report::Error (sformat (_("Error writing file %1."), "/etc/nsswitch.conf"));
 		    return false;
 		}
 
@@ -598,7 +723,6 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	}
 	return true;
     }
-
 
     /**
      * Saves NIS configuration.
@@ -651,6 +775,11 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    }
 	}
 
+	// if the name service cache daemon is running, restart it
+	if (Runlevel::ServiceStatus ("nscd") == 0) {
+	    Runlevel::RunInitScript ("nscd", "restart");
+	}
+
 	if (true) // autofs no longer depends on nis, #19769
 	{
 	    if (_autofs_allowed)
@@ -667,21 +796,35 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
     }
 
     /**
+     * @param file a pathname
+     * @return is there a nis inclusion?
+     */
+    define boolean HasPlus (string file) ``{
+	// does the file have a plus?
+	return (0 == SCR::Execute (.target.bash, "/usr/bin/grep -q '^[+-]' " + file));
+    }
+
+    /**
+     * Do we need compat? Is there a plus in any of the user databases?
+     * @return true/false
+     */
+    define boolean HavePlus () ``{
+	list(string) files = [
+	    "/etc/passwd",
+	    "/etc/shadow",
+	    "/etc/group",
+	    ];
+	// find a file having a plus
+	return nil != find (string file, files, ``( HasPlus (file) ));
+    }
+
+    /**
      * Add "+" lines to system files so that NIS entries get merged in.
      * (Formerly this was done in SuSEconfig.ypclient)
      * @return success?
      */
     define boolean WritePluses () ``{
-	list(string) files = [];
-	if (SCR::Read (.etc.nsswitch_conf.passwd) == "compat")
-	{
-	    files = ["passwd", "shadow"];
-	}
-	if (SCR::Read (.etc.nsswitch_conf.group) == "compat")
-	{
-	    files = add (files, "group");
-	}
-
+	list(string) files = ["passwd", "shadow", "group"];
 	//don't forget a newline
 	map what_to_write = $[
 	    "passwd":	"+::::::",
@@ -704,7 +847,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
      * @return success?
      */
     define boolean WritePlusesTo (string file, string what) ``{
-	if (SCR::Execute (.target.bash, "/usr/bin/grep -q '^[+-]' " + file) != 0)
+	if (!HasPlus (file))
 	{
 	    // not there, add it
 	    // TODO: backup?
