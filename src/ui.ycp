@@ -338,6 +338,82 @@ Change the DHCP server configuration to provide it.
 	}
     }
 
+
+    /**
+     * Let the user choose some of a list of items
+     * @param title	selectionbox title
+     * @param items	a list of items
+     * @return		items or nil on cancel
+     */
+    global define list(string) ChooseItems (string title, list(string) items) ``{
+	list (term) msb_items = maplist (string entry, items,
+					 ``( `item (`id (entry), entry)));
+	UI::OpenDialog (
+	    `VBox (
+		`HSpacing (40),
+		`HBox (
+		    `MultiSelectionBox (`id (`items), title, msb_items),
+		    `VSpacing(10)
+		    ),
+		`HBox (
+		    `PushButton (`id (`ok), `opt (`default, `key_F10),
+				 OKButtonLabel ()),
+		    `PushButton (`id (`cancel), `opt (`key_F9),
+				 CancelButtonLabel())
+		    )
+		));
+	UI::SetFocus (`id (`items));
+	any ret = nil;
+	do
+	{
+	    ret = UI::UserInput();
+	}
+	while (ret != `cancel && ret != `ok);
+
+	if (ret == `ok)
+	{
+	    items = UI::QueryWidget (`id (`items), `SelectedItems);
+	}
+	UI::CloseDialog();
+
+	return items;
+    }
+
+    /**
+     * A cache of NIS servers found on the LAN.
+     * @see SelectNisServers
+     */
+    global list (string) found_servers = nil;
+
+    /**
+     * Scan the network for NIS servers and let the user select among them.
+     * @return space separated list of servers or ""
+     */
+    global define string SelectNisServers () ``{
+	if (found_servers == nil)
+	{
+	    // popup window
+	    // LAN: local area network
+	    UI::OpenDialog (`Label (_("Scanning for NIS servers on this LAN...")));
+	    found_servers = sort (SCR::Read (.net.hostnames.rpc, "ypserv"));
+	    UI::CloseDialog ();
+	    if (found_servers == nil)
+	    {
+		found_servers = ["internal-error"];
+	    }
+	}
+
+	list (string) selected_servers =
+	    // selection box label
+	    ChooseItems (_("&NIS Servers"), found_servers);
+	y2milestone ("selected_servers: %1", selected_servers);
+	if (selected_servers == nil)
+	{
+	    selected_servers = [];
+	}
+	return mergestring (selected_servers, " ");
+    }
+
     /**
      * The simple dialog
      * @return	`back, `abort, `next, `multiple or `expert
@@ -394,8 +470,12 @@ by separating their addresses with spaces.</p>
 			   `VSpacing (0.2),
 			   // text entry label
 			   `TextEntry (`id (`ypa), _("&Addresses of NIS servers"), yp_address),
-			   // check box label
-			   `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Br&oadcast"), default_broadcast)),
+			   `HBox (
+			       // check box label
+			       `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Br&oadcast"), default_broadcast)),
+			       // pushbutton label, find nis servers
+			       `Right (`PushButton (`id (`find), _("&Find")))
+			       ),
 			   `VSpacing (0.2),
 			   `HBox (
 			       `PushButton (`id (`expert), `opt (`key_F7),
@@ -424,6 +504,7 @@ by separating their addresses with spaces.</p>
 	    UI::ChangeWidget (`id (`ypd), `Enabled, !dhcp_wanted);
 	    UI::ChangeWidget (`id (`ypa), `Enabled, !dhcp_wanted);
 	    UI::ChangeWidget (`id (`broadcast), `Enabled, !dhcp_wanted);
+	    UI::ChangeWidget (`id (`find), `Enabled, !dhcp_wanted);
 	    UI::ChangeWidget (`id (`multiple), `Enabled, !dhcp_wanted);
 
 	    result = UI::UserInput ();
@@ -435,6 +516,14 @@ by separating their addresses with spaces.</p>
 	    if (result == `dhcpyes)
 	    {
 		WarnIfDhcpNotServed ();
+	    }
+	    else if (result == `find)
+	    {
+		string servers = SelectNisServers ();
+		if (servers != "")
+		{
+		    UI::ChangeWidget (`id (`ypa), `Value, servers);
+		}
 	    }
 	    else if (contains ([`next, `expert, `multiple], result))
 	    {
@@ -963,9 +1052,13 @@ the default domain will be lost.")))
 			       // comma: ","
 			       _("&Servers (separated by spaces or commas)"),
 			       servers_s),
-		`CheckBox (`id (`local_broadcast),
-			   // checkbox label
-			   _("&Broadcast"), broadcast),
+		`HBox (
+		    `CheckBox (`id (`local_broadcast),
+			       // checkbox label
+			       _("&Broadcast"), broadcast),
+		    // pushbutton label, find nis servers
+		    `PushButton (`id (`find), _("&Find"))
+		    ),
 		`Empty ()
 		);
 
@@ -1001,6 +1094,14 @@ the default domain will be lost.")))
 	    if (ui == `cancel)
 	    {
 		break;
+	    }
+	    else if (ui == `find)
+	    {
+		string servers = SelectNisServers ();
+		if (servers != "")
+		{
+		    UI::ChangeWidget (`id (`servers), `Value, servers);
+		}
 	    }
 	    else if (ui == `ok)
 	    {

@@ -4,6 +4,8 @@
 
 @HEADER@
 Requires:	yast2 yast2-network yast2-packager
+# .net.hostnames.rpc
+Requires:	yast2-core >= 2.8.0
 
 Provides:	yast2-config-nis yast2-config-nis-devel
 Obsoletes:	yast2-config-nis yast2-config-nis-devel
