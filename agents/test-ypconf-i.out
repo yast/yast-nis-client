@@ -16,6 +16,8 @@ true,
  "domainservers":
 $["911":
 ["emergency.com"],
+ "abcd":
+[],
  "bad-domain":
 ["foo.bad-domain.test",
  "bar.bad-domain.test"],
@@ -24,6 +26,8 @@ $["911":
  "other-domain.test":
 ["yp.other-domain.test",
  "yp2.other-domain.test"],
+ "slpdomain":
+[],
  "yourdomain":
 ["10.0.0.1"]],
  "servers":
@@ -31,4 +35,9 @@ $["911":
  "192.168.0.2",
  "192.168.0.3",
  "192.168.0.4",
- "true"]]
+ "true"],
+ "slp":
+$["abcd":
+true,
+ "slpdomain":
+true]]

@@ -8,8 +8,10 @@ domain mydomain broadcast
 domain yourdomain server 10.0.0.1
 ypserver 192.168.0.4	# lots of servers
 ypserver true
+domain abcd slp
 domain other-domain.test  server   yp.other-domain.test
 domain other-domain.test   server  yp2.other-domain.test
+domain slpdomain slp
 # broadcast will supplement specific servers instead of overriding
 domain bad-domain server  foo.bad-domain.test
 domain bad-domain server  bar.bad-domain.test
