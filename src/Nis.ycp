@@ -177,10 +177,10 @@
      */
     global define string valid_nisdomainname () ``{
 	// Translators: do not translate (none)!
-	return _(
-"A NIS domain name must not be empty,
-it must not be \"(none)\"
-and it must be at most 64 characters long.");
+	return _("A NIS domain name must not be empty,
+it must not be \"(none)\",
+and it must be at most 64 characters long.
+");
     }
 
     /**
@@ -408,7 +408,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	summary = Summary::AddLine(summary, (broken_server) ? _("Yes") : nc);
 	summary = Summary::AddHeader(summary, _("ypbind options"));
 	summary = Summary::AddLine(summary, (options!="") ? options : nc);
-	summary = Summary::AddHeader(summary, _("Auto-mounter enabled"));
+	summary = Summary::AddHeader(summary, _("Automounter enabled"));
 	summary = Summary::AddLine(summary, (_start_autofs) ? _("Yes") : nc);
 
 	return summary;
