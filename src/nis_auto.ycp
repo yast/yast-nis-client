@@ -42,86 +42,68 @@
     {
 	y2error ("Bad argument for nis_auto: %1", Args (0));
 	return false;
-    }
-
-    boolean cms_mode = false;
+    }    
     map settings = $[];
     {
 	integer i = 0;
 	while (i < size (Args()))
 	{
-	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);
-	    else if (Args (i) == .cms)			cms_mode=true;
+	    if (is (Args (i), map) && nil != Args (i))	settings = Args (i);	    
 	    i = i + 1;
 	}
-    }
-
-    // The settings are in the first argument
-
-    y2milestone("Imported: (%1)", settings);
+    }    
+    
     Nis::Import ( settings );
-
-    define set_contents(map settings) ``{
-	Nis::Import ( settings );
+    y2milestone("Imported: (%1)", settings);
+    
+    define set_contents()
+	``{	
 	term contents =
 	    `VBox(
 		  `VSpacing(1),
 		  `RichText( `id(`summary), Nis::Summary()),
-		  `VSpacing(),
+		  `VSpacing(0.5),
 		  `HBox(
 			`PushButton(`id(`configure), _("&Configure NIS")),
 			`HStretch(),
 			`PushButton(`id(`reset), _("&Reset Configuration"))
-			)
+			),
+		  `VSpacing(1)
 		  );
-
 	Wizard::SetContents(_("NIS Configuration"),
 			    contents, "", true, true);
     }
 
-    // Create Summary and buttons for launching
-    // in auto mode
-
-    if ( cms_mode) {
-	import "Wizard";
-	set_contents(settings);
-	any ret = nil;
-	repeat {
-	    ret = UI::UserInput();
-	    if (ret == `configure)
-	    {
-		map result = CallModule("nis_auto", [settings]);
-		if (result!=$[])
-		    settings = result;
-
-		set_contents(settings);
-	    }
-	    else if (ret == `reset) {
-		settings = $[];
-		set_contents(settings);
-	    }
-	    else if (ret == `help)
-	    {
-		UI::LongTextPopup (_("Help"), `RichText (_("Help")), 50, 15);
-	    }
-	} until ( ret == `key || ret ==`next || ret == `back);
-
-
-	return [ret,settings];
-
-    }
-
 
     Nis::_autofs_allowed = true;
-
-    Wizard::CreateDialog ();
-    Wizard::ReplaceAbortButton(`Empty ());
-    symbol ret = NisDialog ();
-    UI::CloseDialog ();
-
-    if (ret == `next)
-    {
-	return Nis::Export ();
-    }
-    return $[];
+    set_contents();
+    any result = nil;
+    any ret = nil;
+    repeat {
+	ret = UI::UserInput();
+	if (ret == `configure)
+	{	    
+	        Wizard::CreateDialog ();
+		Wizard::ReplaceAbortButton(`Empty ());
+		result = NisDialog ();				
+		UI::CloseDialog ();
+		if (result == `next || result == `finish)
+		{
+		     settings = Nis::Export ();
+		} 
+		Nis::Set(settings);
+		set_contents();
+	}
+	else if ( ret == `reset)
+	{
+	    settings= $[];
+	    Nis::Set(settings);
+	    set_contents();
+	}		
+    } until (ret == `back || ret == `next || ret ==`key);   
+  
+    return [ret, settings];
 }
+
+
+
