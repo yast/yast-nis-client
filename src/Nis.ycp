@@ -71,7 +71,7 @@
      * Keys are domains, values are booleans.
      * The domains must be the same as for multidomain_servers
      * @see multidomain_servers
-     * @see broadcast
+     * @see global_broadcast
      */
     global map multidomain_broadcast = $[];
 
@@ -124,7 +124,7 @@
      * @see multidomain_broadcast
      * @see default_broadcast
      */
-    global boolean broadcast = false;
+    global boolean global_broadcast = false;
 
     /**
      * You should set this to "yes" if you have a NIS server in your
@@ -177,25 +177,70 @@
     /* ---------------------------------------------------------------- */
 
     /**
+     * Read only, set by ProbePackages.
+     * Use as an argument to require.ycp/DoInstallAndRemove
+     */
+    global list(string) install_packages = [];
+    /**
+     * Read only, set by ProbePackages.
+     * Use as an argument to require.ycp/DoInstallAndRemove
+     */
+    global list(string) remove_packages = [];
+
+    /**
+     * Detect which packages have to be installed
+     * and return a descriptive string for a plain text pop-up.
+     * @return "" or "Foo will be installed.\nBar will be installed.\n"
+     */
+    global define string ProbePackages () ``{
+	string message = "";
+	install_packages = [];
+	remove_packages = [];
+
+	if (_autofs_allowed && _start_autofs)
+	{
+	    string pkg = "autofs";
+	    if (! SCR::Read (.targetpkg.installed, pkg))
+	    {
+		install_packages = add (install_packages, pkg);
+		// Translators: popup message part, ends with a newline
+		message = message + _("The automounter package will be installed.\n");
+	    }
+	}
+
+	return message;
+    }
+
+    /* ---------------------------------------------------------------- */
+
+    /**
      * Set module data
      * @return void
      */
-
     global define void Set (map settings) ``{
-	start = lookup (settings, "start_nis", false);
-	servers = lookup (settings, "nis_servers", []);
-	default_broadcast = lookup (settings, "default_broadcast", false);
-	domain = lookup (settings, "nis_domain", "");
+	start = settings["start_nis"]:false;
+
+	servers = settings["nis_servers"]:[];
+	default_broadcast = settings["nis_broadcast"]:false;
+	domain = settings["nis_domain"]:"";
 	old_domain = domain;
-	multidomain_servers = lookup (settings, "multidomain_servers", $[]);
-	multidomain_broadcast = lookup (settings, "multidomain_broadcast", $[]);
-	local_only = lookup (settings, "nis.local_only", false);
-	broadcast = lookup (settings, "nis.broadcast", false);
-	broken_server = lookup (settings, "nis.broken_server", false);
-	options = lookup (settings, "nis.options", "");
+
+	list other_domains = settings["nis_other_domains"]:$[];
+	foreach (map other_domain, other_domains, ``{
+	    string d = other_domain["nis_domain"]:"";
+	    list(string) s = other_domain["nis_servers"]:[];
+	    boolean b = other_domain["nis_broadcast"]:false;
+	    multidomain_servers = add (multidomain_servers, d, s);
+	    multidomain_broadcast = add (multidomain_broadcast, d, b);
+	});
+
+	local_only = settings["nis_local_only"]:false;
+	broken_server = settings["nis_broken_server"]:false;
+	options = settings["nis_options"]:"";
+
 	// autofs is not touched in Write if the map does not want it
 	_autofs_allowed = haskey (settings, "start_autofs");
-	_start_autofs = lookup (settings, "start_autofs", false);
+	_start_autofs = settings["start_autofs"]:false;
     }
 
     // TODO update the map keys
@@ -217,7 +262,7 @@
 	}
 
 	boolean missing = false;
-	foreach (`k, ["start_nis", "nis_domain", "nis_servers"], ``{
+	foreach (`k, ["start_nis", "nis_domain"], ``{
 	    if (! haskey (settings, k))
 	    {
 		y2error ("Missing at Import: '%1'.", k);
@@ -239,21 +284,36 @@
      * Dump the NIS settings to a map, for autoinstallation use.
      * @return $["start":, "servers":[...], "domain":]
      */
-	global define map Export () ``{
-		return $[
-			"start_nis": start,
-			"nis_servers": servers,
-			"nis_domain": domain,
-			"default_broadcast": default_broadcast,
-			"multidomain_servers": multidomain_servers,
-			"multidomain_broadcast": multidomain_broadcast,
-			"nis.local_only": local_only,
-			"nis.broadcast": broadcast,
-			"nis.broken_server": broken_server,
-			"nis.options": options,
-			"start_autofs": _start_autofs,
+    global define map Export () ``{
+	list other_domains = maplist (string d, list s, multidomain_servers, ``{
+	    return $[
+		"nis_domain": d,
+		"nis_servers": s,
+		"nis_broadcast": multidomain_broadcast[d]:false,
 		];
+	});
+
+	if (global_broadcast)
+	{
+	    y2error ("Attempt to export Nis::global_broadcast");
 	}
+
+	return $[
+	    "start_nis": start,
+
+	    "nis_servers": servers,
+	    "nis_domain": domain,
+	    "nis_broadcast": default_broadcast,
+
+	    "nis_other_domains": other_domains,
+
+	    "nis_local_only": local_only,
+	    "nis_broken_server": broken_server,
+	    "nis_options": options,
+
+	    "start_autofs": _start_autofs,
+	    ];
+    }
 
     /**
      * @return Html formatted configuration summary
@@ -268,11 +328,10 @@
 	summary = Summary::AddLine(summary, (start) ? _("Yes") : nc);
 	summary = Summary::AddHeader(summary, _("NIS Domain"));
 	summary = Summary::AddLine(summary, (domain != "") ? domain : nc);
-	summary = Summary::AddHeader(summary, _("Broadcast"));
-	summary = Summary::AddLine(summary, (broadcast) ? _("Yes") : nc);
-	summary = Summary::AddHeader(summary, _("NIS Server"));
-	// TODO default_broadcast
+	summary = Summary::AddHeader(summary, _("NIS Servers"));
 	summary = Summary::AddLine(summary,(servers !=[]) ? mergestring(servers,"<br>") : nc);
+	summary = Summary::AddHeader(summary, _("Broadcast"));
+	summary = Summary::AddLine(summary, (default_broadcast) ? _("Yes") : nc);
 	// TODO: a full list
 	summary = summary + ListItem (_("Other domains"), multidomain_servers);
 	summary = Summary::AddHeader(summary, _("Answer to local host only"));
@@ -336,13 +395,17 @@
 	//TODO: ypdomainname (dhcpcd does not use defaultdomain)
 	old_domain = domain;
 	local_only = SCR::Read (.sysconfig.ypbind.YPBIND_LOCAL_ONLY) == "yes";
-	broadcast = SCR::Read (.sysconfig.ypbind.YPBIND_BROADCAST) == "yes";
+	global_broadcast = SCR::Read (.sysconfig.ypbind.YPBIND_BROADCAST) == "yes";
 	broken_server = SCR::Read (.sysconfig.ypbind.YPBIND_BROKEN_SERVER) == "yes";
 	options = SCR::Read (.sysconfig.ypbind.YPBIND_OPTIONS);
 
+	// install on demand
+	_autofs_allowed = true;
+	/*
 	_autofs_allowed =
 	    SCR::Read (.targetpkg.installed, "autofs") ||
 	    SCR::Read (.targetpkg.installed, "autofs4");
+	*/
 	_start_autofs = _autofs_allowed && Runlevel::ServiceEnabled ("autofs");
 	return true;
     }
@@ -372,7 +435,7 @@
 		return false;
 	    }
 	    SCR::Write (.sysconfig.ypbind.YPBIND_LOCAL_ONLY, local_only? "yes":"no");
-	    SCR::Write (.sysconfig.ypbind.YPBIND_BROADCAST, broadcast? "yes":"no");
+	    SCR::Write (.sysconfig.ypbind.YPBIND_BROADCAST, global_broadcast? "yes":"no");
 	    SCR::Write (.sysconfig.ypbind.YPBIND_BROKEN_SERVER, broken_server? "yes":"no");
 	    SCR::Write (.sysconfig.ypbind.YPBIND_OPTIONS, options);
 	    if (! SCR::Write (.sysconfig.ypbind, nil))

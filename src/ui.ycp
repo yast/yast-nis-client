@@ -23,6 +23,7 @@
     import "Wizard";
     import "Nis";
 
+    include "require.ycp";
     include "wizard/sequencer.ycp";
     include "ui/common_popups.ycp";
     include "network/ip.ycp";
@@ -102,6 +103,16 @@
 
 	if (result == `next)
 	{
+	    // Install packages if needed.
+	    // Cannot do it in Write, autoinstall does it differently.
+	    if (size (Nis::install_packages) > 0 ||
+		size (Nis::remove_packages) > 0)
+	    {
+		// require.ycp
+		DoInstallAndRemove (Nis::install_packages,
+				    Nis::remove_packages);
+	    }
+
 	    if (Nis::Write ())
 	    {
 		if (Nis::start)
@@ -142,7 +153,8 @@ client was saved."));
     global /*const*/ string broadcast_help =
 	// Translators: network broadcast address
 	_("<p>The <b>Broadcast</b> option enables searching
-in the local network to find a server. It is a security risk!</p>");
+in the local network to find a server, after the specified servers
+fail to respond. It is a security risk!</p>");
 
     global /*const*/ string details_help =
 	_("<p>The <b>Details</b> button gives access to some
@@ -156,7 +168,7 @@ less frequently used settings.</p>");
     global define symbol SwitchDialog () ``{
 	// help text 1/3
 	string help_text = _("<p>Here your machine can be set up as a
- <b>NIS client</b>.<br><b>TODO</b> explain what it is, what is dhcp.</p>");
+ <b>NIS client</b>.</p>");
 
 	// help text 3/3
 	help_text = help_text + _("<p>The Network Information Service (NIS)
@@ -165,11 +177,13 @@ less frequently used settings.</p>");
  Telecommunications plc and may not be used without
  permission.</p>");
 
-	// help text 4/3 (optional)
+	// help text 4/3
 	string autofs_help_text = _(
 "<p>Automounter is a daemon that mounts directories automatically.
 It is assumed that its configuration files (auto.*) already exist,
-either locally or over NIS.</p>");
+either locally or over NIS.<br>
+If it is not installed and you want to use it, it will be installed
+automatically.</p>");
 
 	boolean yp_client = Nis::start;
 	boolean autofs = Nis::_start_autofs;
@@ -187,13 +201,13 @@ either locally or over NIS.</p>");
 					   // radio button label
 					   `Left (`RadioButton (`id (`nisno), `opt (`notify), _("Do &not use NIS"), !yp_client)),
 					   // radio button label
-					   `Left (`RadioButton (`id (`nisyes), `opt (`notify), _("&Use NIS"), yp_client)),
-					   `Left (`RadioButton (`id (`nisdhcp), `opt (`notify), _("&Configure with DHCP")+ " [TODO!]", false && TODO))
+					   `Left (`RadioButton (`id (`nisyes), `opt (`notify), _("&Use NIS"), yp_client))
 					   )))),
 			   `VSpacing (0.2)
 			)
 		);
 
+	// TODO: #16568, like amavis
 	term autofs_frame =
 	    `Frame (
 		`opt (`hstretch),
@@ -291,7 +305,10 @@ by separating their addresses with spaces.</p>
 
 	string yp_domain  = Nis::GetDomain ();
 	string yp_address = Nis::GetServers ();
-	boolean broadcast = Nis::broadcast;
+
+	// In this simple case, let's discard the distinction.
+	boolean default_broadcast =
+	    Nis::default_broadcast || Nis::global_broadcast;
 
 	term con = nil;
 	term nis_frame =
@@ -301,10 +318,10 @@ by separating their addresses with spaces.</p>
 			   // text entry label
 			   `TextEntry (`id (`ypd), _("NIS &domain"), yp_domain),
 			   `VSpacing (0.2),
-			   // check box label
-			   `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("&Broadcast"), broadcast)),
 			   // text entry label
 			   `TextEntry (`id (`ypa), _("&IP addresses of NIS servers"), yp_address),
+			   // check box label
+			   `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("&Broadcast"), default_broadcast)),
 			   `VSpacing (0.2),
 			   `HBox (
 			       `PushButton (`id (`expert), _("D&etails ...")),
@@ -314,7 +331,7 @@ by separating their addresses with spaces.</p>
 			)
 		);
 
-	con = `HVSquash (`VBox (nis_frame, `Empty (`id (`autofs))));
+	con = `HVSquash (nis_frame);
 
 	Wizard::SetContentsButtons (
 	    // dialog title
@@ -324,21 +341,17 @@ by separating their addresses with spaces.</p>
 	any result = nil;
 	repeat
 	{
-	    UI::ChangeWidget (`id (`ypa), `Enabled, !broadcast);
-	    //UI::ChangeWidget (`id (`multiple), `Enabled, !broadcast);
-
 	    result = UI::UserInput ();
 	    if (result == `cancel)
 	    {
 		result = `abort;
 	    }
 
-	    broadcast = UI::QueryWidget (`id (`broadcast), `Value);
-
 	    if (contains ([`next, `expert, `multiple], result))
 	    {
 		yp_domain =  UI::QueryWidget (`id (`ypd), `Value);
 		yp_address = UI::QueryWidget (`id (`ypa), `Value);
+		default_broadcast = UI::QueryWidget (`id (`broadcast), `Value);
 
 		//TODO check_nisdomainname
 		// Sun is permissive
@@ -350,6 +363,8 @@ by separating their addresses with spaces.</p>
 		    continue;
 		}
 
+		// TODO: IP -> IP-or-name
+		// explain caveats
 		list temp_ip = splitstring (yp_address, " ");
 		if (contains (maplist (`i, temp_ip, ``(check_ip4 (i))), false))
 		{
@@ -368,8 +383,10 @@ by separating their addresses with spaces.</p>
 	{
 	    Nis::SetDomain (yp_domain);
 	    Nis::SetServers (yp_address);
-	    Nis::Touch (Nis::broadcast != broadcast);
-	    Nis::broadcast = broadcast;
+	    Nis::Touch (Nis::default_broadcast != default_broadcast);
+	    Nis::default_broadcast = default_broadcast;
+	    Nis::Touch (Nis::global_broadcast != false);
+	    Nis::global_broadcast = false;
 	}
 
 	return result;
@@ -440,7 +457,6 @@ by separating their addresses with spaces.</p>
 		    // error popup label
 		    UI::MessagePopup (_("The domain name is not correct."));
 		    result = nil;
-
 		}
 	    }
 	}
@@ -466,29 +482,37 @@ by separating their addresses with spaces.</p>
      */
     global define symbol MultipleDialog () ``{
 	// variable naming: _d means _domain, _s means _server
-
-	// help text 1/4
-	string help_text = _("<p>Specify here the servers for multiple domains and select the default domain.</p>");
-
-	// help text 3/3
-	help_text = help_text + broadcast_help;
-
-	// help text 3/3
-	// network broadcast address
-	help_text = help_text + _("<p>If enabled for a specific domain, broadcast will be used after the specified servers fail to respond.</p>");
-
-	// help text 3/3
-	help_text = help_text + details_help;
-
-	// help text 3/3
-	help_text = help_text + _("<p>If you do not need multiple domains, use <b>Single domain</b> to switch to a simpler dialog.</p>");
-
 	string default_d = Nis::GetDomain ();
-	boolean broadcast = Nis::broadcast;
+	boolean global_broadcast = Nis::global_broadcast;
 	map all_servers = mapmap (string d, list s, Nis::multidomain_servers,
 				  ``( [d, [s, Nis::multidomain_broadcast[d]:false]] ));
 	all_servers = add (all_servers, "",
 			   [Nis::servers, Nis::default_broadcast]);
+
+	boolean global_broadcast_allowed = global_broadcast;
+
+	// help text
+	string help_text = _("<p>Specify here the servers for multiple domains and select the default domain.</p>");
+
+	// help text
+	help_text = help_text + broadcast_help;
+
+	if (global_broadcast_allowed)
+	{
+	    // help text
+	    // only shown if a deprecated advanced option (%1) is used.
+	    help_text = help_text + sformat (_(
+"<p>The Global broadcast option (%1) is obsoleted
+by the <tt>broadcast</tt> keyword in <tt>/etc/yp.conf</tt>.
+This check box therefore only appears if it is turned on.</p>"),
+					     "<tt>ypbind -broadcast</tt>");
+	}
+
+	// help text
+	help_text = help_text + details_help;
+
+	// help text
+	help_text = help_text + _("<p>If you do not need multiple domains, use <b>Single domain</b> to switch to a simpler dialog.</p>");
 
 	// "" means the default domain
 	string current_d = "";
@@ -502,7 +526,7 @@ by separating their addresses with spaces.</p>
 		    `Table (
 			`id (`domains),
 			`opt (`notify, `immediate),
-			`header (_("Domain"), _("Broadcast"), _("Servers")),
+			`header (_("Domain"), `Center (_("Broadcast")), _("Servers")),
 			DomainTableItems (default_d, all_servers)
 			),
 		    `HBox (
@@ -514,15 +538,23 @@ by separating their addresses with spaces.</p>
 		    )
 		);
 
+	term global_broadcast_t = `Empty ();
+	if (global_broadcast_allowed)
+	{
+	    global_broadcast_t = `CheckBox (
+		`id (`global_broadcast), `opt (`notify),
+		// check box label
+		_("&Global broadcast"), global_broadcast
+		);
+	}
+
 	term nis_vbox =
 	    `VBox (`VSpacing (0.2),
 		   // text entry label
 		   `TextEntry (`id (`domain), `opt (`notify),
 			       _("Default NIS do&main"), default_d),
 		   `VSpacing (0.5),
-		   // check box label
-		   `Left (`CheckBox (`id (`broadcast), `opt (`notify),
-				     _("&Broadcast"), broadcast)),
+		   `Left (global_broadcast_t),
 		   multiple,
 		   `VSpacing (0.2),
 		   `HBox (
@@ -563,7 +595,7 @@ by separating their addresses with spaces.</p>
 	    UI::ChangeWidget (`id (`del_d), `Enabled, any_d
 			      /*&& current_d !=""*/);
 
-	    UI::ChangeWidget (`id (`multiple), `Enabled, !broadcast);
+	    UI::ChangeWidget (`id (`multiple), `Enabled, !global_broadcast);
 
 	    result = UI::UserInput ();
 	    if (result == `cancel)
@@ -571,7 +603,9 @@ by separating their addresses with spaces.</p>
 		result = `abort;
 	    }
 
-	    broadcast = UI::QueryWidget (`id (`broadcast), `Value);
+	    // only query if the widget is there
+	    global_broadcast = global_broadcast_allowed &&
+		UI::QueryWidget (`id (`global_broadcast), `Value);
 
 	    if (result == `domain)
 	    {
@@ -690,8 +724,8 @@ the default domain will be lost.")))
 	if (contains ([`next, `expert, `single], result))
 	{
 	    Nis::SetDomain (default_d);
-	    Nis::Touch (Nis::broadcast != broadcast);
-	    Nis::broadcast = broadcast;
+	    Nis::Touch (Nis::global_broadcast != global_broadcast);
+	    Nis::global_broadcast = global_broadcast;
 
 	    map only_servers = mapmap (string d, list v, all_servers, ``(
 					   [d, v[0]:[]]
@@ -923,9 +957,7 @@ and it must be at most 64 characters long.");
     global define list DomainTableItems (string default_d, map all_servers) ``{
 	if (check_g == nil)
 	{
-	    // fake center alignment:
-	    // indent it a bit because the column header is wide: "Broadcast"
-	    check_g = "  " + UI::Glyph (`CheckMark);
+	    check_g = UI::Glyph (`CheckMark);
 	}
 	// maps are sorted, so the default domain, "", comes first
 	return maplist (string d, list server_sp, all_servers, ``(
@@ -1044,17 +1076,8 @@ and it must be at most 64 characters long.");
      * @return `back or `next
      */
     global define symbol SaveDialog () ``{
-	Wizard::SetContents (_("Summary"), `RichText (Nis::Summary ()),
-"This is a hack to show the summary because autoyast does not work yet<br>" +
-			     "Press any button", true, true);
-	UI::UserInput ();
-
-	string message = _("The configuration of the NIS client will be saved.");
-	if (UI::YesNoPopup (message))
-	{
-	    return `next;
-	}
-
-	return `back;
+	string message1 = _("The configuration of the NIS client will be saved.\n");
+	string message2 = Nis::ProbePackages ();
+	return UI::ContinueCancelPopup (message1 + message2) ? `next : `back;
     }
 }
