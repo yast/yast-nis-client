@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Sep 13 14:28:13 CEST 2001 - mvidner@suse.cz
+
+- Improved ncurses layout. (2.4.9)
+
+-------------------------------------------------------------------
 Fri Sep  7 09:36:47 CEST 2001 - mvidner@suse.cz
 
 - Use the runlevel editor for dealing with START_* variables (2.4.8)
