@@ -38,17 +38,16 @@
  deactivate NIS services, select the <b>Do not use NIS</b> button.</p>");
 
 	// help text 2/3
-	help_text = help_text + _("<p>You can specify multiple servers
+	help_text = help_text + _("<p>Specify multiple servers
 by separating their addresses with spaces.</p>
 ");
 
 	// help text 3/3
 	help_text = help_text + _("<p>The Network Information Service (NIS)
  was formerly known as Sun <b>Yellow Pages</b> (YP). The name Yellow
- Pages is a registered trademark in the United Kingdom of British
+ Pages is a registered trademark in the United Kingdom by British
  Telecommunications plc and may not be used without
- permission.</p>
-");
+ permission.</p>\n");
 
 	boolean yp_client = Nis::start;
 	string yp_domain  = Nis::GetDomain ();
