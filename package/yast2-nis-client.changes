@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Mar  3 14:40:32 CET 2003 - mvidner@suse.de
+
+- Texts from final proofreading.
+- 2.7.10
+
+-------------------------------------------------------------------
 Mon Mar  3 10:58:00 CET 2003 - mvidner@suse.de
 
 - Prefer "compat" to "files nis" so that daemons
