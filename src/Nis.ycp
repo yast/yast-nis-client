@@ -112,40 +112,22 @@
     // DHCP cooperation
 
     /**
-     * Whether sysconfig/network/dhcp says to get yp.conf by DHCP
+     * Whether sysconfig/network/dhcp says
+     * to get the domain AND yp.conf by DHCP.
+     * It will be turned off if dhcp_possible is off
+     * (the user can override it)
      */
-    global boolean servers_by_dhcp_wanted = false;
+    global boolean dhcp_wanted = false;
     /**
-     * Whether sysconfig/network/dhcp says to get the domain by DHCP
+     * Is the domain AND yp.conf served by DHCP?
+     * This is independent of dhcp_wanted:
+     * dhcpcd*.pid exists and dhcpcd*.info contains NISSERVERS and NISDOMAIN.
+     * It is used to warn the user if he wants to turn DHCP on but the config
+     * is not provided.
      */
-    global boolean domain_by_dhcp_wanted = false;
+    global boolean dhcp_possible = false;
     /**
-     * Is yp.conf currently served by DHCP and thus disabled in the UI
-     */
-    boolean servers_by_dhcp_actual = false;
-    /**
-     * Is domain currently served by DHCP and thus disabled in the UI
-     */
-    boolean domain_by_dhcp_actual = false;
-    /**
-     * In autoinst mode, the _actual variables are overriden by their
-     * _wanted counterparts
-     */
-    boolean auto_mode = false;
-    /**
-     * Is yp.conf currently served by DHCP and thus disabled in the UI
-     */
-    global define boolean ServersByDhcpActual () ``{
-	return auto_mode? servers_by_dhcp_wanted : servers_by_dhcp_actual;
-    }
-    /**
-     * Is domain currently served by DHCP and thus disabled in the UI
-     */
-    global define boolean DomainByDhcpActual () ``{
-	return auto_mode? domain_by_dhcp_wanted : domain_by_dhcp_actual;
-    }
-    /**
-     * If *_by_dhcp_wanted changes, we need to restart the DHCP client
+     * If dhcp_wanted changes, we need to restart the DHCP client
      */
     global boolean dhcp_restart = false;
 
@@ -336,9 +318,9 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	domain = settings["nis_domain"]:"";
 	old_domain = domain;
 
-	domain_by_dhcp_wanted = settings["nis_domain_by_dhcp"]:false;
-	servers_by_dhcp_wanted = settings["nis_servers_by_dhcp"]:false;
-	auto_mode = true;
+	dhcp_wanted = settings["nis_by_dhcp"]:false;
+	// we have to hope the config will be available
+	dhcp_possible = true;
 	// we don't know what the state will be before Write, so restart it
 	dhcp_restart = true;
 
@@ -386,7 +368,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	}
 
 	boolean missing = false;
-	// "nis_domain" can be omitted if nis_domain_by_dhcp is true
+	// "nis_domain" can be omitted if nis_by_dhcp is true
 	foreach (`k, ["start_nis"], ``{
 	    if (! haskey (settings, k))
 	    {
@@ -432,8 +414,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 
 	    "nis_other_domains": other_domains,
 
-	    "nis_domain_by_dhcp": domain_by_dhcp_wanted,
-	    "nis_servers_by_dhcp": servers_by_dhcp_wanted,
+	    "nis_by_dhcp": dhcp_wanted,
 
 	    "nis_local_only": local_only,
 	    "nis_broken_server": broken_server,
@@ -466,12 +447,12 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	// summary header
 	summary = Summary::AddHeader(summary, _("NIS Domain"));
 	summary = Summary::AddLine(summary,
-				   domain_by_dhcp_wanted ? dhcp :
+				   dhcp_wanted ? dhcp :
 				   ((domain != "") ? domain : nc));
 	// summary header
 	summary = Summary::AddHeader(summary, _("NIS Servers"));
 	summary = Summary::AddLine(summary,
-				   servers_by_dhcp_wanted ? dhcp :
+				   dhcp_wanted ? dhcp :
 				   ((servers !=[]) ? mergestring(servers,"<br>") : nc));
 	// summary header
 	summary = Summary::AddHeader(summary, _("Broadcast"));
@@ -574,20 +555,27 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	domain = deletechars (out["stdout"]:"", "\n");
 	old_domain = domain;
 
-	servers_by_dhcp_wanted = SCR::Read (
+	boolean servers_by_dhcp_wanted = SCR::Read (
 	    .sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF) == "yes";
-	domain_by_dhcp_wanted = SCR::Read (
+	boolean domain_by_dhcp_wanted = SCR::Read (
 	    .sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME) == "yes";
+	dhcp_wanted = servers_by_dhcp_wanted && domain_by_dhcp_wanted;
+
 	boolean dhcpcd_running =
-	    (servers_by_dhcp_wanted || domain_by_dhcp_wanted) &&
 	    SCR::Execute (.target.bash, "test -f /var/run/dhcpcd-*.pid") == 0;
 	string di = "/var/lib/dhcpcd/dhcpcd-*.info";
-	servers_by_dhcp_actual = servers_by_dhcp_wanted && dhcpcd_running &&
-	    SCR::Execute (
+	boolean servers_by_dhcp_possible = dhcpcd_running && SCR::Execute (
 	    .target.bash, "/bin/grep -qs '^NISSERVERS' " + di) == 0;
-	domain_by_dhcp_actual = domain_by_dhcp_wanted && dhcpcd_running &&
-	    SCR::Execute (
+	boolean domain_by_dhcp_possible = dhcpcd_running && SCR::Execute (
 	    .target.bash, "/bin/grep -qs '^NISDOMAIN' " + di) == 0;
+	dhcp_possible = servers_by_dhcp_possible && domain_by_dhcp_possible;
+	// we do it here instead of in the ui so that the user can override it
+	// in the ui or switch single/multiple domains
+	if (dhcp_wanted && !dhcp_possible)
+	{
+	    dhcp_wanted = false;
+	    Touch (true);
+	}
 
 	local_only = SCR::Read (.sysconfig.ypbind.YPBIND_LOCAL_ONLY) == "yes";
 	global_broadcast = SCR::Read (.sysconfig.ypbind.YPBIND_BROADCAST) == "yes";
@@ -743,7 +731,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    Runlevel::ServiceAdjust ("portmap", "enable");
 	    Runlevel::ServiceAdjust ("ypbind", "enable");
 
-	    if (!DomainByDhcpActual ())
+	    if (!dhcp_wanted)
 	    {
 		if (!SCR::Write (.etc.defaultdomain, domain))
 		{
@@ -752,9 +740,10 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 					    "/etc/defaultdomain"));
 		    return false;
 		}
-	    }
-	    if (!ServersByDhcpActual ())
-	    {
+
+		// so that dhcpcd cannot restore it
+		SCR::Execute (.target.remove, "/etc/yp.conf.sv");
+
 		SCR::Write (.etc.yp_conf.servers, servers);
 		SCR::Write (.etc.yp_conf.defaultbroadcast, default_broadcast);
 		SCR::Write (.etc.yp_conf.domainservers, multidomain_servers);
@@ -780,9 +769,9 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    }
 
 	    SCR::Write (.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME,
-			domain_by_dhcp_wanted? "yes":"no");
+			dhcp_wanted? "yes":"no");
 	    SCR::Write (.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF,
-			servers_by_dhcp_wanted? "yes":"no");
+			dhcp_wanted? "yes":"no");
 	    if (! SCR::Write (.sysconfig.dhcp, nil))
 	    {
 		// error popup
