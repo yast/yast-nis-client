@@ -52,7 +52,7 @@
 
       ////////////////////////////////////////////////////////////////////////////////
       // explanation in YaST2 Control Center                                         //
-     `helptext     : UI(_("Configure your NIS+ client.")),
+     `helptext     : _("Configure NIS+ client"),
 
       ////////////////////////////////////////////////////////////////////////////////
       // leave nil, experts only ;-)
