@@ -29,6 +29,37 @@
     include "network/ip.ycp";
     include "network/dns.ycp";
 
+    global string ssn = "yast2";
+    global list(string) ssn_stack = [];
+
+    /**
+     * Declare a name for the current dialog
+     * to ease making screenshots.
+     * @param s eg. "mail-1-conntype"
+     */
+    global define void SetScreenShotName (string s) ``{
+	ssn_stack = prepend (ssn_stack, ssn);
+	ssn = s;
+	UI::SetModulename (ssn);
+    }
+
+    /**
+     * Restore the screenshot name
+     */
+    global define void RestoreScreenShotName () ``{
+	ssn = ssn_stack[0]:nil;
+	if (ssn == nil)
+	{
+	    ssn = "yast2";
+	    y2error (1, "screenshot name stack empty!");
+	}
+	else
+	{
+	    ssn_stack = remove (ssn_stack, 0);
+	}
+	UI::SetModulename (ssn);
+    }
+
     /**
      * A Wizard Sequencer helper
      * @return	`next
@@ -166,6 +197,8 @@ less frequently used settings.</p>");
      * @return	`back, `abort, `next, `finish
      */
     global define symbol SwitchDialog () ``{
+	SetScreenShotName ("nis-client-1-start");
+
 	// help text 1/3
 	string help_text = _("<p>Here your machine can be set up as a
  <b>NIS client</b>.</p>");
@@ -267,6 +300,7 @@ automatically.</p>");
 	    result = yp_client? result: `finish;
 	}
 
+	RestoreScreenShotName ();
 	return result;
     }
 
@@ -283,6 +317,8 @@ automatically.</p>");
      * @return	`back, `abort, `next, `multiple or `expert
      */
     global define symbol NisDialog () ``{
+	SetScreenShotName ("nis-client-2a-single");
+
 	// help text 1/3
 	string help_text = _("<p>Enter your NIS domain (e.g, foo.com)
  and the NIS server's address (e.g., nis.foo.com or 10.20.1.1).</p>");
@@ -388,6 +424,7 @@ by separating their addresses with spaces.</p>
 	    Nis::global_broadcast = false;
 	}
 
+	RestoreScreenShotName ();
 	return result;
     }
 
@@ -397,6 +434,8 @@ by separating their addresses with spaces.</p>
      * @return	`back, `abort or `next
      */
     global define symbol ExpertDialog () ``{
+	SetScreenShotName ("nis-client-2c-expert");
+
 	// help text 1/3
 	string help_text = _("<p>Normally it is possible from any host to query a client which server it is using. <b>Answer to the local host only</b> prevents it.</p>");
 
@@ -472,6 +511,7 @@ by separating their addresses with spaces.</p>
 	    Nis::options = options;
 	}
 
+	RestoreScreenShotName ();
 	return result;
     }
 
@@ -480,6 +520,8 @@ by separating their addresses with spaces.</p>
      * @return	`back, `abort or `next
      */
     global define symbol MultipleDialog () ``{
+	SetScreenShotName ("nis-client-2b-multiple");
+
 	// variable naming: _d means _domain, _s means _server
 	string default_d = Nis::GetDomain ();
 	boolean global_broadcast = Nis::global_broadcast;
@@ -665,6 +707,7 @@ This check box therefore only appears if it is turned on.</p>"),
 		string d0 = UI::QueryWidget (`id (`domains), `CurrentItem);
 		if (d0 == "")
 		{
+		    SetScreenShotName ("nis-client-2b-del-dfl");
 		    // do not delete the default domain, just the servers
 		    // Translators: a yes-no popup
 		    if (UI::YesNoPopup (_("Really delete the server list
@@ -672,17 +715,20 @@ for the default domain?")))
 		    {
 			all_servers = add (all_servers, "", [[], false]);
 		    }
+		    RestoreScreenShotName ();
 		    // show these items, the default domain selected
 		    UpdateDomainTable (default_d, all_servers, "");
 		}
 		else if (d0 != nil)
 		{
+		    SetScreenShotName ("nis-client-2b-del-dom");
 		    // Translators: a yes-no popup
 		    if (UI::YesNoPopup (_("Really delete this domain?")))
 		    {
 			all_servers = filter (string k, list v,
 					      all_servers, ``(k != d0));
 		    }
+		    RestoreScreenShotName ();
 		    // show these items, the default domain selected
 		    UpdateDomainTable (default_d, all_servers, "");
 		}
@@ -695,7 +741,9 @@ for the default domain?")))
 		if (!Nis::check_nisdomainname (default_d))
 		{
 		    UI::SetFocus (`id (`domain));
+		    SetScreenShotName ("nis-client-2b1-err");
 		    UI::ErrorPopup (Nis::valid_nisdomainname ());
+		    RestoreScreenShotName ();
 		}
 		else
 		{
@@ -761,6 +809,7 @@ the default domain will be lost.")))
 	    Nis::multidomain_broadcast = multidomain_broadcast;
 	}
 
+	RestoreScreenShotName ();
 	return result;
     }
 
@@ -788,6 +837,8 @@ the default domain will be lost.")))
      */
     global define list DomainPopup (string init, string default_d,
 				    list server_sp, list(string) existing) ``{
+	SetScreenShotName ("nis-client-2b1-domain");
+
 	string domain = (init == nil)? "": (init == "")? default_d: init;
 	list servers = server_sp[0]:[];
 	boolean broadcast = server_sp[1]:false;
@@ -910,6 +961,7 @@ the default domain will be lost.")))
 	}
 
 	UI::CloseDialog ();
+	RestoreScreenShotName ();
 	return (ui == `ok)? [domain, [servers, broadcast]] : nil;
     }
 
@@ -966,6 +1018,7 @@ the default domain will be lost.")))
      * @return a server or nil
      */
     global define string InputServer (string init, list(string) existing) ``{
+	SetScreenShotName ("nis-client-2b11-server");
 	string server = init;
 
 	term contents =
@@ -1021,6 +1074,7 @@ the default domain will be lost.")))
 	}
 
 	UI::CloseDialog ();
+	RestoreScreenShotName ();
 	return (ret == `ok)? server : nil;
     }
 
@@ -1051,8 +1105,12 @@ the default domain will be lost.")))
      * @return `back or `next
      */
     global define symbol SaveDialog () ``{
+	SetScreenShotName ("nis-client-3-save");
 	string message1 = _("The configuration of the NIS client will be saved.\n");
 	string message2 = Nis::ProbePackages ();
-	return UI::ContinueCancelPopup (message1 + message2) ? `next : `back;
+	boolean ret = UI::ContinueCancelPopup (message1 + message2);
+
+	RestoreScreenShotName ();
+	return ret ? `next : `back;
     }
 }
