@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Jul 10 17:17:02 CEST 2002 - mvidner@suse.cz
+
+- Install autofs if requested (#16568).
+- Global broadcast option obsoleted, shown only if used. (~#15665).
+- Autoyast data structure and summary simplified.
+- 2.6.5
+
+-------------------------------------------------------------------
 Thu Jul 04 21:31:21 CEST 2002 - arvin@suse.de
 
 - moved non binary files to /usr/share/YaST2
