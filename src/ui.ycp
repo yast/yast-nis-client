@@ -424,7 +424,6 @@ by separating their addresses with spaces.</p>
 
 		if (!Nis::check_nisdomainname (yp_domain))
 		{
-		    // error popup label
 		    UI::SetFocus (`id (`ypd));
 		    UI::ErrorPopup (Nis::valid_nisdomainname ());
 		    result = nil;
@@ -437,7 +436,7 @@ by separating their addresses with spaces.</p>
 		    find (string a, temp_ad,
 			  ``(!Nis::check_address_nis (a))) != nil)
 		{
-		    // error popup label
+		    UI::SetFocus (`id (`ypa));
 		    UI::MessagePopup (Nis::valid_address_nis ());
 		    result = nil;
 		    continue;
