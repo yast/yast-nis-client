@@ -395,6 +395,9 @@ Change the DHCP server configuration to provide it.
 	    // popup window
 	    // LAN: local area network
 	    UI::OpenDialog (`Label (_("Scanning for NIS servers on this LAN...")));
+	    //give a clue to a paranoid admin
+	    y2milestone ("Scanning for NIS servers on this LAN.");
+	    y2milestone ("Keywords: RPC, ypserv");
 	    found_servers = sort (SCR::Read (.net.hostnames.rpc, "ypserv"));
 	    UI::CloseDialog ();
 	    if (found_servers == nil)
