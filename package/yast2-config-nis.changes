@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Tue May 21 16:51:14 CEST 2002 - mvidner@suse.cz
+
+- Support the full yp.conf grammar of ypbind-1.11. (#15665)
+- Added an expert options dialog (/etc/sysconfig/ypbind). (#15666)
+- Abort button added, WM close button works too. (#10571)
+- Using current devtools; menuentries -> config.
+- 2.6.2
+
+-------------------------------------------------------------------
 Wed Apr 24 01:37:17 EDT 2002 - nashif@suse.de
 
 - Adapted to new autoinst interface
