@@ -41,11 +41,6 @@
 		    ],
 		],
 	    ],
-	// targetpkg:
-	"targetpkg": $[
-	    // autofs
-	    "installed": true,
-	    ],
 	// Nis itself:
 	"etc": $[
 	    "yp_conf": $[
