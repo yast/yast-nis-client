@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Fri Jan 11 16:35:56 CET 2002 - mvidner@suse.cz
+
+- Using /etc/defaultdomain instead of YP_DOMAINNAME.
+- Writing yp.conf directly made SuSEconfig.ypclient unnecessary.
+- Changed keys in autoinstallation map.
+- Removed old menu entry for good.
+- 2.5.7
+
+-------------------------------------------------------------------
 Fri Jan  4 09:35:40 CET 2002 - mvidner@suse.cz
 
 - Build fix: duplicate menuentry removed. (2.5.6)
