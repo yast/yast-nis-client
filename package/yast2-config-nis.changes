@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jan  3 17:32:30 CET 2002 - mvidner@suse.cz
+
+- Added a checkbox to start autofs. (#6092)
+- 2.5.5
+
+-------------------------------------------------------------------
 Tue Dec 18 15:09:02 CET 2001 - mvidner@suse.cz
 
 - Added an autoinstallation client.
