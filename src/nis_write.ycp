@@ -3,99 +3,42 @@
  *   nis_write.ycp
  *
  * Module:
- *   Configuration of nis
+ *   Configuration of NIS
  *
  * Summary:
  *   Writing only client
  *
  * Authors:
- *   Jan Holesovsky <kendy@suse.cz>
- *   Dan Vesely <dan@suse.cz>
  *   Martin Vidner <mvidner@suse.cz>
  *
  * $Id$
  *
- * The configuration to save is in the firts argument. It looks like:
- *
- * $[ "start_yp" : true|false, // true/false - start/don't start ypclient when booting
- *    "yp_domain" : <string>,  // written only when "start_yp" is true
- *    "yp_domain_changed": <boolean>, // must reboot for the domain change to take effect
- *    "yp_address" : <string>  // written only when "start_yp" is true
- * ]
- *
+ * This is a write-only client. It takes its arguments and just
+ * write the settings.
  */
 
+/**
+ * @param first a map of NIS settings
+ * @see Nis#Import
+ * @return boolean success of operation
+ */
 {
+
     textdomain "nis";
 
-    map yp_conf = Args(0);
+    import "Nis";
 
-    boolean start_yp = lookup(yp_conf, "start_yp", false);
-
-    /* The end of the definitions */
-
-    SCR::Execute(.target.bash, "/etc/init.d/ypbind stop", $[]);
-
-    if (start_yp)
+    if (size (Args ()) != 1)
     {
-	CallFunction (`runlevel_adjust ("portmap", "enable"));
-	CallFunction (`runlevel_adjust ("ypbind", "enable"));
-
-	SCR::Write(.rc.system.CREATE_YP_CONF, "yes");
-	SCR::Write(.rc.system.YP_DOMAINNAME, lookup(yp_conf, "yp_domain", ""));
-	SCR::Write(.rc.system.YP_SERVER, lookup(yp_conf, "yp_address", ""));
+	y2error ("Exactly one argument required.");
+	return false;
     }
-    else
+    if (! is (Args (0), map))
     {
-	CallFunction (`runlevel_adjust ("ypbind", "disable"));
-    }
-
-    if (!SCR::Write(.rc.system, nil))
-    {
-	// error popup message
-	UI::MessagePopup(_("Error while saving /etc/rc.config.
-Please check that you are running this as a \"root\"
-"));
+	y2error ("The argument must be a map.");
 	return false;
     }
 
-    if (SCR::Execute(.target.bash, "/sbin/SuSEconfig --nonewpackage --module ypclient") != 0)
-    {
-	// warning dialog message
-	UI::MessagePopup(_("Error while running SuSEconfig"));
-	return false;
-    }
-
-    if (start_yp)
-    {
-	if (SCR::Execute(.target.bash, "/etc/init.d/portmap status") != 0)
-	{
-	    // portmap must not be started if it is running already (see bug # 9999)
-	    if (SCR::Execute(.target.bash, "/etc/init.d/portmap start") != 0)
-	    {
-		// error popup message
-		UI::MessagePopup(_("Error while running portmapper."));
-		return false;
-	    }
-	}
-	sleep(1000);	// workaround for bug #10428, ypbind restart
-	if (SCR::Execute(.target.bash, "/etc/init.d/ypbind start") != 0)
-	{
-	    // error popup message
-	    UI::MessagePopup(_("Error while running ypclient."));
-	    return false;
-	}
-	// only test for a server if domain not changed
-	if (! lookup (yp_conf, "yp_domain_changed", false))
-	{
-	    if (SCR::Execute(.target.bash, "/usr/bin/ypwhich >/dev/null") != 0)
-	    {
-		// error popup message
-		UI::MessagePopup(_("NIS server not found."));
-		return false;
-	    }
-	}
-    }
-
-    return true;
+    // The write is a simple one so we don't use Progress
+    return Nis::Import (Args (0)) && Nis::Write ();
 }

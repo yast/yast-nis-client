@@ -6,6 +6,7 @@
 
 clientsdir = $(YAST2DIR)/clients
 includedir = $(YAST2DIR)/include/nis
+modulesdir = $(YAST2DIR)/modules
 menudir = $(YAST2DIR)/menuentries
 
 clients_DATA =		\
@@ -14,6 +15,9 @@ clients_DATA =		\
 
 include_DATA =
 
+modules_DATA =		\
+	Nis.ycp
+
 menu_DATA = menuentry_nis.ycp
 
-EXTRA_DIST = $(clients_DATA) $(include_DATA) $(menu_DATA)
+EXTRA_DIST = $(clients_DATA) $(include_DATA) $(modules_DATA) $(menu_DATA)

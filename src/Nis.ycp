@@ -1,0 +1,225 @@
+/**
+ * File:
+ *   modules/Nis.ycp
+ *
+ * Module:
+ *   Configuration of NIS client
+ *
+ * Summary:
+ *   NIS client configuration data, I/O functions.
+ *
+ * Authors:
+ *   Jan Holesovsky <kendy@suse.cz>
+ *   Dan Vesely <dan@suse.cz>
+ *   Martin Vidner <mvidner@suse.cz>
+ *
+ * $Id$
+ *
+ */
+
+{
+    module "Nis";
+    textdomain "nis";
+
+    import "Runlevel";
+
+    /**
+     * Should ypbind be started at boot?
+     * If not, other settings are not touched.
+     */
+    global boolean start = false;
+
+    /**
+     * IP addresses of NIS servers.
+     */
+    global list(string) servers = [];
+
+    /**
+     * @return Access the servers as a string 
+     */
+    global define string GetServers () ``{
+	return mergestring (servers, " ");
+    }
+
+    /**
+     * Set the servers from a string
+     * @param servers_s a whitespace separated list
+     */
+    global define void SetServers (string servers_s) ``{
+	servers = filter (`s, splitstring (servers_s, " \t"), ``(s != ""));
+    }
+
+    string domain = "";
+    string old_domain = nil;
+    boolean domain_changed = false;
+
+    /**
+     * If the domain has changed from a nonempty one, it may only be
+     * changed at boot time. Use this to warn the user.
+     * @return whether changed by SetDomain
+     */
+    global define boolean DomainChanged () ``{
+	return domain_changed;
+    }
+
+    /**
+     * @return Get the NIS domain.
+     */
+    global define string GetDomain () ``{
+	return domain;
+    }
+
+    /**
+     * Set the NIS domain.
+     * @param new_domain a new domain
+     */
+    global define void SetDomain (string new_domain) ``{
+	domain = new_domain;
+	if (domain != old_domain && old_domain != "")
+	{
+	    domain_changed = true;
+	}
+    }
+
+    /* ---------------------------------------------------------------- */
+
+    /**
+     * Get all the NIS configuration from a map.
+     * When called by nis_auto (preparing autoinstallation data)
+     * the map may be empty.
+     * @param settings	$["start": "domain": "servers":[...] ]
+     * @return	success
+     */
+    global define boolean Import (map settings) ``{
+	if (size (settings) == 0)
+	{
+	    //Provide defaults for autoinstallation editing:
+	    //Leave empty.
+	    old_domain = domain;
+	    return true;
+	}
+
+	boolean missing = false;
+	foreach (`k, ["start", "domain", "servers"], ``{
+	    if (! haskey (settings, k))
+	    {
+		y2error ("Missing at Import: '%1'.", k);
+		missing = true;
+	    }
+	});
+	if (missing)
+	{
+	    return false;
+	}
+
+	start = lookup (settings, "start", false);
+	servers = lookup (settings, "servers", []);
+	domain = lookup (settings, "domain", "");
+	old_domain = domain;
+	return true;
+    }
+
+    /**
+     * Dump the NIS settings to a map, for autoinstallation use.
+     * @return $["start":, "servers":[...], "domain":]
+     */
+    global define map Export () ``{
+	return $[
+	    "start": start,
+	    "servers": servers,
+	    "domain": domain,
+	    ];
+    }
+
+    /**
+     * Log a message. TODO: let the user know?
+     * Before the conversion to a Module, these messages used to be
+     * UI::MessagePopup.
+     * @param message	a message to log
+     */
+    define void errorNoPopup (string message) ``{
+	y2error (message);
+    }
+
+    /**
+     * Reads NIS settings from the SCR
+     * @return success
+     */
+    global define boolean Read () ``{
+	start = Runlevel::ServiceEnabled ("ypbind");
+	SetServers (SCR::Read (.rc.system.YP_SERVER));
+	domain  = SCR::Read (.rc.system.YP_DOMAINNAME);
+	old_domain = domain;
+	return true;
+    }
+
+    /**
+     * Saves NIS configuration.
+     * (No parameters because it is too short to abort)
+     * @return true on success
+     */
+    global define boolean Write () ``{
+	Runlevel::RunInitScript ("ypbind", "stop");
+
+	if (start)
+	{
+	    Runlevel::ServiceAdjust ("portmap", "enable");
+	    Runlevel::ServiceAdjust ("ypbind", "enable");
+
+	    SCR::Write (.rc.system.CREATE_YP_CONF, "yes");
+	    SCR::Write (.rc.system.YP_DOMAINNAME, domain);
+	    SCR::Write (.rc.system.YP_SERVER, GetServers ());
+	}
+	else
+	{
+	    Runlevel::ServiceAdjust ("ypbind", "disable");
+	}
+
+	if (!SCR::Write (.rc.system, nil))
+	{
+	    // error popup message
+	    errorNoPopup(_("Error while saving /etc/rc.config.
+Please check that you are running this as a \"root\"
+"));
+	    return false;
+	}
+
+	if (SCR::Execute (.target.bash, "/sbin/SuSEconfig --nonewpackage --module ypclient") != 0)
+	{
+	    // warning dialog message
+	    errorNoPopup(_("Error while running SuSEconfig"));
+	    return false;
+	}
+
+	if (start)
+	{
+	    if (Runlevel::ServiceStatus ("portmap") != 0)
+	    {
+		// portmap must not be started if it is running already (see bug # 9999)
+		if (Runlevel::RunInitScript ("portmap", "start") != 0)
+		{
+		    // error popup message
+		    errorNoPopup(_("Error while running portmapper."));
+		    return false;
+		}
+	    }
+	}
+	sleep(1000);	// workaround for bug #10428, ypbind restart
+	if (Runlevel::RunInitScript ("ypbind", "start") != 0)
+	{
+	    // error popup message
+	    errorNoPopup(_("Error while running ypclient."));
+	    return false;
+	}
+	// only test for a server if domain not changed
+	if (! domain_changed)
+	{
+	    if (SCR::Execute(.target.bash, "/usr/bin/ypwhich >/dev/null") != 0)
+	    {
+		// error popup message
+		errorNoPopup(_("NIS server not found."));
+		return false;
+	    }
+	}
+    }
+}

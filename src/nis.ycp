@@ -26,6 +26,7 @@
 {
     textdomain "nis";
 
+    import "Nis";
     include "require.ycp";
     include "ui/wizard_dialog.ycp";
     include "ui/common_popups.ycp";
@@ -66,10 +67,10 @@ by separating their addresses with spaces.</p>
  permission.</p>
 ");
 
-    boolean yp_client = CallFunction (`runlevel_adjust ("ypbind", "ask")) == `enabled;
-    string yp_domain  = SCR::Read (.rc.system.YP_DOMAINNAME);
-    string old_yp_domain = yp_domain;
-    string yp_address = SCR::Read (.rc.system.YP_SERVER);
+    Nis::Read ();
+    boolean yp_client = Nis::start;
+    string yp_domain  = Nis::GetDomain ();
+    string yp_address = Nis::GetServers ();
 
 // frame label
     term con = `HVSquash(`Frame (_("NIS client"),
@@ -133,15 +134,14 @@ by separating their addresses with spaces.</p>
 
     if (result == `next)
     {
-	boolean yp_domain_changed = yp_domain != old_yp_domain && old_yp_domain != "";
-	if (CallFunction(`nis_write($[ "start_yp" : yp_client,
-				       "yp_domain" : yp_domain,
-				       "yp_domain_changed": yp_domain_changed,
-				       "yp_address" : yp_address ])))
+	Nis::start = yp_client;
+	Nis::SetDomain (yp_domain);
+	Nis::SetServers (yp_address);
+	if (Nis::Write ())
 	{
 	    if (yp_client)
 	    {
-		if (yp_domain_changed)
+		if (Nis::DomainChanged ())
 		    UI::WarningPopup (_("The domain has changed.
 You must reboot for the changes to take effect."));
 		else
