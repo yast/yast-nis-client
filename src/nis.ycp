@@ -27,8 +27,8 @@
     textdomain "nis";
 
     import "Nis";
+    import "Wizard";
     include "require.ycp";
-    include "ui/wizard_dialog.ycp";
     include "ui/common_popups.ycp";
 
     include "network/dns.ycp";
@@ -42,8 +42,8 @@
 	return;
     }
 
-    UI::CreateWizardDialog ();
-    UI::ReplaceWizardAbortButton(`Empty (`id (`empty)));
+    Wizard::CreateDialog ();
+    Wizard::ReplaceAbortButton(`Empty ());
 
 
 // ===== main =====
@@ -89,7 +89,7 @@ by separating their addresses with spaces.</p>
 			     ));
 
     // dialog title
-    UI::SetWizardContents (_("Configuration of NIS client"), con, help_text, true, true);
+    Wizard::SetContents (_("Configuration of NIS client"), con, help_text, true, true);
     // "Finish" button: Proceed to finish the configuration
     UI::ChangeWidget (`id(`next), `Label, FinishButtonLabel());
     UI::ChangeWidget(`id(`ypd), `Enabled, yp_client);
