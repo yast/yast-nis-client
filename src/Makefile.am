@@ -5,7 +5,7 @@
 #
 
 clientsdir = $(YAST2DIR)/clients
-includedir = $(YAST2DIR)/include/nis
+yincludedir = $(YAST2DIR)/include/nis
 modulesdir = $(YAST2DIR)/modules
 menudir = $(YAST2DIR)/menuentries
 autoinstdir = $(YAST2DIR)/autoinstall
@@ -15,7 +15,7 @@ clients_DATA =		\
 	nis_auto.ycp	\
 	nis_write.ycp
 
-include_DATA =		\
+yinclude_DATA =		\
 	ui.ycp
 
 modules_DATA =		\
@@ -24,4 +24,4 @@ modules_DATA =		\
 menu_DATA = menuentry_nis.y2cc
 autoinst_DATA = autoinst_nis.conf
 
-EXTRA_DIST = $(clients_DATA) $(include_DATA) $(modules_DATA) $(menu_DATA) $(autoinst_DATA)
+EXTRA_DIST = $(clients_DATA) $(yinclude_DATA) $(modules_DATA) $(menu_DATA) $(autoinst_DATA)
