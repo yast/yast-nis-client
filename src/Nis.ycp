@@ -131,6 +131,13 @@
      * (the user can override it)
      */
     global boolean dhcp_wanted = false;
+
+    /**
+     * #35654: if the server is running and sysconfig wants NIS data,
+     * it's ok to FitIntoSingle
+     */
+    global boolean dhcpcd_running = false;
+
     /**
      * Is the domain AND yp.conf served by DHCP?
      * This is independent of dhcp_wanted:
@@ -626,7 +633,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    .sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME) == "yes";
 	dhcp_wanted = servers_by_dhcp_wanted && domain_by_dhcp_wanted;
 
-	boolean dhcpcd_running =
+	dhcpcd_running =
 	    SCR::Execute (.target.bash, "test -f /var/run/dhcpcd-*.pid") == 0;
 	string di = "/var/lib/dhcpcd/dhcpcd-*.info";
 	boolean servers_by_dhcp_possible = dhcpcd_running && SCR::Execute (

@@ -1122,7 +1122,7 @@ automatically.</p>");
      * It is done only after read.
      */
     define void FitIntoSingle () ``{
-	if (Nis::dhcp_wanted && Nis::dhcp_possible)
+	if (Nis::dhcp_wanted && Nis::dhcpcd_running)
 	{
 	    string d = Nis::GetDomain ();
 	    if (size (Nis::multidomain_servers) == 1)
