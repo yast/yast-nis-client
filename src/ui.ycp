@@ -127,26 +127,11 @@
 
 	    if (Nis::Write ())
 	    {
-		if (Nis::start)
+		if (Nis::start && Nis::DomainChanged ())
 		{
-		    if (Nis::DomainChanged ())
-		    {
-			// waring popup
-			Popup::Warning (_("The domain has changed.
+		    // waring popup
+		    Popup::Warning (_("The domain has changed.
 You must reboot for the changes to take effect."));
-		    }
-		    else if (!Mode::cont) // #23777
-		    {
-			// message popup
-			Popup::Message(_("The configuration of the NIS client
-was saved and can be used."));
-		    }
-		}
-		else
-		{
-		    // message popup
-		    Popup::Message(_("The configuration of the NIS
-client was saved."));
 		}
 	    }
 	}
