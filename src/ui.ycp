@@ -284,6 +284,10 @@ automatically.</p>");
 	    BackButtonLabel (),
 	    (yp_client || Mode::cont)? NextButtonLabel (): FinishButtonLabel ());
 
+    // during installation, only enabling makes sence (#23831)
+    if (Mode::cont)
+        UI::ChangeWidget (`id(`nisno), `Enabled, false);
+
 	any result = nil;
 	repeat
 	{

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Feb 19 14:17:23 CET 2003 - jsuchome@suse.de
+
+- Enable only starting service if run during the installation (#23831)
+
+-------------------------------------------------------------------
 Tue Feb 18 15:27:44 CET 2003 - mvidner@suse.de
 
 - Preselect to start the service if run during the installation
