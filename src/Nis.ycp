@@ -896,7 +896,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    _("Stop services"),
 	    // progress stage label
 	    _("Start services"),
-           ], [
+	   ], [
 	    // progress step label
 	    _("Stopping services..."),
 	    // progress step label
@@ -1054,7 +1054,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	return true;
     }
     /**
-     * Return needed packages and packages to be removed 
+     * Return needed packages and packages to be removed
      * during autoinstallation.
      * @return map of lists.
      *
