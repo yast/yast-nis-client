@@ -42,7 +42,10 @@ sub write_file ()
     }
     close (FILE);
 
-    rename $filename, "$filename.YaST2.save" or return y2error ("$filename: $!"), 0;
+    if (-f $filename)
+    {
+	rename $filename, "$filename.YaST2.save" or return y2error ("$filename: $!"), 0;
+    }
     rename "$filename.YaST2.new", $filename or return  y2error ("$filename: $!"), 0;
     return 1;
 }
