@@ -31,7 +31,7 @@
     import "Nis";
     import "Wizard";
     include "nis/ui.ycp";
-
+    include "wizard/sequencer.ycp";
     list args = Args ();
     if ( size (args) <= 0 )
     {
@@ -73,8 +73,6 @@
 	Wizard::SetContents(_("NIS Configuration"),
 			    contents, "", true, true);
     }
-
-
     Nis::_autofs_allowed = true;
     set_contents();
     any result = nil;
@@ -83,16 +81,13 @@
 	ret = UI::UserInput();
 	if (ret == `configure)
 	{
-		Wizard::CreateDialog ();
-		Wizard::ReplaceAbortButton(`Empty ());
-		result = NisDialog ();
-		UI::CloseDialog ();
-		if (result == `next || result == `finish)
-		{
-		     settings = Nis::Export ();
-		}
-		Nis::Set(settings);
-		set_contents();
+	    result = AutoSequence();
+	    if (result == `next || result == `finish)
+	    {
+		settings = Nis::Export ();
+	    }
+	    Nis::Set(settings);
+	    set_contents();
 	}
 	else if ( ret == `reset)
 	{

@@ -303,4 +303,31 @@ either locally or over NIS.</p>");
 
 	return `back;
     }
+
+
+    global define symbol AutoSequence() ``{
+	map dlg = $[
+			"nis":	``(NisDialog ()),
+			"expert":``(ExpertDialog ())
+	];
+
+	map seq = $[
+			 "ws_start"  : "nis",
+			 "nis"       : $[
+					 `next   : `next,
+					 `expert : "expert",
+					 `abort  : `abort
+			 ],
+			 "expert"       : $[
+					    `next   : "nis",
+					    `abort  : `abort
+			 ]
+	];
+
+	Wizard::CreateDialog ();
+	Wizard::ReplaceAbortButton(`Empty ());
+	symbol ret = WizardSequencer (dlg, seq);
+	UI::CloseDialog ();
+	return ret;
+    }
 }
