@@ -27,7 +27,7 @@
  * @param flag "<b>screenshots</b>"<br>
  *  <dl>
  *   <dd>uses faked data (see Nis::Fake), enables running the module
- *    as non-root. (Uses Mode::screen_shot.)
+ *    as non-root. (Uses Mode::screen_shot().)
  *  </dl>
  */
 {
