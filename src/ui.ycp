@@ -963,127 +963,6 @@ This option is only available if the firewall is enabled.</p>
     }
 
     /**
-     * The switch dialog.
-     * Selects NIS: off/on, Automount off/on
-     * @return	`back, `abort, `next, `finish
-     */
-/*    define symbol SwitchDialog () ``{
-	Wizard::SetScreenShotName ("nis-client-1-start");
-
-	// help text 1/3
-	string help_text = _("<p>Here, your machine can be set up as an
- <b>NIS client</b>.</p>
-");
-
-	// help text 3/3
-	help_text = help_text + _("<p>The Network Information Service (NIS)
- was formerly known as Sun <b>Yellow Pages</b> (YP). The name Yellow
- Pages is a registered trademark in the United Kingdom by British
- Telecommunications plc and may not be used without
- permission.</p>");
-
-	// help text 4/3
-	string autofs_help_text = _("<p>Automounter is a daemon that mounts directories automatically,
-such as users' home directories.
-It is assumed that its configuration files (auto.*) already exist,
-either locally or over NIS.<br>
-If it is not installed and you want to use it, it will be installed
-automatically.</p>");
-
-	boolean yp_client = Mode::cont || Nis::start; // #23733
-	boolean autofs = Nis::_start_autofs;
-
-	term con = nil;
-	term nis_frame =
-	    // frame label
-	    `Frame (_("NIS client"),
-		    `VBox (`VSpacing (0.2),
-			   `RadioButtonGroup (
-			       `id (`rd),
-			       `Left (
-				   `HVSquash (
-				       `VBox (
-					   // radio button label
-					   `Left (`RadioButton (`id (`nisno), `opt (`notify), _("Do &not use NIS"), !yp_client)),
-					   // radio button label
-					   `Left (`RadioButton (`id (`nisyes), `opt (`notify), _("&Use NIS"), yp_client))
-					   )))),
-			   `VSpacing (0.2)
-			)
-		);
-
-	term autofs_frame =
-	    `Frame (
-		`opt (`hstretch),
-		// frame label
-		_("Automounter"),
-		`VBox (
-		    `VSpacing (0.2),
-		    // check box label
-		    `CheckBox (`id(`autofs), _("Start &Automounter"), autofs),
-		    `VSpacing (0.2),
-		    `Empty ()
-		    )
-		);
-
-	if (Nis::_autofs_allowed)
-	{
-	    con = `HVSquash (`VBox (nis_frame, `VSpacing (1), autofs_frame));
-	    help_text = help_text + autofs_help_text;
-	}
-	else
-	{
-	    con = `HVSquash (`VBox (nis_frame, `Empty (`id (`autofs))));
-	}
-
-	Wizard::SetContentsButtons (
-	    // dialog title
-	    _("Configuration of NIS client"), con, help_text,
-	    Label::BackButton (),
-	    (yp_client || Mode::cont)? Label::NextButton (): Label::FinishButton ());
-
-	// during installation, only enabling makes sence (#23831)
-	if (Mode::cont)
-	{
-	    UI::ChangeWidget (`id(`nisno), `Enabled, false);
-
-	    // sh: We don't use "Abort Installation" any more. Stick with the normal "Abort" button.
-	    // Wizard::SetAbortButton(`abort, Label::AbortInstallationButton() );
-	}
-
-	any result = nil;
-	repeat
-	{
-	    result = UI::UserInput ();
-	    if (result == `cancel)
-	    {
-		result = `abort;
-	    }
-
-	    yp_client = ((symbol) UI::QueryWidget (`id (`rd), `CurrentButton) != `nisno);
-
-	    if (result == `nisyes || result == `nisno || result == `nisdhcp)
-	    {
-		UI::ChangeWidget (
-		    `id (`next), `Label,
-		    (yp_client || Mode::cont)? Label::NextButton(): Label::FinishButton ());
-	    }
-	}
-	until (result == `back || result == `next ||
-	       (result == `abort && ReallyAbort (Nis::touched)));
-
-	if (result == `next)
-	{
-	    Nis::start = yp_client;
-	    Nis::_start_autofs = Nis::_autofs_allowed && (boolean) UI::QueryWidget (`id (`autofs), `Value);
-	    result = yp_client? result: `finish;
-	}
-
-	Wizard::RestoreScreenShotName ();
-	return (symbol) result;
-    }*/
-
-    /**
      * Confirmation dialog
      * Also probes for packages that need to be installed (autofs)
      * #23050 don't display the dialog
@@ -1091,14 +970,16 @@ automatically.</p>");
      */
     define symbol SaveDialog () ``{
 	Wizard::SetScreenShotName ("nis-client-3-save");
-	// continue-cancel popup
-	string message1 = _("The configuration of the NIS client will be saved.\n");
-	string message2 = Nis::ProbePackages ();
-	//boolean ret = Popup::ContinueCancel (message1 + message2);
-	boolean ret = true;
+
+	string message = Nis::ProbePackages ();
+
+	if (message != "")
+	{
+	    Popup::Message (message);
+	}
 
 	Wizard::RestoreScreenShotName ();
-	return ret ? `next : `back;
+	return `next;
     }
 
     map Dialogs = $[
