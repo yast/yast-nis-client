@@ -1,3 +1,6 @@
+- Added broadcast option of ypbind-1.12.
+- Adapted to changed any-agent interface.
+
 -------------------------------------------------------------------
 Tue May 21 16:51:14 CEST 2002 - mvidner@suse.cz
 

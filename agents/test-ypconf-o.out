@@ -3,10 +3,12 @@
 #that continues
 # lots of servers
 # broadcast will supplement specific servers instead of overriding
+# broadcast for the default domain works too
 ypserver 192.168.0.1
 ypserver 192.168.0.2
 ypserver 192.168.0.3
 ypserver 192.168.0.4
+broadcast
 domain bad-domain server foo.bad-domain.test
 domain bad-domain server bar.bad-domain.test
 domain bad-domain broadcast

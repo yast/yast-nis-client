@@ -19,6 +19,7 @@ Another comment
 that continues
  lots of servers
  broadcast will supplement specific servers instead of overriding
+ broadcast for the default domain works too
 ",
 "servers":
 ["192.168.0.1",
@@ -36,4 +37,6 @@ $["bad-domain":
 "mydomain":
 (true),
 ] ,
+"defaultbroadcast":
+(true),
 ] 

@@ -52,6 +52,12 @@
     }
 
     /**
+     * Broadcast for the default domain?
+     * (New in ypbind-1.12)
+     */
+    global boolean default_broadcast = false;
+
+    /**
      * Servers for a multiple-domain configuration.
      * Keys are domains, values are lists of servers (strings).
      * The domains must be the same as for multidomain_broadcast
@@ -116,6 +122,7 @@
      * a broadcast call to find a NIS server in the local subnet. You
      * should avoid to use this, it is a big security risk.
      * @see multidomain_broadcast
+     * @see default_broadcast
      */
     global boolean broadcast = false;
 
@@ -177,6 +184,7 @@
     global define void Set (map settings) ``{
 	start = lookup (settings, "start_nis", false);
 	servers = lookup (settings, "nis_servers", []);
+	default_broadcast = lookup (settings, "default_broadcast", false);
 	domain = lookup (settings, "nis_domain", "");
 	old_domain = domain;
 	multidomain_servers = lookup (settings, "multidomain_servers", $[]);
@@ -236,6 +244,7 @@
 			"start_nis": start,
 			"nis_servers": servers,
 			"nis_domain": domain,
+			"default_broadcast": default_broadcast,
 			"multidomain_servers": multidomain_servers,
 			"multidomain_broadcast": multidomain_broadcast,
 			"nis.local_only": local_only,
@@ -262,6 +271,7 @@
 	summary = Summary::AddHeader(summary, _("Broadcast"));
 	summary = Summary::AddLine(summary, (broadcast) ? _("Yes") : nc);
 	summary = Summary::AddHeader(summary, _("NIS Server"));
+	// TODO default_broadcast
 	summary = Summary::AddLine(summary,(servers !=[]) ? mergestring(servers,"<br>") : nc);
 	// TODO: a full list
 	summary = summary + ListItem (_("Other domains"), multidomain_servers);
@@ -319,6 +329,7 @@
     global define boolean Read () ``{
 	start = Runlevel::ServiceEnabled ("ypbind");
 	servers = SCR::Read (.etc.yp_conf.servers);
+	default_broadcast = SCR::Read (.etc.yp_conf.defaultbroadcast);
 	multidomain_servers = SCR::Read (.etc.yp_conf.domainservers);
 	multidomain_broadcast = SCR::Read (.etc.yp_conf.broadcast);
 	domain  = SCR::Read (.etc.defaultdomain);
@@ -352,6 +363,7 @@
 		return false;
 	    }
 	    SCR::Write (.etc.yp_conf.servers, servers);
+	    SCR::Write (.etc.yp_conf.defaultbroadcast, default_broadcast);
 	    SCR::Write (.etc.yp_conf.domainservers, multidomain_servers);
 	    SCR::Write (.etc.yp_conf.broadcast, multidomain_broadcast);
 	    if (! SCR::Write (.etc.yp_conf, nil))
