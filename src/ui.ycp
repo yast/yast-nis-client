@@ -285,7 +285,7 @@ either locally or over NIS.</p>");
 		);
 
 	con =
-	    `VBox (`VSpacing (0.9),
+	    `VBox (`VSpacing (0.5),
 		`RadioButtonGroup (
 		    `id (`rd),
 		    `Left (
@@ -296,17 +296,17 @@ either locally or over NIS.</p>");
 				// radio button label
 				`Left (`RadioButton (`id (`nisyes), `opt (`notify), _("&Use NIS"), yp_client))
 				)))),
-		`VSpacing (1.9),
+		`VSpacing (1.2),
 		nis_frame,
-		`VSpacing (1.9),
+		`VSpacing (0.5),
 		`CheckBox (`id(`autofs), _("Start &Automounter"), autofs),
-		`VSpacing (0.9),
+		`VSpacing (0.5),
 		`PushButton (`id (`expert), `opt (`key_F7),
 		    // button label
 		    // (short for Expert settings)
 		    _("&Expert ...")
 		),
-		`VSpacing (1.9)
+		`VSpacing (0.5)
 	    );
 
 	Wizard::SetContentsButtons (
@@ -761,7 +761,7 @@ either locally or over NIS.</p>");
 			// button label
 			`PushButton (`id (`del_d), `opt (`key_F5), _("De&lete"))
 			),
-		    `VSpacing (1.9)
+		    `VSpacing (1)
 		    );
 
 	term nis_vbox =
