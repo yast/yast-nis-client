@@ -43,9 +43,12 @@ Write	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "no" true
 Write	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "no" true
 Write	.sysconfig.dhcp nil true
 Read	.etc.nsswitch_conf."passwd" "compat"
+Write	.etc.nsswitch_conf."passwd_compat" nil true
 Read	.etc.nsswitch_conf."group" "compat"
+Write	.etc.nsswitch_conf."group_compat" nil true
 Read	.etc.nsswitch_conf."shadow" nil
 Write	.etc.nsswitch_conf."shadow" "compat" true
+Write	.etc.nsswitch_conf."shadow_compat" nil true
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/shadow" 0
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/group" 0
@@ -106,9 +109,12 @@ Write	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "yes" true
 Write	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes" true
 Write	.sysconfig.dhcp nil true
 Read	.etc.nsswitch_conf."passwd" "compat"
+Write	.etc.nsswitch_conf."passwd_compat" nil true
 Read	.etc.nsswitch_conf."group" "compat"
+Write	.etc.nsswitch_conf."group_compat" nil true
 Read	.etc.nsswitch_conf."shadow" nil
 Write	.etc.nsswitch_conf."shadow" "compat" true
+Write	.etc.nsswitch_conf."shadow_compat" nil true
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/shadow" 0
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/group" 0

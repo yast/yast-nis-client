@@ -535,8 +535,10 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
      * @return success?
      */
     define boolean WriteNssDb (string db, list(string) entries) ``{
+	// if there are no entries, delete the key using nil
+	string entry = mergestring (entries, " ");
 	return SCR::Write (add (.etc.nsswitch_conf, db),
-			   mergestring (entries, " "));
+			   entry == ""? nil: entry);
     }
 
     /**
@@ -625,6 +627,10 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 			db_l = prepend (db_l, "compat");
 			WriteNssDb (db, db_l);
 		    }
+
+		    // *_compat may be set to nisplus, nuke it (#16168)
+		    string db_c = db + "_compat";
+		    WriteNssDb (db_c, []);
 		});
 		WritePluses ();
 	}
