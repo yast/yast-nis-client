@@ -29,6 +29,7 @@
 
     global map Dialogs = $[
 	"nis":	``(NisDialog ()),
+	"expert":``(ExpertDialog ()),
 	"end":	``(SaveDialog ()),
 	];
 
@@ -36,6 +37,11 @@
 	"ws_start"  : "nis",
 	"nis"       : $[
 	    `next   : "end",
+	    `expert : "expert",
+	    `abort  : `abort
+	    ],
+	"expert"       : $[
+	    `next   : "nis",
 	    `abort  : `abort
 	    ],
 	"end"       : $[
@@ -44,8 +50,8 @@
 	];
 
     /**
-     * The only dialog
-     * @return	`back or `next
+     * The main dialog
+     * @return	`back, `abort, `next or `expert
      */
     global define symbol NisDialog () ``{
 	// help text 1/3
@@ -96,6 +102,8 @@ either locally or over NIS.</p>");
 			   `TextEntry (`id (`ypd), _("NIS &domain"), yp_domain),
 			   // text entry label
 			   `TextEntry (`id (`ypa), _("&IP addresses of NIS servers"), yp_address),
+			   `VSpacing (0.2),
+			   `PushButton (`id (`expert), _("D&etails ...")),
 			   `VSpacing (0.2)
 			)
 		);
@@ -133,9 +141,13 @@ either locally or over NIS.</p>");
 	UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 
 	any result = nil;
-	do
+	repeat
 	{
 	    result = UI::UserInput ();
+	    if (result == `cancel)
+	    {
+		result = abort;
+	    }
 
 	    yp_client = (UI::QueryWidget (`id (`rd), `CurrentButton) == `nisyes);
 
@@ -169,7 +181,8 @@ either locally or over NIS.</p>");
 		}
 	    }
 	}
-	while (result != `back && result != `next);
+	until (result == `back || result == `next || result == `expert ||
+	       (result == `abort && UI::ReallyAbortPopup (Nis::Touched)));
 
 	if (result == `next)
 	{
@@ -181,6 +194,99 @@ either locally or over NIS.</p>");
 
 	return result;
     }
+
+
+    /**
+     * The expert dialog
+     * @return	`back, `abort or `next
+     */
+    global define symbol ExpertDialog () ``{
+	// help text 1/4
+	string help_text = _("<p>Normally it is possible to query a client which server it is using. <b>Answer to the local host only</b> prevents it.</p>");
+
+	// help text 2/4
+	// network broadcast address
+	help_text = help_text + _("<p><b>Use any server</b> ignores the server address entered in the previous dialog and uses a network broadcast in the local network to find a server. It is a security risk!</p>");
+
+	// help text 3/4
+	// Check, ie. turn on a check box
+	help_text = help_text + _("<p>Check <b>Broken server</b> if answers from servers running on an unprivileged port should be accepted. It is a security risk and it is better to replace such a server.</p>");
+
+	// help text 4/4
+	help_text = help_text + _("<p>See <b>man ypbind</b> for details on other options.</p>");
+
+	boolean local_only = Nis::local_only;
+	boolean broadcast = Nis::broadcast;
+	boolean broken_server = Nis::broken_server;
+	string options = Nis::options;
+
+	term contents =
+	    `HVSquash (
+		`VBox (
+		    `VSpacing (0.2),
+		    // check box label
+		    `Left (`CheckBox (`id (`local_only), _("Answer to the &local host only"), local_only)),
+		    // check box label
+		    `Left (`CheckBox (`id (`broadcast), _("Use &any server"), broadcast)),
+		    // check box label
+		    `Left (`CheckBox (`id (`broken_server), _("&Broken server"), broken_server)),
+		    `VSpacing (0.2),
+		    // text entry label
+		    // ypbind is the daemon name
+		    `TextEntry (`id (`options), _("Other &ypbind options"), options),
+		    `VSpacing (0.2)
+		    )
+		);
+
+	Wizard::SetContentsButtons (
+	    // dialog title
+	    _("Expert settings"), contents, help_text,
+	    BackButtonLabel (), OKButtonLabel ());
+
+	any result = nil;
+	repeat
+	{
+	    result = UI::UserInput ();
+	    if (result == `cancel)
+	    {
+		result = abort;
+	    }
+
+	    if (result == `next)
+	    {
+		local_only =  UI::QueryWidget (`id (`local_only), `Value);
+		broadcast = UI::QueryWidget (`id (`broadcast), `Value);
+		broken_server = UI::QueryWidget (`id (`broken_server), `Value);
+		// TODO: disallow " in options
+		options = UI::QueryWidget (`id (`options), `Value);
+
+		if (false && some_error)
+		{
+		    // error popup label
+		    UI::MessagePopup (_("The domain name is not correct."));
+		    result = nil;
+
+		}
+	    }
+	}
+	until (result == `back || result == `next ||
+	       (result == `abort && UI::ReallyAbortPopup (Nis::Touched)));
+
+	if (result == `next)
+	{
+	    Nis::Touch (Nis::local_only != local_only);
+	    Nis::local_only = local_only;
+	    Nis::Touch (Nis::broadcast != broadcast);
+	    Nis::broadcast = broadcast;
+	    Nis::Touch (Nis::broken_server != broken_server);
+	    Nis::broken_server = broken_server;
+	    Nis::Touch (Nis::options != options);
+	    Nis::options = options;
+	}
+
+	return result;
+    }
+
 
     /**
      * Confirmation dialog

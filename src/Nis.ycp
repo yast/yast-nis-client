@@ -83,6 +83,37 @@
 	}
     }
 
+    // The following four are from sysconfig/ypbind; the comments are
+    // taken from there. The dialog help texts have "user friendlier"
+    // descriptions.
+
+    /**
+     * If this option is set, ypbind will only bind to the loopback
+     * interface and remote hosts cannot query it.
+     */
+    global boolean local_only = false;
+
+    /**
+     * If this option is set, ypbind will ignore /etc/yp.conf and use
+     * a broadcast call to find a NIS server in the local subnet. You
+     * should avoid to use this, it is a big security risk.
+     */
+    global boolean broadcast = false;
+
+    /**
+     * You should set this to "yes" if you have a NIS server in your
+     * network, which binds only to high ports over 1024. Since this
+     * is a security risk, you should consider to replace the NIS
+     * server with another implementation.
+     */
+    global boolean broken_server = false;
+
+    /**
+     * Extra options for ypbind. Here you can add options like
+     * "-ypset", "-ypsetme", "-p port" or "-no-ping".
+     */
+    global string options = "";
+
     /**
      * If no, automounter will not be affected.
      */
@@ -103,6 +134,23 @@
     /* ---------------------------------------------------------------- */
 
     /**
+     * Has the configuration been changed?
+     * Can be used as an argument to UI::ReallyAbortPopup
+     */
+    global boolean touched = false;
+
+    /**
+     * A convenient shortcut for setting touched.
+     * @param really	if true, set Nis::touched
+     * @example Nis::Touch (Nis::var != ui_var);
+     */
+    global define void Touch (boolean really) ``{
+	touched = touched || really;
+    }
+
+    /* ---------------------------------------------------------------- */
+
+    /**
      * Set module data
      * @return void
      */
@@ -112,6 +160,10 @@
 	servers = lookup (settings, "nis_servers", []);
 	domain = lookup (settings, "nis_domain", "");
 	old_domain = domain;
+	local_only = lookup (settings, "local_only", false);
+	broadcast = lookup (settings, "broadcast", false);
+	broken_server = lookup (settings, "broken_server", false);
+	options = lookup (settings, "options", "");
 	// autofs is not touched in Write if the map does not want it
 	_autofs_allowed = haskey (settings, "start_autofs");
 	_start_autofs = lookup (settings, "start_autofs", false);
@@ -132,7 +184,7 @@
 	    old_domain = domain;
 	    return true;
 	}
-	
+
 	boolean missing = false;
 	foreach (`k, ["start_nis", "nis_domain", "nis_servers"], ``{
 	    if (! haskey (settings, k))
@@ -159,6 +211,10 @@
 			"start_nis": start,
 			"nis_servers": servers,
 			"nis_domain": domain,
+			"local_only": local_only,
+			"broadcast": broadcast,
+			"broken_server": broken_server,
+			"options": options,
 			"start_autofs": _start_autofs,
 		];
 	}
@@ -172,6 +228,10 @@
 	servers = SCR::Read (.etc.yp_conf.servers);
 	domain  = SCR::Read (.etc.defaultdomain);
 	old_domain = domain;
+	local_only = SCR::Read (.sysconfig.ypbind.YPBIND_LOCAL_ONLY) == "yes";
+	broadcast = SCR::Read (.sysconfig.ypbind.YPBIND_BROADCAST) == "yes";
+	broken_server = SCR::Read (.sysconfig.ypbind.YPBIND_BROKEN_SERVER) == "yes";
+	options = SCR::Read (.sysconfig.ypbind.YPBIND_OPTIONS);
 
 	_autofs_allowed =
 	    SCR::Read (.targetpkg.installed, "autofs") ||
@@ -235,7 +295,15 @@
 		Report::Error (sformat (_("Error writing file %1."), "/etc/yp.conf"));
 		return false;
 	    }
-
+	    SCR::Write (.sysconfig.ypbind.YPBIND_LOCAL_ONLY, local_only);
+	    SCR::Write (.sysconfig.ypbind.YPBIND_BROADCAST, broadcast);
+	    SCR::Write (.sysconfig.ypbind.YPBIND_BROKEN_SERVER, broken_server);
+	    SCR::Write (.sysconfig.ypbind.YPBIND_OPTIONS, options);
+	    if (! SCR::Write (.sysconfig.ypbind, nil))
+	    {
+		Report::Error (sformat (_("Error writing file %1."), "/etc/sysconfig/ypbind"));
+		return false;
+	    }
 	}
 	else
 	{

@@ -46,6 +46,7 @@ Group:		System Environment/YaST
 @YAST2DIR@/modules/Nis.ycp
 @YAST2DIR@/menuentries/menuentry_nis.y2cc
 @YAST2DIR@/servers_non_y2/ag_yp_conf
+@YAST2DIR@/scrconf/cfg_ypbind.scr
 @YAST2DIR@/scrconf/yp_conf.scr
 
 %files devel
