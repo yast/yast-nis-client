@@ -235,7 +235,13 @@ while ( <STDIN> )
 	}
 	elsif ($path eq ".broadcast" && ref ($argument) eq "HASH")
 	{
-	    %broadcast = perl_to_br (%{$argument});
+	    # broadcast must be maintained as boolean references
+	    my %broadcast_norefs = %{$argument};
+	    %broadcast = ();
+	    while (my ($k, $v) = each %broadcast_norefs)
+	    {
+		$broadcast{$k} = perl_to_br ($v);
+	    }
 	    $modified = 1;
 	}
 	elsif ($path eq ".defaultbroadcast" && !ref ($argument))
