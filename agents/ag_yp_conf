@@ -4,13 +4,14 @@
 # Author: Martin Vidner <mvidner@suse.cz>
 #
 # An agent for parsing and writing /etc/yp.conf.
-# Only ypserver is supported.
 
-# $comment: all comments, separated by newlines.
+# $comment: all comments, excluding the hash signs, separated by newlines.
 #  they will be written to the beginning of file
 # @servers: a list of ypservers (for the local domain)
 # %domainservers:  keys are domains, values are lists of servers
-#  an empty list means broadcast
+# %broadcast: keys are domains, values booleans
+#  if true, broadcast will be used as fallback.
+#  The maps must have the same set of keys!
 
 use lib "/usr/lib/YaST2/agents_non_y2";
 use ycp;
@@ -20,9 +21,30 @@ use Errno qw(ENOENT);
 my $comment;
 my @servers;
 my %domainservers;
+my %broadcast;
 
 my $filename;
 my $modified;
+
+# fill in default values for missing entries
+sub complete_maps ()
+{
+    my $domain;
+    foreach $domain (keys %domainservers)
+    {
+	if (!defined $broadcast{$domain})
+	{
+	    $broadcast{$domain} = "false";
+	}
+    }
+    foreach $domain (keys %broadcast)
+    {
+	if (!defined $domainservers{$domain})
+	{
+	    $domainservers{$domain} = [];
+	}
+    }
+}
 
 # return false if an error occurred
 sub parse_file ()
@@ -57,7 +79,7 @@ sub parse_file ()
 	}
 	elsif (/^domain\s+(\S+)\s+broadcast/)
 	{
-	    $domainservers{$1} = [];
+	    $broadcast{$1} = "true";
 	}
 	else
 	{
@@ -67,6 +89,7 @@ sub parse_file ()
 	}
     }
     close (FILE);
+    complete_maps ();
     return 1;
 }
 
@@ -74,6 +97,7 @@ sub write_file ()
 {
     return 1 if (! $modified);
 
+    complete_maps ();
     open (FILE, ">$filename.YaST2.new") or return y2error ("$filename: $!"), 0;
 
     foreach (split /\n/, $comment)
@@ -86,16 +110,13 @@ sub write_file ()
     }
     foreach my $domain (sort keys %domainservers)
     {
-	if (@{$domainservers{$domain}} == 0)
+	foreach my $server (@{$domainservers{$domain}})
+	{
+	    print FILE "domain $domain server $server\n";
+	}
+	if ($broadcast{$domain} eq "true")
 	{
 	    print FILE "domain $domain broadcast\n";
-	}
-	else
-	{
-	    foreach my $server (@{$domainservers{$domain}})
-	    {
-		print FILE "domain $domain server $server\n";
-	    }
 	}
     }
     close (FILE);
@@ -147,7 +168,7 @@ while ( <STDIN> )
     {
 	if ($path eq ".")
 	{
-	    ycp::Return (["comment", "domainservers", "servers"]);
+	    ycp::Return (["broadcast", "comment", "domainservers", "servers"]);
 	}
 	else
 	{
@@ -179,6 +200,11 @@ while ( <STDIN> )
 		%domainservers = %{$argument};
 		$modified = 1;
 	    }
+	}
+	elsif ($path eq ".broadcast" && ref ($argument) eq "HASH")
+	{
+	    %broadcast = %{$argument};
+	    $modified = 1;
 	}
 	elsif ($path eq ".comment" && !ref ($argument))
 	{
@@ -216,6 +242,10 @@ while ( <STDIN> )
 	{
 	    ycp::Return (\%domainservers);
 	}
+	elsif ($path eq ".broadcast")
+	{
+	    ycp::Return (\%broadcast);
+	}
 	elsif ($path eq ".comment")
 	{
 	    ycp::Return ($comment);
@@ -226,6 +256,7 @@ while ( <STDIN> )
 	    ycp::Return ({
 			  "comment" => $comment,
 			  "domainservers" => \%domainservers,
+			  "broadcast" => \%broadcast,
 			  "servers" => \@servers,
 			  });
 	}
