@@ -124,7 +124,7 @@ by separating their addresses by spaces.</p>");
 	}
 
 	if (result == `next &&
-	    ! UI::YesNoPopup(_("The configuration of the NIS client will be saved\nand the client will be restarted.")))
+	    ! UI::YesNoPopup(_("The configuration of the NIS client will be saved.")))
 	    result = nil;
 
     } while (result != `back && result != `next);
