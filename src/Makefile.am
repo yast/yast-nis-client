@@ -20,6 +20,6 @@ include_DATA =		\
 modules_DATA =		\
 	Nis.ycp
 
-menu_DATA = menuentry_nis.y2cc menuentry_nis.ycp
+menu_DATA = menuentry_nis.y2cc
 
 EXTRA_DIST = $(clients_DATA) $(include_DATA) $(modules_DATA) $(menu_DATA)
