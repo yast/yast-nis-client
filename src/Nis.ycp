@@ -177,17 +177,27 @@
      */
     global define boolean Write (boolean writeonly) ``{
 	if (!writeonly)
+	{
 	    Runlevel::RunInitScript ("ypbind", "stop");
+	}
 
 	if (start)
 	{
 	    Runlevel::ServiceAdjust ("portmap", "enable");
 	    Runlevel::ServiceAdjust ("ypbind", "enable");
 
-	    // TODO: report errors
-	    SCR::Write (.etc.defaultdomain, domain);
+	    if (! SCR::Write (.etc.defaultdomain, domain))
+	    {
+		Report::Error (sformat (_("Error writing file %1."), "/etc/defaultdomain"));
+		return false;
+	    }
 	    SCR::Write (.etc.yp_conf.servers, servers);
-	    SCR::Write (.etc.yp_conf, nil);
+	    if (! SCR::Write (.etc.yp_conf, nil))
+	    {
+		Report::Error (sformat (_("Error writing file %1."), "/etc/yp.conf"));
+		return false;
+	    }
+
 	}
 	else
 	{
@@ -196,7 +206,10 @@
 
 	if (start)
 	{
-	    WritePluses ();
+	    if (! WritePluses ())
+	    {
+		return false;
+	    }
 
 	    if (!writeonly && Runlevel::ServiceStatus ("portmap") != 0 )
 	    {
@@ -229,21 +242,29 @@
 	    if (_autofs_allowed)
 	    {
 		if (!writeonly)
+		{
 		    Runlevel::RunInitScript ("autofs", "stop");
+		}
 
 		// nsswitch automount:
 		// bracket options not allowed, order does not matter
 		string automount_s = SCR::Read (.etc.nsswitch_conf.automount);
 		list(string) automount_l = filter (`s, splitstring (automount_s, " \t"), ``(s != ""));
 		boolean enabled = find (string s, automount_l, ``(s == "nis")) != nil;
+		boolean ok = true;
 		if (_start_autofs && !enabled)
 		{
-		    SCR::Write (.etc.nsswitch_conf.automount, automount_s + " nis");
+		    ok = SCR::Write (.etc.nsswitch_conf.automount, automount_s + " nis");
 		}
 		else if (!_start_autofs && enabled)
 		{
 		    automount_l = filter (string s, automount_l, ``(s != "nis"));
-		    SCR::Write (.etc.nsswitch_conf.automount, mergestring (automount_l, " "));
+		    ok = SCR::Write (.etc.nsswitch_conf.automount, mergestring (automount_l, " "));
+		}
+		if (!ok)
+		{
+		    Report::Error (sformat (_("Error writing file %1."), "/etc/nsswitch.conf"));
+		    return false;
 		}
 
 		if (_start_autofs && !writeonly)
@@ -265,8 +286,9 @@
     /**
      * Add "+" lines to system files so that NIS entries get merged in.
      * (Formerly this was done in SuSEconfig.ypclient)
+     * @return success?
      */
-    define void WritePluses () ``{
+    define boolean WritePluses () ``{
 	list(string) files = [];
 	if (SCR::Read (.etc.nsswitch_conf.passwd) == "compat")
 	{
@@ -284,21 +306,31 @@
 	    "shadow":	"+",
 	    ];
 	foreach (string f, files, ``{
-	    WritePlusesTo (sformat ("/etc/%1", f), what_to_write[f]:"");
+	    if (! WritePlusesTo (sformat ("/etc/%1", f), what_to_write[f]:""))
+	    {
+		return false;
+	    }
 	});
+	return true;
     }
 
     /**
      * If a file does not contain a NIS entry, add it.
      * @param	file	pathname
      * @param	what	a "+" line without a '\n'
+     * @return success?
      */
-    define void WritePlusesTo (string file, string what) ``{
+    define boolean WritePlusesTo (string file, string what) ``{
 	if (SCR::Execute (.target.bash, "/usr/bin/grep -q '^[+-]' " + file) != 0)
 	{
 	    // not there, add it
 	    // TODO: backup?
-	    SCR::Execute (.target.bash, sformat ("/bin/echo '%1' >> %2", what, file));
+	    if (SCR::Execute (.target.bash, sformat ("/bin/echo '%1' >> %2", what, file)) != 0)
+	    {
+		Report::Error (sformat (_("Error writing file %1."), file));
+		return false;
+	    }
 	}
+	return true;
     }
 }
