@@ -8,6 +8,7 @@ myyncludedir = $(yncludedir)/nis
 
 client_DATA =		\
 	nis.ycp		\
+	nis-client.ycp	\
 	nis_auto.ycp	\
 	nis_write.ycp
 
