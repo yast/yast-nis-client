@@ -91,6 +91,14 @@
      */
     global boolean _start_autofs = false;
 
+    /**
+     * Output of "rcypbind start", if there was an error.
+     * Read only.
+     * This is currently used only in nis-server for its more advanced
+     * error reporting. (Bug 14706)
+     */
+    global string YpbindErrors = "";
+
     /* ---------------------------------------------------------------- */
 
     /**
@@ -158,7 +166,7 @@
 	_autofs_allowed =
 	    SCR::Read (.targetpkg.installed, "autofs") ||
 	    SCR::Read (.targetpkg.installed, "autofs4");
-	_start_autofs = Runlevel::ServiceEnabled ("autofs");
+	_start_autofs = _autofs_allowed && Runlevel::ServiceEnabled ("autofs");
 	return true;
     }
 
@@ -222,11 +230,20 @@
 		}
 	    }
 	    sleep(1000);	// workaround for bug #10428, ypbind restart
-	    if (!writeonly && Runlevel::RunInitScript ("ypbind", "start") != 0)
+	    if (!writeonly)
 	    {
-		// error popup message
-		Report::Error (_("Error while running ypclient."));
-		return false;
+		map out = SCR::Execute (.target.bash_output, "/etc/init.d/ypbind start", $["TERM": "raw"]);
+		if (out["exit"]:1 == 0)
+		{
+		    YpbindErrors = "";
+		}
+		else
+		{
+		    YpbindErrors = out["stdout"]:"internal error";
+		    // error popup message
+		    Report::Error (_("Error while running ypclient."));
+		    return false;
+		}
 	    }
 	    // only test for a server if domain not changed
 	    if (! domain_changed && !writeonly)

@@ -24,7 +24,24 @@
     import "Nis";
 
     include "ui/common_popups.ycp";
+    include "network/ip.ycp";
     include "network/dns.ycp";
+
+    global map Dialogs = $[
+	"nis":	``(NisDialog ()),
+	"end":	``(SaveDialog ()),
+	];
+
+    global map Sequence = $[
+	"ws_start"  : "nis",
+	"nis"       : $[
+	    `next   : "end",
+	    `abort  : `abort
+	    ],
+	"end"       : $[
+	    `next    : `next
+	    ]
+	];
 
     /**
      * The only dialog
@@ -48,6 +65,12 @@ by separating their addresses with spaces.</p>
  Pages is a registered trademark in the United Kingdom by British
  Telecommunications plc and may not be used without
  permission.</p>");
+
+	// help text 4/3 (optional)
+	string autofs_help_text = _(
+"<p>Automounter is a daemon that mounts directories automatically.
+It is assumed that its configuration files (auto.*) already exist,
+either locally or over NIS.</p>");
 
 	boolean yp_client = Nis::start;
 	string yp_domain  = Nis::GetDomain ();
@@ -94,6 +117,7 @@ by separating their addresses with spaces.</p>
 	if (Nis::_autofs_allowed)
 	{
 	    con = `HVSquash (`VBox (nis_frame, `VSpacing (1), autofs_frame));
+	    help_text = help_text + autofs_help_text;
 	}
 	else
 	{
@@ -136,7 +160,7 @@ by separating their addresses with spaces.</p>
 		}
 
 		list temp_ip = splitstring (yp_address, " ");
-		if (contains (maplist (`i, temp_ip, ``(checkIP (i))), false))
+		if (contains (maplist (`i, temp_ip, ``(check_ip4 (i))), false))
 		{
 		    // error popup label
 		    UI::MessagePopup (_("The IP address is not correct."));
@@ -144,15 +168,6 @@ by separating their addresses with spaces.</p>
 		    continue;
 		}
 	    }
-
-	    if (result == `next)
-	    {
-		if (! UI::YesNoPopup (_("The configuration of the NIS client will be saved.")))
-		{
-		    result = nil;
-		}
-	    }
-
 	}
 	while (result != `back && result != `next);
 
@@ -165,5 +180,19 @@ by separating their addresses with spaces.</p>
 	}
 
 	return result;
+    }
+
+    /**
+     * Confirmation dialog
+     * @return `back or `next
+     */
+    global define symbol SaveDialog () ``{
+	string message = _("The configuration of the NIS client will be saved.");
+	if (UI::YesNoPopup (message))
+	{
+	    return `next;
+	}
+
+	return `back;
     }
 }

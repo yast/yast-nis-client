@@ -9,6 +9,7 @@
 use lib "/usr/lib/YaST2/agents_non_y2";
 use ycp;
 use strict;
+use Errno qw(ENOENT);
 
 my @servers;
 
@@ -18,7 +19,13 @@ sub parse_file ()
 {
     @servers = ();
 
-    open (FILE, $filename) or return y2error ("$filename: $!"), 0;
+    if (!open (FILE, $filename))
+    {
+	return 1 if ($! == ENOENT); # ok if it is not there
+	y2error ("$filename: $!");
+	return 0;
+    }
+
     while (<FILE>)
     {
 	chomp;
@@ -55,6 +62,7 @@ sub write_file ()
 # MAIN cycle
 #
 
+# if reading fails, defaulting to no servers
 parse_file ();
 
 while ( <STDIN> )
