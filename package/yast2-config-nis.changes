@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Sep  7 09:36:47 CEST 2001 - mvidner@suse.cz
+
+- Use the runlevel editor for dealing with START_* variables (2.4.8)
+
+-------------------------------------------------------------------
 Mon Sep  3 14:43:07 CEST 2001 - mvidner@suse.cz
 
 - Use yast2-config-runlevel.
