@@ -11,7 +11,7 @@
  * $Id$
  */
 {
-    // testedfiles: Nis.ycp Autologin.ycp Require.ycp Service.ycp Report.ycp Testsuite.ycp
+    // testedfiles: Nis.ycp Autologin.ycp Require.ycp Service.ycp Report.ycp Testsuite.ycp Nsswitch.ycp
 
     include "testsuite.ycp";
     import "Pkg"; // override

@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Jul 22 20:16:32 CEST 2004 - jsuchome@suse.cz
+
+- use Nsswitch module from yast2-pam for handling /etc/nsswitch.conf
+- use Message module for common messages 
+- command-line interface
+- 2.10.1
+
+-------------------------------------------------------------------
 Thu Jun 17 10:37:38 CEST 2004 - mvidner@suse.cz
 
 - Added "testedfiles" to test cases to make it work with the new testsuite.

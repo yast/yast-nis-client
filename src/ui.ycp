@@ -184,7 +184,6 @@ Change the DHCP server configuration to provide it.
 	return mergestring (selected_servers, " ");
     }
 
-
     /**
      * The simple dialog
      * @return	`back, `abort, `next, `multiple or `expert

@@ -21,6 +21,10 @@
     module "Nis";
     textdomain "nis";
 
+    import "Address";
+    import "IP";
+    import "Nsswitch";
+    import "Message";
     import "Service";
     import "Report";
     import "Summary";
@@ -28,9 +32,6 @@
     import "Progress";
     import "Wizard";
     import "Autologin";
-
-    import "IP";
-    import "Address";
 
     /**
      * Required packages for this module to operate
@@ -555,7 +556,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
      * @param value
      * @return [b]title[/b]: value[br]
      */
-    define string BrItem (string title, string value) ``{
+    global define string BrItem (string title, string value) ``{
 	return sformat ("<b>%1</b>: %2<br>", title, value);
     }
 
@@ -581,33 +582,6 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    BrItem (_("Client Enabled"), start ? _("Yes"): _("No"));
 
 	return summary;
-    }
-
-    /**
-     * Reads a database entry from nsswitch_conf and returns it as a list
-     * @param db eg. "passwd"
-     * @return   eg. ["files", "nis"]
-     */
-    define list<string> ReadNssDb (string db) ``{
-	string db_s = (string) SCR::Read (add (.etc.nsswitch_conf, db));
-	if (db_s == nil)
-	{
-	    db_s = "";
-	}
-	return filter (string s, splitstring (db_s, " \t"), ``(s != ""));
-    }
-
-    /**
-     * Writes a database entry as a list to nsswitch_conf
-     * @param db eg. "passwd"
-     * @param entries eg. ["files", "nis"]
-     * @return success?
-     */
-    define boolean WriteNssDb (string db, list<string> entries) ``{
-	// if there are no entries, delete the key using nil
-	string entry = mergestring (entries, " ");
-	return SCR::Write (add (.etc.nsswitch_conf, db),
-			   entry == ""? nil: entry);
     }
 
     /**
@@ -663,13 +637,13 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	*/
 	_start_autofs = _autofs_allowed && Service::Enabled("autofs");
 
-	hosts_by_nis = contains (ReadNssDb ("hosts"), "nis");
+	hosts_by_nis = contains (Nsswitch::ReadDb ("hosts"), "nis");
 
-	list<string> nss_passwd = ReadNssDb ("passwd");
+	list<string> nss_passwd = Nsswitch::ReadDb ("passwd");
 	users_by_ldap =
 	    contains (nss_passwd, "ldap") ||
 	    (contains (nss_passwd, "compat") &&
-	     contains (ReadNssDb ("passwd_compat"), "ldap"));
+	     contains (Nsswitch::ReadDb ("passwd_compat"), "ldap"));
 
 	Autologin::Read ();
 
@@ -729,8 +703,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    // TODO: backup?
 	    if (SCR::Execute (.target.bash, sformat ("/bin/echo '%1' >> %2", what, file)) != 0)
 	    {
-		// error popup
-		Report::Error (sformat (_("Error writing file %1."), file));
+		Report::Error (Message::ErrorWritingFile (file));
 		return false;
 	    }
 	}
@@ -792,7 +765,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 		foreach (string db, dbs, ``{
 		    // what if a db is not mentioned?
 		    // We get [] meaning compat, so it's ok to make it explicit
-		    list<string> db_l = ReadNssDb (db);
+		    list<string> db_l = Nsswitch::ReadDb (db);
 
 		    if (!contains (db_l, "compat"))
 		    {
@@ -801,12 +774,12 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 					   s != "files" && s != "nis"));
 			// put "compat" and the rest;
 			db_l = prepend (db_l, "compat");
-			WriteNssDb (db, db_l);
+			Nsswitch::WriteDb (db, db_l);
 		    }
 
 		    // *_compat may be set to nisplus, nuke it (#16168)
 		    string db_c = db + "_compat";
-		    WriteNssDb (db_c, []);
+		    Nsswitch::WriteDb (db_c, []);
 		});
 		y2milestone("Writing pulses");
 		WritePluses ();
@@ -816,72 +789,27 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 
 		y2milestone("not writing pluses");
 	    boolean have_plus = HavePlus ();
-/*	    if (have_plus)
-	    {
-		// Do nothing - it is ok to leave the pluses in with compat
-		// (if there's plus and nis, it's inconsistent -
-		//  resolve manually)
-	    }
-	    else*/
 
 	    if (!have_plus)
 	    {
 		foreach (string db, dbs, ``{
-		    list<string> db_l = ReadNssDb (db);
+		    list<string> db_l = Nsswitch::ReadDb (db);
 
 		    // remove "nis" if there;
 		    db_l = filter (string s, db_l, ``(s != "nis"));
 		    // if nothing left, put "files";
 		    // NOT. just remove it, meaning compat. #35299
-		    WriteNssDb (db, db_l);
+		    Nsswitch::WriteDb (db, db_l);
 		});
 	    }
 	}
 
 	if (!SCR::Write (.etc.nsswitch_conf, nil))
 	{
-	    // error popup
-	    Report::Error (sformat (_("Error writing file %1."),
-				    "/etc/nsswitch.conf"));
+	    Report::Error (Message::ErrorWritingFile ("/etc/nsswitch.conf"));
 	    return false;
 	}
 	return true;
-    }
-
-    /**
-     * Configures the name service switch for autofs
-     * according to chosen settings
-     * @return success?
-     */
-    global define boolean WriteNssAutofs () ``{
-	boolean ok = true;
-
-	// nsswitch automount:
-	// bracket options not allowed, order does not matter
-	list<string> automount_l = ReadNssDb ("automount");
-	boolean enabled = contains (automount_l, "nis");
-	// enable it if it is not enabled yet and both services run
-	if (start && _start_autofs && !enabled)
-	{
-	    automount_l = add (automount_l, "nis");
-	    ok = WriteNssDb ("automount", automount_l);
-	    ok = ok && SCR::Write (.etc.nsswitch_conf, nil);
-	}
-	// disable it if it is enabled and either service does not run
-	else if (!(start && _start_autofs) && enabled)
-	{
-	    automount_l = filter (string s, automount_l, ``(s != "nis"));
-	    ok = WriteNssDb ("automount", automount_l);
-	    ok = ok && SCR::Write (.etc.nsswitch_conf, nil);
-	}
-
-	if (!ok)
-	{
-	    // error popup
-	    Report::Error (sformat (_("Error writing file %1."),
-				    "/etc/nsswitch.conf"));
-	}
-	return ok;
     }
 
     /**
@@ -898,9 +826,8 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    {
 		if (!SCR::Write (.etc.defaultdomain, domain))
 		{
-		    // error popup
-		    Report::Error (sformat (_("Error writing file %1."),
-					    "/etc/defaultdomain"));
+		    Report::Error (
+			Message::ErrorWritingFile ("/etc/defaultdomain"));
 		    return false;
 		}
 
@@ -914,9 +841,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 		SCR::Write (.etc.yp_conf.slp, slp_domain);
 		if (! SCR::Write (.etc.yp_conf, nil))
 		{
-		    // error popup
-		    Report::Error (sformat (_("Error writing file %1."),
-					    "/etc/yp.conf"));
+		    Report::Error (Message::ErrorWritingFile ("/etc/yp.conf"));
 		    return false;
 		}
 	    }
@@ -926,9 +851,8 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    SCR::Write (.sysconfig.ypbind.YPBIND_OPTIONS, options);
 	    if (! SCR::Write (.sysconfig.ypbind, nil))
 	    {
-		// error popup
-		Report::Error (sformat (_("Error writing file %1."),
-					"/etc/sysconfig/ypbind"));
+		Report::Error (Message::ErrorWritingFile (
+		    "/etc/sysconfig/ypbind"));
 		return false;
 	    }
 
@@ -938,9 +862,8 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 			dhcp_wanted? "yes":"no");
 	    if (! SCR::Write (.sysconfig.network.dhcp, nil))
 	    {
-		// error popup
-		Report::Error (sformat (_("Error writing file %1."),
-					"/etc/sysconfig/network/dhcp"));
+		Report::Error (Message::ErrorWritingFile (
+		    "/etc/sysconfig/network/dhcp"));
 		return false;
 	    }
 	    Autologin::Write (false);
@@ -954,24 +877,20 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	// especially WRT nis/autofs independence
 	WriteNssUsers ();
 
-	if (true) // autofs no longer depends on nis, #19769
+	if (_autofs_allowed)
 	{
-	    if (_autofs_allowed)
+	    if (! Nsswitch::WriteAutofs (start && _start_autofs,"nis"))
 	    {
-		boolean ok = WriteNssAutofs ();
-		if (!ok)
-		{
-		    return false;
-		}
+	        return false;
+	    }
 
-		if (_start_autofs)
-		{
-		    Service::Enable("autofs");
-		}
-		else
-		{
-		    Service::Disable("autofs");
-		}
+	    if (_start_autofs)
+	    {
+	        Service::Enable("autofs");
+	    }
+	    else
+	    {
+	        Service::Disable("autofs");
 	    }
 	}
 	return true;
