@@ -416,7 +416,10 @@ by separating their addresses with spaces.</p>
 		result = `abort;
 	    }
 
-	    if (contains ([`next, `expert, `multiple], result))
+	    // Don't check when going to the expert dialog
+	    // because they may want to leave the inputs empty here
+	    // and turn on DHCP there.
+	    if (contains ([`next, `multiple], result))
 	    {
 		yp_domain =  UI::QueryWidget (`id (`ypd), `Value);
 		yp_address = UI::QueryWidget (`id (`ypa), `Value);
@@ -835,6 +838,14 @@ for the default domain?")))
 	    }
 	    else if (contains ([`next, `expert, `single], result))
 	    {
+		// Don't check when going to the expert dialog
+		// because they may want to leave the inputs empty here
+		// and turn on DHCP there.
+		if (result == `expert)
+		{
+		    break;
+		}
+
 		// Input validation
 		default_d = UI::QueryWidget (`id (`domain), `Value);
 
