@@ -1,104 +1,72 @@
 /**
- * File:
- *   nis_auto.ycp
- *
- * Package:
- *   Configuration of NIS
- *
- * Summary:
- *   Client for autoinstallation
- *
- * Authors:
- *   Martin Vidner <mvidner@suse.cz>
+ * File:	clients/lan_proposal.ycp
+ * Package:	Network configuration
+ * Summary:	Lan configuration proposal
+ * Authors:	Michal Svec <msvec@suse.cz>
  *
  * $Id$
- *
- * This is a client for autoinstallation. It takes its arguments,
- * goes through the configuration and return the setting.
- * Does not do any changes to the configuration.
- */
-
-/**
- * @param first a map of NIS settings
- * @return map edited settings or an empty map if canceled
- * @example map mm = $[ "FAIL_DELAY" : "77" ];
- * @example map ret = WFM::CallModule ("nis_auto", [ mm ]);
  */
 
 {
-    textdomain "nis";
 
-    import "Nis";
-    import "Wizard";
-    include "nis/ui.ycp";
-    include "wizard/sequencer.ycp";
-    list args = WFM::Args ();
-    if ( size (args) <= 0 )
-    {
-	y2error ("Did not get the settings, probably some mistake...");
-	return false;
-    }
-    if ( !is ( WFM::Args (0), map ) )
-    {
-	y2error ("Bad argument for nis_auto: %1", WFM::Args (0));
-	return false;
-    }
-    map settings = $[];
-    {
-	integer i = 0;
-	while (i < size (WFM::Args()))
-	{
-	    if (is (WFM::Args (i), map) && nil != WFM::Args (i))	settings = WFM::Args (i);
-	    i = i + 1;
-	}
-    }
+textdomain "nis";
 
-    Nis::Import ( settings );
-    y2milestone("Imported: (%1)", settings);
+import "Nis";
+include "nis/ui.ycp";
 
-    define set_contents()
-	``{
-	term contents =
-	    `VBox(
-		  `VSpacing(1),
-		  `RichText( `id(`summary), Nis::Summary()),
-		  `VSpacing(),
-		  `HBox(
-		      // button label
-			`PushButton(`id(`configure), _("&Configure NIS")),
-			`HStretch(),
-		      // button label
-			`PushButton(`id(`reset), _("&Reset Configuration"))
-			),
-		  `VSpacing()
-		  );
-	// dialog heading
-	Wizard::SetContents(_("NIS Configuration"),
-			    contents, "", true, true);
-    }
-    Nis::_autofs_allowed = true;
-    set_contents();
-    any result = nil;
-    any ret = nil;
-    repeat {
-	ret = UI::UserInput();
-	if (ret == `configure)
-	{
-	    result = AutoSequence();
-	    if (result == `next || result == `finish)
-	    {
-		settings = Nis::Export ();
-	    }
-	    Nis::Set(settings);
-	    set_contents();
-	}
-	else if ( ret == `reset)
-	{
-	    settings= $[];
-	    Nis::Set(settings);
-	    set_contents();
-	}
-    } until (ret == `back || ret == `next || ret ==`key || ret ==`abort);
+/* The main () */
+y2milestone("----------------------------------------");
+y2milestone("NIS client autoinst client started");
+any ret = nil;
+string func = "";
+map param = $[];
 
-    return [ret, settings];
+
+/* Check arguments */
+if(size(Args()) > 0 && is(Args(0), string)) {
+    func = WFM::Args(0);
+    if(size(Args()) > 1 && is(Args(1), map))
+    param = WFM::Args(1);
+}
+y2debug("func=%1", func);
+y2debug("param=%1", param);
+
+/* Import data*/
+if(func == "Import") {
+	ret = Nis::Import(param);
+}
+/* create a  summary*/
+else if(func == "Summary") {
+    ret =  Nis::Summary();
+}
+else if (func == "Reset") {
+	ret = Nis::Import($[]);
+}
+else if (func == "Change") {
+	ret = AutoSequence();
+}
+else if (func == "Result") {
+	ret = Nis::Export();
+}
+else if (func == "Write") {
+    import "Progress";
+    Progress::off();
+    ret = Nis::WriteOnly();
+    Progress::on();
+
+}
+
+/* unknown function */
+else {
+    y2error("unknown function: %1", func);
+	ret =  false;
+}
+
+/* Finish */
+y2debug("ret=%1", ret);
+y2milestone("NIS client autoinit client finished");
+y2milestone("----------------------------------------");
+
+return ret;
+/* EOF */
 }
