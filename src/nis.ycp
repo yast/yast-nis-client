@@ -75,39 +75,25 @@ define boolean NisChangeConfiguration (map options ) {
 	if (Nis::DomainChanged ())
 	    ret = true;
     }
-    string auto = options["automounter"]:"";
-    if (auto == "start" || auto == "on" || auto == "enable")
+    if (options["automounter"]:"" == "yes" && !Nis::_start_autofs)
     {
-	if (!Nis::_start_autofs)
-	{
-	    Nis::_start_autofs	= true;
-	    ret			= true;
-	}
+	Nis::_start_autofs	= true;
+	ret			= true;
     }
-    if (auto == "stop" || auto == "off" || auto == "disable")
+    if (options["automounter"]:"" == "no" && Nis::_start_autofs)
     {
-	if (Nis::_start_autofs)
-	{
-	    Nis::_start_autofs	= false;
-	    ret			= true;
-	}
+	Nis::_start_autofs	= false;
+	ret			= true;
     }
-    string broadcast	= options["broadcast"]:"";
-    if (broadcast == "start" || broadcast == "on" || broadcast == "enable")
+    if (options["broadcast"]:"" == "yes" && !Nis::global_broadcast)
     {
-	if (!Nis::global_broadcast)
-	{
-	    Nis::global_broadcast	= true;
-	    ret				= true;
-	}
+	Nis::global_broadcast	= true;
+	ret			= true;
     }
-    if (broadcast == "stop" || broadcast == "off" || broadcast == "disable")
+    if (options["broadcast"]:"" == "no" && Nis::global_broadcast)
     {
-	if (Nis::global_broadcast)
-	{
-	    Nis::global_broadcast	= false;
-	    ret				= true;
-	}
+	Nis::global_broadcast	= false;
+	ret			= true;
     }
     return ret;
 }
@@ -196,7 +182,7 @@ map cmdline = $[
 	    // command line help text for 'summary' action
 	    "help"	: _("Configuration summary of NIS client")
 	],
-	"configure"	: $[
+	"configure"	: $[ //FIXME "set" alias?
 	    "handler"	: NisChangeConfiguration,
 	    // command line help text for 'configure' action
 	    "help"	: _("Change the global settings of NIS client")
@@ -219,14 +205,16 @@ map cmdline = $[
 	    "type"	: "string"
 	],
 	"automounter"	:$[
-	    // help text for the 'automounter' option (do not trans. values)
-	    "help"	: _("Start or stop automounter (use on or off values)"),
-	    "type"	: "string"
+	    // help text for the 'automounter' option
+	    "help"	: _("Start or stop automounter"),
+	    "type"	: "enum",
+	    "typespec"  : [ "yes", "no" ],
 	],
 	"broadcast"	:$[
-	    // help text for the 'broadcast' option (do not trans. values)
-	    "help"	: _("Set or unset broadcast search (use on or off values)"),
-	    "type"	: "string"
+	    // help text for the 'broadcast' option
+	    "help"	: _("Set or unset broadcast search"),
+	    "type"	: "enum",
+	    "typespec"  : [ "yes", "no" ],
 	],
     ],
     "mappings"		: $[
