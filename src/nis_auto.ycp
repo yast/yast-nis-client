@@ -51,10 +51,16 @@ else if (func == "Change") {
 	ret = AutoSequence();
 }
 else if (func == "Read") {
-	ret = Nis::Read();
+    ret = Nis::Read();
+}
+else if (func == "GetModified") {
+    ret =  Nis::GetModified();
+}
+else if (func == "SetModified") {
+    Nis::SetModified();
 }
 else if (func == "Export") {
-	ret = Nis::Export();
+    ret = Nis::Export();
 }
 else if (func == "Packages") {
 	ret = Nis::AutoPackages();
