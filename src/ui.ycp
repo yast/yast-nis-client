@@ -23,8 +23,8 @@
     import "Wizard";
     import "Nis";
     import "Mode";
+    import "Require";
 
-    include "require.ycp";
     include "wizard/sequencer.ycp";
     include "ui/common_popups.ycp";
     include "network/ip.ycp";
@@ -111,9 +111,8 @@
 	    if (size (Nis::install_packages) > 0 ||
 		size (Nis::remove_packages) > 0)
 	    {
-		// require.ycp
-		DoInstallAndRemove (Nis::install_packages,
-				    Nis::remove_packages);
+		Require::DoInstallAndRemove (Nis::install_packages,
+					     Nis::remove_packages);
 	    }
 
 	    if (Nis::Write ())

@@ -27,11 +27,11 @@
     textdomain "nis";
 
     import "Nis";
-    include "require.ycp";
+    import "Require";
 
     include "nis/ui.ycp";
 
-    if (!RequireAndConflict (["ypbind"], [],
+    if (!Require::RequireAndConflict (["ypbind"], [],
 			     // notification 1/2
 			     _("<p>To access the Network Information Services, the <b>%1</b> package must be installed.</p>") +
 			     // notification 2/2
