@@ -11,4 +11,7 @@ agent_SCRIPTS = ag_yp_conf
 
 scrconf_DATA = cfg_ypbind.scr yp_conf.scr
 
-EXTRA_DIST = $(agent_SCRIPTS) $(scrconf_DATA)
+TESTS = test-ypconf
+testdata = test-ypconf-i.in test-ypconf-i.out
+
+EXTRA_DIST = $(agent_SCRIPTS) $(scrconf_DATA) $(TESTS) $(testdata)

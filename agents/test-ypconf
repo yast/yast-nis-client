@@ -11,7 +11,7 @@ S3='s/\([:,]\)/\1\
 /g'
 echo "$AGPROG" | $AGENT | sed -e 1d >$CASE.ycp.tmp
 sed -e "$S3" $CASE.ycp.tmp > $CASE-i.out.tmp
-diff -u $CASE-i.out.tmp $CASE-i.out
+diff -u $CASE-i.out $CASE-i.out.tmp
 
 # the output contains newlines...
 # cannot cope yet
@@ -20,4 +20,4 @@ exit
 echo -n 'YpConf ("'$CASE'-o.out.tmp")
 Write (.,' `cat $CASE.ycp.tmp` ')' \
     | $AGENT >/dev/null
-diff -u $CASE-o.out.tmp $CASE-o.out
+diff -u $CASE-o.out $CASE-o.out.tmp
