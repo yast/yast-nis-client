@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Tue Oct 14 13:49:23 CEST 2003 - mvidner@suse.cz
+
+- Got a more reliable way of finding NIS servers,
+  using RPC broadcasts (#37099).
+- Added Select All and Select None buttons to the server selection popup.
+- Shortcut of Find changed not to conflict with Next (#29960).
+- 2.9.1
+
+-------------------------------------------------------------------
 Thu Oct  2 13:43:48 CEST 2003 - jsuchome@suse.cz
 
 - adapted to new Autologin interface
