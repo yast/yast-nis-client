@@ -27,8 +27,6 @@
     textdomain "nis";
 
     import "Nis";
-    import "Wizard";
-    include "wizard/sequencer.ycp";
     include "require.ycp";
 
     include "nis/ui.ycp";
@@ -42,38 +40,5 @@
 	return;
     }
 
-    Wizard::CreateDialog ();
-
-    Nis::Read ();
-
-    // Dialogs and Sequence are in ui.ycp
-    symbol result = WizardSequencer (Dialogs, Sequence);
-
-    if (result == `next)
-    {
-	if (Nis::Write ())
-	{
-	    if (Nis::start)
-	    {
-		if (Nis::DomainChanged ())
-		{
-		    UI::WarningPopup (_("The domain has changed.
-You must reboot for the changes to take effect."));
-		}
-		else
-		{
-		    UI::MessagePopup(_("The configuration of the NIS client
-was saved and can be used."));
-		}
-	    }
-	    else
-	    {
-		UI::MessagePopup(_("The configuration of the NIS
-client was saved."));
-	    }
-	}
-    }
-
-    return UI::CloseDialog();
-
+    NormalSequence ();
 }

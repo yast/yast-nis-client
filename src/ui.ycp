@@ -23,9 +23,18 @@
     import "Wizard";
     import "Nis";
 
+    include "wizard/sequencer.ycp";
     include "ui/common_popups.ycp";
     include "network/ip.ycp";
     include "network/dns.ycp";
+
+    /**
+     * A Wizard Sequencer helper
+     * @return	`next
+     */
+    global define symbol JustNext () ``{
+	return `next;
+    }
 
     global map Dialogs = $[
 	"switch":	``(SwitchDialog ()),
@@ -34,12 +43,14 @@
 	"multiple":	``(MultipleDialog ()),
 	"expert":	``(ExpertDialog ()),
 	"end":		``(SaveDialog ()),
+	"common-next":	[ ``( JustNext () ), true ],
 	];
 
     global map Sequence = $[
 	"ws_start"  : "switch",
 	"switch"    : $[
 	    `next   : "ismultiple",
+	    `finish : "common-next",
 	    `abort  : `abort,
 	    ],
 	"ismultiple": $[
@@ -47,13 +58,13 @@
 	    `yes    : "multiple",
 	    ],
 	"single"       : $[
-	    `next   : "end",
+	    `next   : "common-next",
 	    `multiple: "multiple",
 	    `expert : "expert",
 	    `abort  : `abort
 	    ],
 	"multiple"  : $[
-	    `next   : "end",
+	    `next   : "common-next",
 	    `single : "single",
 	    `expert : "expert",
 	    `abort  : `abort
@@ -62,10 +73,71 @@
 	    `next   : "ismultiple",
 	    `abort  : `abort
 	    ],
+	// This is will make AutoSequence finish without
+	// confirmation. NormalSequence overrides it.
+	"common-next" : $[
+	    `next	: `next,
+	    ],
 	"end"       : $[
 	    `next    : `next
 	    ]
 	];
+
+    /**
+     * The normal workflow
+     * @return `back, `abort or `next
+     */
+    global define symbol NormalSequence() ``{
+	map normal_override = $[
+	    "common-next": $[
+		`next: "end",
+		],
+	    ];
+
+	Wizard::CreateDialog ();
+	Nis::Read ();
+	// the second map must override the first!
+	symbol result = WizardSequencer (Dialogs,
+					 union (Sequence, normal_override));
+
+	if (result == `next)
+	{
+	    if (Nis::Write ())
+	    {
+		if (Nis::start)
+		{
+		    if (Nis::DomainChanged ())
+		    {
+			UI::WarningPopup (_("The domain has changed.
+You must reboot for the changes to take effect."));
+		    }
+		    else
+		    {
+			UI::MessagePopup(_("The configuration of the NIS client
+was saved and can be used."));
+		    }
+		}
+		else
+		{
+		    UI::MessagePopup(_("The configuration of the NIS
+client was saved."));
+		}
+	    }
+	}
+	UI::CloseDialog();
+	return result;
+    }
+
+    /**
+     * The autoinstallation workflow
+     * @return `back, `abort or `next
+     */
+    global define symbol AutoSequence() ``{
+	Wizard::CreateDialog ();
+	symbol ret = WizardSequencer (Dialogs, Sequence);
+	UI::CloseDialog ();
+	return ret;
+    }
 
     global /*const*/ string broadcast_help =
 	// Translators: network broadcast address
@@ -79,7 +151,7 @@ less frequently used settings.</p>");
     /**
      * The switch dialog.
      * Selects NIS: off/on/on with dhcp, Automount off/on
-     * @return	`back, `abort, `next
+     * @return	`back, `abort, `next, `finish
      */
     global define symbol SwitchDialog () ``{
 	// help text 1/3
@@ -149,7 +221,8 @@ either locally or over NIS.</p>");
 	Wizard::SetContentsButtons (
 	    // dialog title
 	    _("Configuration of NIS client"), con, help_text,
-	    BackButtonLabel (), NextButtonLabel ());
+	    BackButtonLabel (),
+	    yp_client? NextButtonLabel (): FinishButtonLabel ());
 	UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 
 	any result = nil;
@@ -165,6 +238,9 @@ either locally or over NIS.</p>");
 
 	    if (result == `nisyes || result == `nisno || result == `nisdhcp)
 	    {
+		UI::ChangeWidget (
+		    `id (`next), `Label,
+		    yp_client? NextButtonLabel (): FinishButtonLabel ());
 		UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 	    }
 	}
@@ -175,6 +251,7 @@ either locally or over NIS.</p>");
 	{
 	    Nis::start = yp_client;
 	    Nis::_start_autofs = Nis::_autofs_allowed && UI::QueryWidget (`id (`autofs), `Value);
+	    result = yp_client? result: `finish;
 	}
 
 	return result;
@@ -305,7 +382,7 @@ by separating their addresses with spaces.</p>
      */
     global define symbol ExpertDialog () ``{
 	// help text 1/3
-	string help_text = _("<p>Normally it is possible to query a client which server it is using. <b>Answer to the local host only</b> prevents it.</p>");
+	string help_text = _("<p>Normally it is possible from any host to query a client which server it is using. <b>Answer to the local host only</b> prevents it.</p>");
 
 	// help text 2/3
 	// Check, ie. turn on a check box
@@ -961,6 +1038,11 @@ and it must be at most 64 characters long.");
      * @return `back or `next
      */
     global define symbol SaveDialog () ``{
+	Wizard::SetContents (_("Summary"), `RichText (Nis::Summary ()),
+"This is a hack to show the summary because autoyast does not work yet<br>" +
+			     "Press any button", true, true);
+	UI::UserInput ();
+
 	string message = _("The configuration of the NIS client will be saved.");
 	if (UI::YesNoPopup (message))
 	{
@@ -968,32 +1050,5 @@ and it must be at most 64 characters long.");
 	}
 
 	return `back;
-    }
-
-    // TODO: update to the new workflow
-    global define symbol AutoSequence() ``{
-	map dlg = $[
-			"nis":	``(NisDialog ()),
-			"expert":``(ExpertDialog ())
-	];
-
-	map seq = $[
-			 "ws_start"  : "nis",
-			 "nis"       : $[
-					 `next   : `next,
-					 `expert : "expert",
-					 `abort  : `abort
-			 ],
-			 "expert"       : $[
-					    `next   : "nis",
-					    `abort  : `abort
-			 ]
-	];
-
-	Wizard::CreateDialog ();
-	Wizard::ReplaceAbortButton(`Empty ());
-	symbol ret = WizardSequencer (dlg, seq);
-	UI::CloseDialog ();
-	return ret;
     }
 }
