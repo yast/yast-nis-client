@@ -621,6 +621,36 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
     }
 
     /**
+     * Make up data for screnshots.
+     * To be used instead of @ref Read .
+     */
+    global define void Fake () ``{
+	y2milestone ("Faking data for screenshots");
+	start = true;
+	servers = ["10.42.0.1"];
+	default_broadcast = false;
+	multidomain_servers = $[
+	    "printer.example.com": [],
+	    "test.example.com": ["10.42.1.1", "10.42.1.2"],
+	    ];
+	multidomain_broadcast = $[
+	    "printer.example.com": true,
+	    "test.example.com": false,
+	    ];
+	domain = "example.com";
+	old_domain = domain;
+	dhcp_wanted = false;
+	dhcp_possible = false; // to see the warning popup
+	local_only = false;
+	global_broadcast = false;
+	broken_server = false;
+	options = "";
+	_autofs_allowed = true;
+	_start_autofs = true;
+	hosts_by_nis = false;
+    }
+
+    /**
      * Configures the name service switch for the user databases
      * according to chosen settings
      * @return success?
