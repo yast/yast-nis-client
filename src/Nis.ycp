@@ -110,7 +110,7 @@
 	}
 
 	boolean missing = false;
-	foreach (`k, ["start", "domain", "servers"], ``{
+	foreach (`k, ["start_nis", "nis_domain", "nis_servers"], ``{
 	    if (! haskey (settings, k))
 	    {
 		y2error ("Missing at Import: '%1'.", k);
@@ -122,13 +122,13 @@
 	    return false;
 	}
 
-	start = lookup (settings, "start", false);
-	servers = lookup (settings, "servers", []);
-	domain = lookup (settings, "domain", "");
+	start = lookup (settings, "start_nis", false);
+	servers = splitstring(lookup (settings, "nis_servers", ""), " ");
+	domain = lookup (settings, "nis_domain", "");
 	old_domain = domain;
 	// autofs is not touched in Write if the map does not want it
-	_autofs_allowed = haskey (settings, "autofs");
-	_start_autofs = lookup (settings, "autofs", false);
+	_autofs_allowed = haskey (settings, "start_autofs");
+	_start_autofs = lookup (settings, "start_autofs", false);
 	return true;
     }
 
@@ -136,12 +136,12 @@
      * Dump the NIS settings to a map, for autoinstallation use.
      * @return $["start":, "servers":[...], "domain":]
      */
-    global define map Export () ``{
+    global define map Export () ``{	
 	return $[
-	    "start": start,
-	    "servers": servers,
-	    "domain": domain,
-	    "autofs": _start_autofs,
+	    "start_nis": start,
+	    "nis_servers": servers,
+	    "nis_domain": domain,
+	    "start_autofs": _start_autofs,
 	    ];
     }
 
