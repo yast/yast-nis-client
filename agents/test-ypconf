@@ -9,17 +9,17 @@ Read (.)'
 # kludge: break up the output into lines
 S3='s/\([:,]\)/\1\
 /g'
-echo "$AGPROG" | $AGENT | sed -e 1d >$CASE.ycp.tmp
+NORMALIZE="parseycp -n"
+
+echo "$AGPROG" | $AGENT | sed -e 1d | $NORMALIZE >$CASE.ycp.tmp
 sed -e "$S3" $CASE.ycp.tmp > $CASE-i.out.tmp
 diff -u $CASE-i.out $CASE-i.out.tmp
-
-NORMALIZE="parseycp -n"
 
 # do it twice: once without the file, then with it.
 rm -f $CASE-o.out.tmp
 for i in 1 2; do
 echo 'YpConf ("'$CASE'-o.out.tmp")
-Write (.,' `$NORMALIZE $CASE.ycp.tmp` ')' \
+Write (.,' `cat $CASE.ycp.tmp` ')' \
     | $AGENT >/dev/null
 diff -u $CASE-o.out $CASE-o.out.tmp
 done

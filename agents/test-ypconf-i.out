@@ -1,42 +1,29 @@
-$["domainservers":
+$["broadcast":
+$["bad-domain":
+true,
+ "mydomain":
+true,
+ "other-domain.test":
+false,
+ "yourdomain":
+false],
+ "comment":
+" This is a comment\nAnother comment\nthat continues\n lots of servers\n broadcast will supplement specific servers instead of overriding\n broadcast for the default domain works too\n",
+ "defaultbroadcast":
+true,
+ "domainservers":
 $["bad-domain":
 ["foo.bad-domain.test",
-"bar.bad-domain.test",
-] ,
-"other-domain.test":
+ "bar.bad-domain.test"],
+ "mydomain":
+[],
+ "other-domain.test":
 ["yp.other-domain.test",
-"yp2.other-domain.test",
-] ,
-"mydomain":
-[] ,
-"yourdomain":
-["10.0.0.1",
-] ,
-] ,
-"comment":
-" This is a comment
-Another comment
-that continues
- lots of servers
- broadcast will supplement specific servers instead of overriding
- broadcast for the default domain works too
-",
-"servers":
+ "yp2.other-domain.test"],
+ "yourdomain":
+["10.0.0.1"]],
+ "servers":
 ["192.168.0.1",
-"192.168.0.2",
-"192.168.0.3",
-"192.168.0.4",
-] ,
-"broadcast":
-$["bad-domain":
-(true),
-"other-domain.test":
-(false),
-"yourdomain":
-(false),
-"mydomain":
-(true),
-] ,
-"defaultbroadcast":
-(true),
-] 
+ "192.168.0.2",
+ "192.168.0.3",
+ "192.168.0.4"]]
