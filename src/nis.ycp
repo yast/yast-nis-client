@@ -50,7 +50,6 @@
 
     if (result == `next)
     {
-	Nis::SetServers (yp_address);
 	if (Nis::Write ())
 	{
 	    if (Nis::start)
