@@ -187,6 +187,16 @@ in the local network to find a server after the specified servers
 fail to respond. It is a security risk.</p>
 ");
 
+    global /*const*/ string dhcp_help =
+	// Translators: optional help text
+	// DHCP = Dynamic host configuration protocol
+	_("<p>The domain or servers are currently provided
+by <b>DHCP</b> and cannot be changed.
+This can be turned off in the Expert dialog
+but it will take effect only after restarting the module.</p>
+");
+
+
     global /*const*/ string expert_help =
 	// Translators: short for Expert settings
 	_("<p><b>Expert</b> gives access to some
@@ -313,29 +323,10 @@ automatically.</p>");
     }
 
     /**
-     * Inform the user that some settings cannot be modified locally
-     */
-    global define void DhcpPopup () ``{
-	Wizard::SetScreenShotName ("nis-client-2ab-dhcp");
-	// Translators: popup message
-	// DHCP = Dynamic host configuration protocol
-	string msg = _("The domain or servers are currently provided
-by DHCP and cannot be changed.
-This can be turned off in the Expert dialog.");
-	UI::MessagePopup (msg);
-	Wizard::RestoreScreenShotName ();
-    }
-
-    /**
      * The simple dialog
      * @return	`back, `abort, `next, `multiple or `expert
      */
     global define symbol NisDialog () ``{
-	if (Nis::DomainByDhcpActual () || Nis::ServersByDhcpActual ())
-	{
-	    DhcpPopup ();
-	}
-
 	Wizard::SetScreenShotName ("nis-client-2a-single");
 
 	// help text 1/3
@@ -348,6 +339,11 @@ by separating their addresses with spaces.</p>
 ");
 	// help text 3/3
 	help_text = help_text + broadcast_help;
+
+	if (Nis::DomainByDhcpActual () || Nis::ServersByDhcpActual ())
+	{
+	    help_text = help_text + dhcp_help;
+	}
 
 	// help text 3/3
 	help_text = help_text + expert_help;
@@ -589,11 +585,6 @@ by separating their addresses with spaces.</p>
      * @return	`back, `abort or `next
      */
     global define symbol MultipleDialog () ``{
-	if (Nis::DomainByDhcpActual () || Nis::ServersByDhcpActual ())
-	{
-	    DhcpPopup ();
-	}
-
 	Wizard::SetScreenShotName ("nis-client-2b-multiple");
 
 	// variable naming: _d means _domain, _s means _server
@@ -621,6 +612,11 @@ by the <tt>broadcast</tt> keyword in <tt>/etc/yp.conf</tt>.
 This check box only appears if it is turned on.</p>
 "),
 					     "<tt>ypbind -broadcast</tt>");
+	}
+
+	if (Nis::DomainByDhcpActual () || Nis::ServersByDhcpActual ())
+	{
+	    help_text = help_text + dhcp_help;
 	}
 
 	// help text
