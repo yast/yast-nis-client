@@ -606,12 +606,10 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	// Why bother with both compat and nis?
 	// If there's no plus, we don't have to write passwd etc.
 	// And it's supposed to be faster.
-	boolean have_plus = HavePlus ();
+	// But then programs have to reread nsswitch :( #23203
+	// so we stick with compat.
 	if (start)
 	{
-	    // watch out for failures :))
-	    if (have_plus)
-	    {
 		// we want to switch to "compat"
 		foreach (string db, dbs, ``{
 		    // what if a db is not mentioned?
@@ -629,29 +627,10 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		    }
 		});
 		WritePluses ();
-	    }
-	    else // no plus - can add files nis
-	    {
-		foreach (string db, dbs, ``{
-		    list(string) db_l = ReadNssDb (db);
-
-		    if (!contains (db_l, "nis"))
-		    {
-			// remove "compat" if there;
-			// put "files", "nis" and the rest
-			db_l = filter (string s, db_l, ``(
-					   s != "compat" && s != "files"));
-			// put "nis", we know it's not there
-			db_l = prepend (db_l, "nis");
-			// put "files" - before nis
-			db_l = prepend (db_l, "files");
-			WriteNssDb (db, db_l);
-		    }
-		});
-	    }
 	}
 	else // not start
 	{
+	    boolean have_plus = HavePlus ();
 	    if (have_plus)
 	    {
 		// Do nothing - it is ok to leave the pluses in with compat

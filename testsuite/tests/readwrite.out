@@ -42,7 +42,6 @@ Write	.sysconfig.ypbind nil true
 Write	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "no" true
 Write	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "no" true
 Write	.sysconfig.dhcp nil true
-Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
 Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."group" "compat"
 Read	.etc.nsswitch_conf."shadow" nil
@@ -106,7 +105,6 @@ Write	.sysconfig.ypbind nil true
 Write	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "yes" true
 Write	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes" true
 Write	.sysconfig.dhcp nil true
-Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
 Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."group" "compat"
 Read	.etc.nsswitch_conf."shadow" nil
