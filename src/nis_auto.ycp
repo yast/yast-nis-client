@@ -67,9 +67,9 @@ else if (func == "Packages") {
 }
 else if (func == "Write") {
     import "Progress";
-    Progress::off();
+    boolean progress_orig = Progress::set (false);
     ret = Nis::WriteOnly();
-    Progress::on();
+    Progress::set (progress_orig);
 
 }
 

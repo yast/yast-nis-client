@@ -621,7 +621,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	dhcp_wanted = servers_by_dhcp_wanted && domain_by_dhcp_wanted;
 
 	dhcpcd_running =
-	    SCR::Execute (.target.bash, "test -f /var/run/dhcpcd-*.pid") == 0;
+	    SCR::Execute (.target.bash, "ls /var/run/dhcpcd-*.pid") == 0;
 	string di = "/var/lib/dhcpcd/dhcpcd-*.info";
 	boolean servers_by_dhcp_possible = dhcpcd_running && SCR::Execute (
 	    .target.bash, "/bin/grep -qs '^NISSERVERS' " + di) == 0;
@@ -655,9 +655,9 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 
 	Autologin::Read ();
 
-	Progress::off();
+	boolean progress_orig = Progress::set (false);
 	SuSEFirewall::Read ();
-	Progress::on();
+	Progress::set (progress_orig);
 
 	return true;
     }
@@ -916,9 +916,9 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    }
 	}
 
-	Progress::off();
+	boolean progress_orig = Progress::set (false);
 	SuSEFirewall::WriteOnly ();
-	Progress::on();
+	Progress::set (progress_orig);
 
 	return true;
     }

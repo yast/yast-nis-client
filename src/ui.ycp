@@ -28,6 +28,7 @@
     import "Nis";
     import "Package";
     import "Popup";
+    import "Report";
     import "Sequencer";
     import "Stage";
     import "Wizard";
@@ -77,7 +78,7 @@ less frequently used settings.</p>
 	if (!Nis::dhcp_possible)
 	{
 	    // Translators: warning popup
-	    Popup::Warning (_("NIS configuration is not currently provided by DHCP.
+	    Report::Warning (_("NIS configuration is not currently provided by DHCP.
 Change the DHCP server configuration to provide it.
 "));
 	}
@@ -317,11 +318,12 @@ either locally or over NIS.</p>");
 	    // dialog title
 	    _("Configuration of NIS client"), con, help_text,
 	    Label::BackButton (), Stage::cont ()? Label::NextButton():Label::FinishButton ());
+	Wizard::RestoreAbortButton ();
 
 	// during installation, only enabling makes sence
 	if (Stage::cont ())
 	{
-		UI::ChangeWidget (`id (`nisno), `Enabled, false);
+	    UI::ChangeWidget (`id (`nisno), `Enabled, false);
 	}
 
 
@@ -452,7 +454,7 @@ Are you sure?")))
      * The expert dialog
      * @return	`back, `abort or `next
      */
-    define symbol ExpertDialog () ``{
+    define symbol ExpertDialog () {
 	Wizard::SetScreenShotName ("nis-client-2c-expert");
 
 	map<string,any> firewall_widget =
@@ -510,7 +512,8 @@ This option is only available if the firewall is enabled.</p>
 	Wizard::SetContentsButtons (
 	    // dialog title
 	    _("Expert settings"), contents, help_text,
-	    Label::BackButton (), Label::OKButton ());
+	    Label::CancelButton (), Label::OKButton ());
+	Wizard::HideAbortButton ();
 
 	CWMFirewallInterfaces::OpenFirewallInit (firewall_widget, "");
 
@@ -758,7 +761,7 @@ This option is only available if the firewall is enabled.</p>
      * The servers dialog
      * @return	`back, `abort or `next
      */
-    define symbol AdditionalDialog () ``{
+    define symbol AdditionalDialog () {
 	Wizard::SetScreenShotName ("nis-client-2b-multiple");
 
 	// variable naming: _d means _domain, _s means _server
@@ -825,11 +828,8 @@ This option is only available if the firewall is enabled.</p>
 		     _("Configuration of NIS client"),
 		     // dialog subtitle
 		     _("Additional Domains")), contents, help_text,
-	    Label::BackButton (), Stage::cont ()? Label::NextButton():Label::OKButton ());
-
-	// sh: We don't use "Abort Installation" any more. Stick with the normal "Abort" button.
-	// if (Stage::cont ())
-	//     Wizard::SetAbortButton(`abort, Label::AbortInstallationButton() );
+	    Label::CancelButton (), Label::OKButton ());
+	Wizard::HideAbortButton ();
 
 	any result = nil;
 
