@@ -2,7 +2,7 @@
 ## invoked automatically from Makefile.am
 @HEADER-COMMENT@
 
-# neededforbuild yast2-devtools  autoconf automake ycpdoc yast2-testsuite dejagnu expect tcl yast2-base libycp libycp-devel liby2 libyui libscr yast2-core-wfm yast2-core-scr yast2-agent-system
+# neededforbuild yast2-devtools  autoconf automake ycpdoc yast2-testsuite dejagnu expect tcl yast2-base libycp libycp-devel liby2 libyui libscr yast2-core-wfm yast2-core-scr yast2-agent-system yast2 yast2-lib-wizard yast2-config-runlevel
 
 @HEADER@
 
