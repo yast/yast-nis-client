@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jun 20 16:42:35 CEST 2003 - mvidner@suse.cz
+
+- Using Label, Popup and Require.
+- 2.8.1
+
+-------------------------------------------------------------------
 Thu Apr 24 12:54:34 CEST 2003 - mvidner@suse.de
 
 - Added a button to find NIS servers.
