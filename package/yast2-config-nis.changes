@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Dec 11 13:43:07 CET 2001 - mvidner@suse.cz
+
+- Preserve the case of the domain name (bug 12546).
+- Menu entry unification.
+- Nis::Write can be used by NisServer::Write.
+- 2.5.3
+
+-------------------------------------------------------------------
 Fri Nov 30 16:46:48 CET 2001 - mvidner@suse.cz
 
 - Converted to a Module.
