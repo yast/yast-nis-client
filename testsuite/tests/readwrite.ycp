@@ -133,5 +133,6 @@
     DUMP ("DHCP on");
     READ["sysconfig", "network", "dhcp"] = dhcp_yes;
     TEST (``(Nis::Read ()), [READ, WRITE, EXECUTE], nil);
+    TEST (``(Nis::Touch (true)), [], nil);
     TEST (``(Nis::Write ()), [READ, WRITE, EXECUTE], nil);
 }

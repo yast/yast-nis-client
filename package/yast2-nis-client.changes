@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Feb 14 13:44:43 CET 2005 - jsuchome@suse.cz
+
+- save changes when editing Additional domains (#50734)
+- enable to set autofs in autoyast configuration (#50734)
+- 2.11.8
+
+-------------------------------------------------------------------
 Thu Feb 10 13:53:27 CET 2005 - jsuchome@suse.cz
 
 - fixed testsuite (firewall initialization)

@@ -92,10 +92,6 @@ Read	.init.scripts.exists "nscd" true
 Execute	.target.bash "/etc/init.d/nscd status" $["TERM":"raw"] 0
 Read	.init.scripts.exists "nscd" true
 Execute	.target.bash "/etc/init.d/nscd restart" $["TERM":"raw"] 0
-Read	.init.scripts.exists "autofs" true
-Execute	.target.bash "/etc/init.d/autofs stop" $["TERM":"raw"] 0
-Read	.init.scripts.exists "autofs" true
-Execute	.target.bash "/etc/init.d/autofs start" $["TERM":"raw"] 0
 Read	.init.scripts.exists "SuSEfirewall2_init" true
 Execute	.target.bash "/etc/init.d/SuSEfirewall2_init status" $["TERM":"raw"] 0
 Return	true
@@ -128,6 +124,7 @@ Execute	.target.bash "rpm -q kdebase3-kdm" 0
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Return	true
+Return	nil
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true

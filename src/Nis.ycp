@@ -208,7 +208,8 @@
     /**
      * If no, automounter will not be affected.
      */
-    global boolean _autofs_allowed = false;
+    global boolean _autofs_allowed = true;
+
     /**
      * Start automounter and import the settings from NIS. (Bug 6092)
      */
@@ -388,6 +389,8 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	_start_autofs = settings["start_autofs"]:false;
 	if (_start_autofs)
 		required_packages = add(required_packages, "autofs");
+
+	touched	= true;
     }
 
     // TODO update the map keys
@@ -642,7 +645,6 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	options = (string) SCR::Read (.sysconfig.ypbind.YPBIND_OPTIONS);
 
 	// install on demand
-	_autofs_allowed = true;
 	_start_autofs = _autofs_allowed && Service::Enabled("autofs");
 
 	hosts_by_nis = contains (Nsswitch::ReadDb ("hosts"), "nis");
@@ -1010,16 +1012,13 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    Service::Restart("nscd");
 	}
 
-	if (true) // autofs no longer depends on nis, #19769
+	if (_autofs_allowed && touched)
 	{
-	    if (_autofs_allowed)
-	    {
-		Service::Stop("autofs");
+	    Service::Stop("autofs");
 
-		if (_start_autofs)
-		{
-		    Service::Start("autofs");
-		}
+	    if (_start_autofs)
+	    {
+		Service::Start("autofs");
 	    }
 	}
 

@@ -231,7 +231,6 @@ either locally or over NIS.</p>");
 	// or true in case we were called during the installation
 	boolean yp_client = Stage::cont () || Nis::start; // #23733
 	boolean autofs = Nis::_start_autofs;
-
 	map<string,list> all_servers = mapmap (string d, list s, Nis::multidomain_servers,
 				  ``( $[d: [s, Nis::multidomain_broadcast[d]:false, Nis::slp_domain[d]:false ]] ));
 	all_servers = add (all_servers, "",
@@ -377,12 +376,13 @@ either locally or over NIS.</p>");
 		    }
 		}
 	    }
-	    else if (contains ([`next, `expert], result))
+	    else if (contains ([`next, `edit, `expert], result))
 	    {
 		yp_client = ((symbol) UI::QueryWidget (`id (`rd), `CurrentButton) != `nisno);
 
 		// Using NIS and LDAP simultaneously is not supported (#36981).
-		if (yp_client && !Nis::start && Nis::UsersByLdap ())
+		if (result == `next &&
+		    yp_client && !Nis::start && Nis::UsersByLdap ())
 		{
 		    // yes-no popup
 		    if (!Popup::YesNo (_("When you configure your machine as a NIS client,
@@ -407,8 +407,8 @@ Are you sure?")))
 		    continue;
 		}
 
-		list<string> temp_ad = filter (string a, splitstring (servers, " "),
-				       ``(a != ""));
+		list<string> temp_ad = filter (
+		    string a, splitstring (servers, " "), ``(a != ""));
 		if (yp_client && !dhcp_wanted && !default_broadcast &&
 		    (size (temp_ad) == 0 ||
 		     find (string a, temp_ad,
@@ -425,7 +425,7 @@ Are you sure?")))
 	       result == `edit ||
 	       (result == `abort && ReallyAbort (Nis::touched)));
 
-	if (contains ([`next, `expert], result))
+	if (contains ([`next, `expert, `edit], result))
 	{
 	    Nis::Touch (Nis::start != yp_client);
 	    Nis::start = yp_client;
