@@ -11,6 +11,7 @@
  * Authors:
  *   Jan Holesovsky <kendy@suse.cz>
  *   Dan Vesely <dan@suse.cz>
+ *   Martin Vidner <mvidner@suse.cz>
  *
  * $Id$
  *
@@ -18,6 +19,7 @@
  *
  * $[ "start_yp" : true|false, // true/false - start/don't start ypclient when booting
  *    "yp_domain" : <string>,  // written only when "start_yp" is true
+ *    "yp_domain_changed": <boolean>, // must reboot for the domain change to take effect
  *    "yp_address" : <string>  // written only when "start_yp" is true
  * ]
  *
@@ -61,17 +63,21 @@
     if (SCR (`Execute(.target.bash, "/etc/init.d/portmap start", $[])) != 0) {
 		// error popup message
       UI(`MessagePopup(_("Error while running portmapper.")));
-      return 0;
+      return false;
     }
     if (SCR (`Execute(.target.bash, "/etc/init.d/ypbind start", $[])) != 0) {
     	// error popup message
       UI(`MessagePopup(_("Error while running ypclient.")));
       return false;
     }
-    if (SCR (`Execute(.target.bash, "/usr/bin/ypwhich >/dev/null", $[])) != 0) {
-    	// error popup message
-      UI(`MessagePopup(_("NIS server not found.")));
-      return false;
+    // only test for a server if domain not changed
+    if (! lookup (yp_conf, "yp_domain_changed", false))
+    {
+	if (SCR (`Execute(.target.bash, "/usr/bin/ypwhich >/dev/null", $[])) != 0) {
+	    // error popup message
+	    UI(`MessagePopup(_("NIS server not found.")));
+	    return false;
+	}
     }
   }
 
