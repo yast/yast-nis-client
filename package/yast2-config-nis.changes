@@ -1,9 +1,9 @@
 -------------------------------------------------------------------
-Mon Jan 14 16:31:00 CET 2002 - mvidner@suse.cz
+Mon Jan 14 16:43:13 CET 2002 - mvidner@suse.cz
 
 - yp.conf now flushed.
 - Added missing files (agent and *.scr) to spec. (nashif)
-- 2.5.8
+- 2.5.9
 
 -------------------------------------------------------------------
 Fri Jan 11 16:35:56 CET 2002 - mvidner@suse.cz
