@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Feb 18 15:13:03 CET 2004 - jsuchome@suse.cz
+
+- added possibility to call ShortSummary function from auto-client
+
+-------------------------------------------------------------------
 Tue Feb 10 18:42:13 CET 2004 - lslezak@suse.cz
 
 - NI fixes (data types, removed globals)

@@ -39,6 +39,10 @@ if(func == "Import") {
 else if(func == "Summary") {
     ret =  Nis::Summary();
 }
+// ShortSummary is used by Users module
+else if(func == "ShortSummary") {
+    ret =  Nis::ShortSummary();
+}
 else if (func == "Reset") {
 	Nis::Import($[]);
 	ret = $[];
