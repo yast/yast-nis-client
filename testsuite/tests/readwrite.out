@@ -1,0 +1,39 @@
+Read	.init.scripts.exists "ypbind" true
+Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.etc.yp_conf.servers ["10.20.30.40", "10.20.30.80"]
+Read	.etc.defaultdomain "mydomain"
+Read	.targetpkg.installed "autofs" true
+Read	.init.scripts.exists "autofs" true
+Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Return	true
+Execute	.target.bash "/etc/init.d/ypbind stop" $["TERM":"raw"] 0
+Read	.init.scripts.exists "portmap" true
+Read	.init.scripts.exists "portmap" true
+Read	.init.scripts.runlevel "portmap" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "portmap" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Read	.init.scripts.exists "ypbind" true
+Read	.init.scripts.exists "ypbind" true
+Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "ypbind" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Write	.etc.defaultdomain "mydomain" true
+Write	.etc.yp_conf.servers ["10.20.30.40", "10.20.30.80"] true
+Write	.etc.yp_conf nil true
+Read	.etc.nsswitch_conf.passwd "compat"
+Read	.etc.nsswitch_conf.group "compat"
+Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
+Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/shadow" 0
+Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/group" 0
+Read	.init.scripts.exists "portmap" true
+Execute	.target.bash "/etc/init.d/portmap status" $["TERM":"raw"] 0
+Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":""]
+Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
+Execute	.target.bash "/etc/init.d/autofs stop" $["TERM":"raw"] 0
+Read	.etc.nsswitch_conf.automount "files"
+Write	.etc.nsswitch_conf.automount "files nis" true
+Write	.etc.nsswitch_conf nil true
+Execute	.target.bash "/etc/init.d/autofs start" $["TERM":"raw"] 0
+Read	.init.scripts.exists "autofs" true
+Read	.init.scripts.exists "autofs" true
+Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "autofs" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Return	true
