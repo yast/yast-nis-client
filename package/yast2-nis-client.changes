@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Feb 18 14:39:53 CET 2005 - jsuchome@suse.cz
+
+- install autofs4 by default (not autofs) - bug #50871
+- 2.11.9
+
+-------------------------------------------------------------------
 Mon Feb 14 13:44:43 CET 2005 - jsuchome@suse.cz
 
 - save changes when editing Additional domains (#50734)
