@@ -25,6 +25,8 @@ Read	.sysconfig.displaymanager.DISPLAYMANAGER "kdm"
 Execute	.target.bash "rpm -q kdebase3-kdm" 0
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
+Read	.init.scripts.exists "SuSEfirewall2_init" true
+Read	.init.scripts.runlevel "SuSEfirewall2_init" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Return	true
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true
@@ -91,6 +93,7 @@ Read	.init.scripts.exists "autofs" true
 Execute	.target.bash "/etc/init.d/autofs stop" $["TERM":"raw"] 0
 Read	.init.scripts.exists "autofs" true
 Execute	.target.bash "/etc/init.d/autofs start" $["TERM":"raw"] 0
+Execute	.target.bash "/etc/init.d/SuSEfirewall2_final start" $["TERM":"raw"] 0
 Return	true
 Dump	DHCP on
 Read	.init.scripts.exists "ypbind" true
@@ -119,6 +122,8 @@ Read	.sysconfig.displaymanager.DISPLAYMANAGER "kdm"
 Execute	.target.bash "rpm -q kdebase3-kdm" 0
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
+Read	.init.scripts.exists "SuSEfirewall2_init" true
+Read	.init.scripts.runlevel "SuSEfirewall2_init" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Return	true
 Read	.init.scripts.exists "portmap" true
 Read	.init.scripts.exists "portmap" true
@@ -177,4 +182,5 @@ Read	.init.scripts.exists "autofs" true
 Execute	.target.bash "/etc/init.d/autofs stop" $["TERM":"raw"] 0
 Read	.init.scripts.exists "autofs" true
 Execute	.target.bash "/etc/init.d/autofs start" $["TERM":"raw"] 0
+Execute	.target.bash "/etc/init.d/SuSEfirewall2_final start" $["TERM":"raw"] 0
 Return	true

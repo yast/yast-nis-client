@@ -21,6 +21,7 @@
     textdomain "nis";
 
     import "Autologin";
+    import "CWMFirewallInterfaces";
     import "Label";
     import "Mode";
     import "Nis";
@@ -452,8 +453,22 @@ Are you sure?")))
     define symbol ExpertDialog () ``{
 	Wizard::SetScreenShotName ("nis-client-2c-expert");
 
+	map<string,any> firewall_widget =
+	    CWMFirewallInterfaces::CreateOpenFirewallWidget ($[
+	    "services"	: [ "nis-client" ],// = portmap + ypbind
+	    "display_details" : true,
+	    // firewall openning help
+	    "help" : _("<p><b>Firewall Settings</b><br>
+To open the firewall to allow accessing the 'ypbind' service
+from remote computers, set <b>Open Port in Firewall</b>.
+To select interfaces on which to open the port, click <b>Firewall Details</b>.
+This option is only available if the firewall is enabled.</p>
+"),
+	]);
+	term firewall_layout = firewall_widget["custom_widget"]:`VBox ();
+
 	// help text 1/4
-	string help_text = _("<p>Normally, it is possible for any host to query which server a client is using. <b>Answer to the local host only</b> prevents it.</p>");
+	string help_text = _("<p>Normally, it is possible for any host to query which server a client is using. Disabling <b>Answer to the remote hosts</b> will restrict this only to the local host.</p>");
 
 	// help text 2/4
 	// Check, ie. turn on a check box
@@ -461,6 +476,8 @@ Are you sure?")))
 
 	// help text 3/4
 	help_text = help_text + _("<p>See <b>man ypbind</b> for details on other options.</p>");
+
+	help_text = help_text + firewall_widget["help"]:"";
 
 	boolean local_only = Nis::local_only;
 	boolean broken_server = Nis::broken_server;
@@ -474,7 +491,7 @@ Are you sure?")))
 		    `VBox (
 			`VSpacing (0.2),
 			// check box label
-			`Left (`CheckBox (`id (`local_only), _("Answer to the &local host only"), local_only)),
+			`Left (`CheckBox (`id (`remote), _("&Answer to the remote hosts"), !local_only)),
 			// check box label
 			`Left (`CheckBox (`id (`broken_server), _("Br&oken server"), broken_server)),
 			`VSpacing (0.2),
@@ -484,7 +501,8 @@ Are you sure?")))
 			`VSpacing (0.2)
 			)
 		    ),
-		`Empty ()
+		`VSpacing (),
+		firewall_layout
 		));
 
 	Wizard::SetContentsButtons (
@@ -492,10 +510,16 @@ Are you sure?")))
 	    _("Expert settings"), contents, help_text,
 	    Label::BackButton (), Label::OKButton ());
 
+	CWMFirewallInterfaces::OpenFirewallInit (firewall_widget, "");
+
+	map event	= $[];
 	any result = nil;
 	repeat
 	{
-	    result = UI::UserInput ();
+	    event	= UI::WaitForEvent ();
+	    result	= event["ID"]:nil;
+	    CWMFirewallInterfaces::OpenFirewallHandle(firewall_widget,"",event);
+
 	    if (result == `cancel)
 	    {
 		result = `abort;
@@ -503,10 +527,12 @@ Are you sure?")))
 
 	    if (result == `next)
 	    {
-		local_only =  (boolean) UI::QueryWidget (`id (`local_only), `Value);
+		local_only = !(boolean) UI::QueryWidget (`id (`remote), `Value);
 		broken_server = (boolean) UI::QueryWidget (`id (`broken_server), `Value);
 		// TODO: disallow " in options
 		options = (string) UI::QueryWidget (`id (`options), `Value);
+		CWMFirewallInterfaces::OpenFirewallStore (
+		    firewall_widget,"",event);
 	    }
 	}
 	until (result == `back || result == `next ||
