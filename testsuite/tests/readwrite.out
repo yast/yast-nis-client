@@ -60,8 +60,14 @@ Read	.etc.nsswitch_conf."shadow" nil
 Write	.etc.nsswitch_conf."shadow" "compat" true
 Write	.etc.nsswitch_conf."shadow_compat" nil true
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
+Execute	.target.bash "/bin/grep -q '^+::::::/sbin/nologin' /etc/passwd" 0
+Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+::::::/sbin/nologin@+::::::@' /etc/passwd" 0
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/shadow" 0
+Execute	.target.bash "/bin/grep -q '^+/sbin/nologin' /etc/shadow" 0
+Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+/sbin/nologin@+@' /etc/shadow" 0
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/group" 0
+Execute	.target.bash "/bin/grep -q '^+:::/sbin/nologin' /etc/group" 0
+Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+:::/sbin/nologin@+:::@' /etc/group" 0
 Write	.etc.nsswitch_conf nil true
 Read	.etc.nsswitch_conf."automount" "files"
 Write	.etc.nsswitch_conf."automount" "files nis" true
@@ -140,8 +146,14 @@ Read	.etc.nsswitch_conf."shadow" nil
 Write	.etc.nsswitch_conf."shadow" "compat" true
 Write	.etc.nsswitch_conf."shadow_compat" nil true
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
+Execute	.target.bash "/bin/grep -q '^+::::::/sbin/nologin' /etc/passwd" 0
+Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+::::::/sbin/nologin@+::::::@' /etc/passwd" 0
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/shadow" 0
+Execute	.target.bash "/bin/grep -q '^+/sbin/nologin' /etc/shadow" 0
+Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+/sbin/nologin@+@' /etc/shadow" 0
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/group" 0
+Execute	.target.bash "/bin/grep -q '^+:::/sbin/nologin' /etc/group" 0
+Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+:::/sbin/nologin@+:::@' /etc/group" 0
 Write	.etc.nsswitch_conf nil true
 Read	.etc.nsswitch_conf."automount" "files"
 Write	.etc.nsswitch_conf."automount" "files nis" true
