@@ -156,7 +156,7 @@ client was saved."));
     global /*const*/ string broadcast_help =
 	// Translators: network broadcast address
 	_("<p>The <b>Broadcast</b> option enables searching
-in the local network to find a server, after the specified servers
+in the local network to find a server after the specified servers
 fail to respond. It is a security risk.</p>
 ");
 
@@ -520,7 +520,7 @@ by separating their addresses with spaces.</p>
 	    // only shown if a deprecated advanced option (%1) is used.
 	    help_text = help_text + sformat (_("<p>The global broadcast option (%1) was made obsolete
 by the <tt>broadcast</tt> keyword in <tt>/etc/yp.conf</tt>.
-This check box therefore only appears if it is turned on.</p>
+This check box only appears if it is turned on.</p>
 "),
 					     "<tt>ypbind -broadcast</tt>");
 	}
@@ -750,7 +750,7 @@ for the default domain?")))
 			size (all_servers) <= 1 ||
 			UI::ContinueCancelPopup(
 // Translators: Continue/Cancel popup
-_("The settings for all domains except for
+_("The settings for all domains except
 the default domain will be lost.")))
 		    {
 			break;
