@@ -31,6 +31,7 @@
     import "Report";
     import "Service";
     import "Summary";
+    import "SuSEFirewall";
     import "Wizard";
 
     /* default value of settings modified */
@@ -660,6 +661,10 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 
 	Autologin::Read ();
 
+	Progress::off();
+	SuSEFirewall::Read ();
+	Progress::on();
+
 	return true;
     }
 
@@ -916,6 +921,11 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	        Service::Disable("autofs");
 	    }
 	}
+
+	Progress::off();
+	SuSEFirewall::WriteOnly ();
+	Progress::on();
+
 	return true;
     }
 
@@ -1018,6 +1028,8 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 		}
 	    }
 	}
+
+	SuSEFirewall::ActivateConfiguration ();
 
 	// final stage
 	Progress::NextStage ();
