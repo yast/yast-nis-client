@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Sep 23 12:30:04 CEST 2003 - jsuchome@suse.cz
+
+- disable autologin when nis is enabled (#31470)
+- 2.8.9
+
+-------------------------------------------------------------------
 Tue Sep 16 14:25:12 CEST 2003 - jsuchome@suse.cz
 
 - fix of #30994: broadcast doesn't need IP/hostname

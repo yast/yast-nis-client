@@ -89,6 +89,8 @@
     string domain = "";
     string old_domain = nil;
     boolean domain_changed = false;
+    // autologin feature was set off now (-> run suseconfig)
+    boolean autologin_changed = false;
 
     /**
      * If the domain has changed from a nonempty one, it may only be
@@ -675,6 +677,22 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
     }
 
     /**
+     * Disable autologin feature when nis is started
+     */
+    global define boolean DisableAutologin () ``{
+
+	if (SCR::Read (.sysconfig.displaymanager.DISPLAYMANAGER) == "kdm" &&
+	    SCR::Read (.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN)!="")
+	{
+	    SCR::Write (.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN, "");
+	    SCR::Write (.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN, "no");
+	    SCR::Write(.sysconfig.displaymanager, nil);
+	    autologin_changed = true;
+	}
+	return true;
+    }
+
+    /**
      * Configures the name service switch for the user databases
      * according to chosen settings
      * @return success?
@@ -843,6 +861,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 					"/etc/sysconfig/network/dhcp"));
 		return false;
 	    }
+	    DisableAutologin ();
 	}
 	else
 	{
@@ -954,6 +973,8 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		    return false;
 		}
 	    }
+	    if (autologin_changed)
+		SCR::Execute (.target.bash, "/sbin/SuSEconfig --module kdm3");
 	}
 
 	// if the name service cache daemon is running, restart it
