@@ -229,16 +229,30 @@ either locally or over NIS.</p>");
 
 	// the default is the current status
 	// or true in case we were called during the installation
-	boolean yp_client = Stage::cont () || Nis::start; // #23733
+	boolean yp_client = Nis::start;
+	if (Stage::cont () && !contains (WFM::Args (), "from_users"))
+	    yp_client	= true;
 	boolean autofs = Nis::_start_autofs;
-	map<string,list> all_servers = mapmap (string d, list s, Nis::multidomain_servers,
-				  ``( $[d: [s, Nis::multidomain_broadcast[d]:false, Nis::slp_domain[d]:false ]] ));
+	map<string,list> all_servers =
+	    mapmap (string d, list s, Nis::multidomain_servers, ``(
+		$[
+		    d: [
+			s,
+			Nis::multidomain_broadcast[d]:false,
+			Nis::slp_domain[d]:false
+		    ]
+		]
+	));
+
 	all_servers = add (all_servers, "",
-			   [Nis::servers, Nis::default_broadcast]);
+	    [Nis::servers, Nis::default_broadcast]);
 
 	list<string> additional_domains = [];
 
-	foreach(string d, list s, all_servers, {if (d != nil && d != "") additional_domains = add(additional_domains, d);});
+	foreach (string d, list s, all_servers, {
+	    if (d != nil && d != "")
+		additional_domains = add (additional_domains, d);
+	});
 
 	y2debug("all_servers: %1", all_servers);
 	y2debug("additional_domains: %1", additional_domains);
