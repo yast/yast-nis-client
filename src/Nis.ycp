@@ -329,6 +329,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    //Provide defaults for autoinstallation editing:
 	    //Leave empty.
 	    old_domain = domain;
+		Set(settings);
 	    return true;
 	}
 
