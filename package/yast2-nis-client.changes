@@ -1,7 +1,7 @@
 -------------------------------------------------------------------
-Mon Jul  1 19:17:07 CEST 2002 - msvec@suse.cz
+Thu Jul 04 21:31:21 CEST 2002 - arvin@suse.de
 
-- 2.6.3
+- moved non binary files to /usr/share/YaST2
 
 -------------------------------------------------------------------
 Thu Jun 27 16:37:50 CEST 2002 - kkaempf@suse.de
@@ -179,7 +179,7 @@ Tue Aug 21 17:25:01 CEST 2001 - mvidner@suse.cz
 -------------------------------------------------------------------
 Tue Aug  7 17:24:46 CEST 2001 - mvidner@suse.cz
 
-- Warn about the necessity of reboot when changing the domain. 
+- Warn about the necessity of reboot when changing the domain.
 - Changed from RPM Requires to require.ycp.
 - Documented the possibility to enter multiple NIS servers. (#9559)
 - version 2.4.4
