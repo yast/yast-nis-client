@@ -25,6 +25,7 @@
     import "Report";
     import "Summary";
     include "network/dns.ycp";
+    include "require.ycp";
 
     /**
      * Should ypbind be started at boot?
@@ -269,7 +270,8 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	if (_autofs_allowed && _start_autofs)
 	{
 	    string pkg = "autofs";
-	    if (! SCR::Read (.targetpkg.installed, pkg))
+	    if (! IsPackageInstalled (pkg) &&
+		! IsPackageInstalled ("autofs4"))
 	    {
 		install_packages = add (install_packages, pkg);
 		// Translators: popup message part, ends with a newline
@@ -491,8 +493,8 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	_autofs_allowed = true;
 	/*
 	_autofs_allowed =
-	    SCR::Read (.targetpkg.installed, "autofs") ||
-	    SCR::Read (.targetpkg.installed, "autofs4");
+	    IsPackageInstalled ("autofs") ||
+	    IsPackageInstalled ("autofs4");
 	*/
 	_start_autofs = _autofs_allowed && Runlevel::ServiceEnabled ("autofs");
 
