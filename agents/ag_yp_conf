@@ -43,6 +43,15 @@ sub complete_maps ()
 	{
 	    $domainservers{$domain} = [];
 	}
+	# TODO: workaround for broken boolean handling in ycp.pm
+	if ($broadcast{$domain} eq 0)
+	{
+	    $broadcast{$domain} = "false";
+	}
+	elsif ($broadcast{$domain} eq 1)
+	{
+	    $broadcast{$domain} = "true";
+	}
     }
 }
 
@@ -221,6 +230,7 @@ while ( <STDIN> )
 	    $comment = $argument->{"comment"};
 	    @servers = @{$argument->{"servers"}};
 	    %domainservers = %{$argument->{"domainservers"}};
+	    %broadcast = %{$argument->{"broadcast"}};
 	    $modified = 1;
 	}
 	else
