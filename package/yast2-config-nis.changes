@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Aug  7 17:24:46 CEST 2001 - mvidner@suse.cz
+
+- Warn about the necessity of reboot when changing the domain. 
+- Changed from RPM Requires to require.ycp.
+- Documented the possibility to enter multiple NIS servers. (#9559)
+- version 2.4.4
+
+-------------------------------------------------------------------
 Mon Jul 30 13:12:36 CEST 2001 - mvidner@suse.cz
 
 - Turned off autoheader.
