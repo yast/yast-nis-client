@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Dec 16 13:01:24 CET 2004 - jsuchome@suse.cz
+
+- do not ask for 'Abort Installation' when called from users
+- use Accept button instead of OK in the dialogs
+- 2.11.3
+
+-------------------------------------------------------------------
 Wed Dec 15 11:09:24 CET 2004 - jsuchome@suse.cz
 
 - when looking for running dhcpcd, handle multiple files correctly (#49181)

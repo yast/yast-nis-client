@@ -2,7 +2,7 @@
 # neededforbuild gpp libgpp yast2-devel-packages yast2-pam
 
 @HEADER@
-Requires:	yast2 yast2-network yast2-pam yast2-installation
+Requires:	yast2 yast2-pam
 # .net.hostnames.rpc
 Requires:	yast2-core >= 2.8.0
 
