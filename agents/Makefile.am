@@ -9,6 +9,6 @@ scrconfdir = $(YAST2DIR)/scrconf
 
 agent_SCRIPTS = ag_yp_conf
 
-scrconf_DATA = yp_conf.scr
+scrconf_DATA = cfg_ypbind.scr yp_conf.scr
 
 EXTRA_DIST = $(agent_SCRIPTS) $(scrconf_DATA)

@@ -43,7 +43,6 @@
     }
 
     Wizard::CreateDialog ();
-    Wizard::ReplaceAbortButton(`Empty ());
 
     Nis::Read ();
 
