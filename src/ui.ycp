@@ -154,11 +154,13 @@ client was saved."));
 	// Translators: network broadcast address
 	_("<p>The <b>Broadcast</b> option enables searching
 in the local network to find a server, after the specified servers
-fail to respond. It is a security risk!</p>");
+fail to respond. It is a security risk.</p>
+");
 
     global /*const*/ string details_help =
-	_("<p>The <b>Details</b> button gives access to some
-less frequently used settings.</p>");
+	_("<p><b>Details</b> gives access to some
+less frequently used settings.</p>
+");
 
     /**
      * The switch dialog.
@@ -169,8 +171,9 @@ less frequently used settings.</p>");
 	Wizard::SetScreenShotName ("nis-client-1-start");
 
 	// help text 1/3
-	string help_text = _("<p>Here your machine can be set up as a
- <b>NIS client</b>.</p>");
+	string help_text = _("<p>Here, your machine can be set up as an
+ <b>NIS client</b>.</p>
+");
 
 	// help text 3/3
 	help_text = help_text + _("<p>The Network Information Service (NIS)
@@ -180,8 +183,7 @@ less frequently used settings.</p>");
  permission.</p>");
 
 	// help text 4/3
-	string autofs_help_text = _(
-"<p>Automounter is a daemon that mounts directories automatically.
+	string autofs_help_text = _("<p>Automounter is a daemon that mounts directories automatically.
 It is assumed that its configuration files (auto.*) already exist,
 either locally or over NIS.<br>
 If it is not installed and you want to use it, it will be installed
@@ -406,7 +408,7 @@ by separating their addresses with spaces.</p>
 	Wizard::SetScreenShotName ("nis-client-2c-expert");
 
 	// help text 1/3
-	string help_text = _("<p>Normally it is possible from any host to query a client which server it is using. <b>Answer to the local host only</b> prevents it.</p>");
+	string help_text = _("<p>Normally, it is possible for any host to query which server a client is using. <b>Answer to the local host only</b> prevents it.</p>");
 
 	// help text 2/3
 	// Check, ie. turn on a check box
@@ -502,7 +504,7 @@ by separating their addresses with spaces.</p>
 	boolean global_broadcast_allowed = global_broadcast;
 
 	// help text
-	string help_text = _("<p>Specify here the servers for multiple domains and select the default domain.</p>");
+	string help_text = _("<p>Specify the servers for multiple domains and select the default domain.</p>");
 
 	// help text
 	help_text = help_text + broadcast_help;
@@ -511,10 +513,10 @@ by separating their addresses with spaces.</p>
 	{
 	    // help text
 	    // only shown if a deprecated advanced option (%1) is used.
-	    help_text = help_text + sformat (_(
-"<p>The Global broadcast option (%1) is obsoleted
+	    help_text = help_text + sformat (_("<p>The global broadcast option (%1) was made obsolete
 by the <tt>broadcast</tt> keyword in <tt>/etc/yp.conf</tt>.
-This check box therefore only appears if it is turned on.</p>"),
+This check box therefore only appears if it is turned on.</p>
+"),
 					     "<tt>ypbind -broadcast</tt>");
 	}
 
@@ -721,9 +723,9 @@ for the default domain?")))
 		    //  or warn before checking?
 		    if (result != `single ||
 			size (all_servers) <= 1 ||
-			UI::ContinueCancelPopup(_(
+			UI::ContinueCancelPopup(
 // Translators: Continue/Cancel popup
-"The setttings for all domains except for
+_("The settings for all domains except for
 the default domain will be lost.")))
 		    {
 			break;

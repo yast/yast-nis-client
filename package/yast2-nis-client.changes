@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Jul 19 17:50:52 CEST 2002 - mvidner@suse.cz
+
+- Merged proofread texts.
+- Fixed other_domains in autoyast import (nashif).
+- Screenshot helpers using Wizard.
+- 2.6.8
+
+-------------------------------------------------------------------
 Fri Jul 12 16:27:17 CEST 2002 - arvin@suse.de
 
 - use proper namespace for Args and CallFunction (#16776)
