@@ -23,7 +23,7 @@ and portmap.
 <h2>Background Documentation</h2>
 
 <ul>
-<li><a href="http://www.suse.de/~kukuk/nis/">Linux NIS(YP) Server and Tools</a>
+<li><a href="http://www.linux-nis.org/nis/">Linux NIS(YP) Server and Tools</a>
 <li><a
 href="http://www.linuxbase.org/spec/gLSB/gLSB/iniscrptact.html">Linux
 Standard Base, Init Script Actions</a>
@@ -49,29 +49,30 @@ See <a href="http://bugzilla.suse.de/show_bug.cgi?id=6092">bug #6092</a>.
 See <a href="http://bugzilla.suse.de/show_bug.cgi?id=15666">bug #15666</a>.
 <p>Added a Multiple domains dialog
 See <a href="http://bugzilla.suse.de/show_bug.cgi?id=15665">bug #15665</a>.
-<p>Work in progress: configuration over DHCP.
+<p>(Configuration over DHCP postponed.)
+
+<h3>Overview</h3>
+
+<p><img src="workflow.png" />
 
 <h3>Individual dialogs</h3>
 
-<p><img src="nis1.png" />
-<p><img src="nis2a.png" />
-<p><img src="nis2b.png" />
+<p><img src="nis-client-1-start-000.png" />
+<p><img src="nis-client-2a-single-000.png" />
+<p><img src="nis-client-2b-multiple-000.png" />
 <p>Delete:
-<p><img src="nis2b_del_dfl.png" />
-&nbsp;<img src="nis2b_del_dom.png" />
+<p><img src="nis-client-2b-del-dfl-000.png" />
+&nbsp;<img src="nis-client-2b-del-dom.png" />
 <p>Add/Edit:
-<p><img src="nis2b1.png" />
-<p><img src="nis2b1_err.png" />
-<font color="red">TODO: other restrictions?</font>
+<p><img src="nis-client-2b1-domain-000.png" />
+<p><img src="nis-client-2b1-err-000.png" />
 <p>Add/Edit server:
-<p><img src="nis2b11.png" />
-<p>This refers to a server DNS domain name. TODO: Allow IPs (names?)
-and describe them.
+<p><img src="nis-client-2b11-server-000.png" />
 <p><img src="nis2b11_err.png" />
 <p>Switching from the multiple domain dialog to the single domain dialog:
 <p><img src="nis2b_m_s.png" />
-<p><img src="nis2c.png" />
-<p><img src="nis3.png" />
+<p><img src="nis-client-2c-expert-000.png" />
+<p><img src="nis-client-3-save-000.png" />
 
 <h2>Implementation</h2>
 
