@@ -1,0 +1,130 @@
+/**
+ * File:
+ *   nis.ycp
+ *
+ * Module:
+ *   Configuration of nis
+ *
+ * Summary:
+ *   Main file
+ *
+ * Authors:
+ *   Dan Vesely <dan@suse.cz>
+ *
+ * $Id$
+ *
+ * Configure ypclient via running SuSEconfig
+ * Modify: /etc/rc.config
+ *
+ */
+
+/***
+ * <h3>Configuration of the nis</h3>
+ */
+
+{
+    textdomain "lan";
+
+    include "ui/wizard_dialog.ycp";
+    include "ui/common_popups.ycp";
+
+    include "network/dns.ycp";
+
+    UI (`CreateWizardDialog ());
+    UI (`ReplaceWizardAbortButton(`Empty (`id (`empty))));
+
+
+// ===== main =====
+
+// help text 1/2
+    string help_text = UI(_("<p>Here your machine can be set up as a 
+ <b>NIS client</b>. Just enter your NIS domain (e.g, suse.de) as the 
+ first entry and the NIS server's IP address (e.g., 10.20.0.2) as the second. To
+ deactivate NIS services, select the <b>Do not use NIS</b> button.</p>"));
+    
+// help text 2/2
+    help_text = help_text + UI(_("<p>The Network Information Service (NIS) 
+ was formerly known as Sun <b>Yellow Pages</b> (YP). The name Yellow 
+ Pages is a registered trademark in the United Kingdom of British 
+ Telecommunications plc, and may not be used without 
+ permission.</p>"));
+
+    boolean yp_client = (tolower(SCR(`Read (.rc.system.START_YPBIND))) == "yes");
+    string yp_domain  = SCR(`Read (.rc.system.YP_DOMAINNAME));
+    string yp_address = SCR(`Read (.rc.system.YP_SERVER));
+    
+// frame label
+    term con = `HVSquash(`Frame (_("NIS client"), 
+                                 `VBox (`VSpacing (0.2),
+                                        `RadioButtonGroup(`id(`rd),
+                                                          // radio button label
+                                                          `Left(`HVSquash(`VBox (`Left (`RadioButton(`id(`nisno), `opt (`notify), _("Do &not use NIS"), !yp_client)),
+                                                                                 // radio button label
+                                                                                 `Left(`RadioButton(`id(`nisyes), `opt (`notify), _("&Use NIS"), yp_client)))))),
+                                        // text entry label
+                                        `HSquash(`TextEntry (`id (`ypd), _("NIS &domain"), yp_domain)),
+                                        // test entry label
+                                        `HSquash(`TextEntry (`id (`ypa), _("&IP address of the NIS server"), yp_address)),
+                                        `VSpacing (0.2)
+                                     )
+                             ));
+
+    // dialog title
+    UI (`SetWizardContents (_("Configuration of NIS client"), con, help_text, true, true));
+    // "Finish" button: Proceed to finish the configuration
+    UI(`ChangeWidget (`id(`next), `Label, _("&Finish")));
+    UI(`ChangeWidget(`id(`ypd), `Enabled, yp_client));
+    UI(`ChangeWidget(`id(`ypa), `Enabled, yp_client));
+    
+    any result = nil;
+    do {
+        result = UI (`UserInput ());
+    	
+        yp_client = (UI(`QueryWidget(`id(`rd), `CurrentButton)) == `nisyes);
+        
+        if (result == `nisyes || result == `nisno) {
+            UI(`ChangeWidget(`id(`ypd), `Enabled, yp_client));
+            UI(`ChangeWidget(`id(`ypa), `Enabled, yp_client));
+        }
+        
+        if (result == `next && yp_client) {
+            yp_domain = tolower(UI(`QueryWidget(`id(`ypd), `Value)));
+            yp_address = UI(`QueryWidget(`id(`ypa), `Value));
+            
+            if (!check_domain (yp_domain)) {
+    		// error popup label
+                UI(`MessagePopup(_("The domain name is not correct.")));
+                result = nil;
+                continue;
+            }
+            
+            list temp_ip = splitstring (yp_address, " ");
+            if (contains (maplist(`i, temp_ip, ``(checkIP (i))), false)) {
+    		// error popup label
+                UI(`MessagePopup(_("The IP address is not correct.")));
+                result = nil;
+                continue;
+            }
+        }
+        
+        if (result == `next &&
+            ! UI(`YesNoPopup(_("The configuration of the NIS client will be saved\nand the client will be restarted."))))
+            result = nil;
+        
+    } while (result != `back && result != `next && result != `cancel);
+    
+    if (result == `next && 
+        CallFunction(`nis_write($[ "start_yp" : yp_client,
+                                            "yp_domain" : yp_domain,
+                                            "yp_address" : yp_address ]))) {
+        if (yp_client)
+            UI(`MessagePopup(_("The configuration of the NIS client
+was saved and can be used.")));
+        else
+            UI(`MessagePopup(_("The configuration of the NIS
+client was saved.")));
+    }
+    
+    return UI(`CloseDialog());
+    
+}

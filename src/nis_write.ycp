@@ -1,0 +1,79 @@
+/**
+ * File:
+ *   nis_write.ycp
+ *
+ * Module:
+ *   Configuration of nis
+ *
+ * Summary:
+ *   Writing only client
+ *
+ * Authors:
+ *   Jan Holesovsky <kendy@suse.cz>
+ *   Dan Vesely <dan@suse.cz>
+ *
+ * $Id$
+ *
+ * The configuration to save is in the firts argument. It looks like:
+ *
+ * $[ "start_yp" : true|false, // true/false - start/don't start ypclient when booting
+ *    "yp_domain" : <string>,  // written only when "start_yp" is true
+ *    "yp_address" : <string>  // written only when "start_yp" is true
+ * ]
+ *
+ */
+
+{
+
+    textdomain "lan";
+
+  map yp_conf = Args(0);
+
+  boolean start_yp = lookup(yp_conf, "start_yp", false);
+
+  /* The end of the definitions */
+    
+  SCR (`Execute(.target.bash, "/etc/init.d/ypbind stop", $[]));
+
+  if (start_yp) {
+    SCR(`Write(.rc.system.START_YPBIND, "yes"));
+    SCR(`Write(.rc.system.CREATE_YP_CONF, "yes"));
+    SCR(`Write(.rc.system.START_PORTMAP, "yes")); // write portmapper as well
+    
+    SCR(`Write(.rc.system.YP_DOMAINNAME, lookup(yp_conf, "yp_domain", "")));
+    SCR(`Write(.rc.system.YP_SERVER, lookup(yp_conf, "yp_address", "")));
+  } else
+    SCR(`Write(.rc.system.START_YPBIND, "no"));
+
+  if (!SCR(`Write(.rc.system, nil))) {
+	    // error popup message
+    UI(`MessagePopup(_("Error while saving /etc/rc.config.\nPlease check out that you are running this as a \"root\"")));
+    return false;
+  }
+	
+  if (SCR (`Execute(.target.bash, "/sbin/SuSEconfig -quick -nonewpackage", $[])) != 0) {
+	    // warning dialog message
+    UI(`MessagePopup(_("Error while running SuSEconfig")));
+    return false;
+  }
+  
+  if (start_yp) {
+    if (SCR (`Execute(.target.bash, "/etc/init.d/portmap start", $[])) != 0) {
+		// error popup message
+      UI(`MessagePopup(_("Error while running portmapper.")));
+      return 0;
+    }
+    if (SCR (`Execute(.target.bash, "/etc/init.d/ypbind start", $[])) != 0) {
+    	// error popup message
+      UI(`MessagePopup(_("Error while running ypclient.")));
+      return false;
+    }
+    if (SCR (`Execute(.target.bash, "/usr/bin/ypwhich >/dev/null", $[])) != 0) {
+    	// error popup message
+      UI(`MessagePopup(_("NIS server not found.")));
+      return false;
+    }
+  }
+
+  return true;
+}
