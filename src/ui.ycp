@@ -387,7 +387,7 @@ Are you sure?")))
 		servers = (string) UI::QueryWidget (`id (`servers), `Value);
 		default_broadcast = (boolean) UI::QueryWidget (`id (`broadcast), `Value);
 
-		if (!dhcp_wanted &&
+		if (yp_client && !dhcp_wanted &&
 		    !Nis::check_nisdomainname (domain))
 		{
 		    UI::SetFocus (`id (`domain));
@@ -398,7 +398,7 @@ Are you sure?")))
 
 		list<string> temp_ad = filter (string a, splitstring (servers, " "),
 				       ``(a != ""));
-		if (!dhcp_wanted && !default_broadcast &&
+		if (yp_client && !dhcp_wanted && !default_broadcast &&
 		    (size (temp_ad) == 0 ||
 		     find (string a, temp_ad,
 			   ``(!Nis::check_address_nis (a))) != nil))
