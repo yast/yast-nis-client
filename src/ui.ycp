@@ -24,9 +24,10 @@
     import "Nis";
     import "Mode";
     import "Require";
+    import "Label";
+    import "Popup";
 
     include "wizard/sequencer.ycp";
-    include "ui/common_popups.ycp";
     include "network/ip.ycp";
     include "network/dns.ycp";
 
@@ -122,20 +123,20 @@
 		    if (Nis::DomainChanged ())
 		    {
 			// waring popup
-			UI::WarningPopup (_("The domain has changed.
+			Popup::Warning (_("The domain has changed.
 You must reboot for the changes to take effect."));
 		    }
 		    else if (!Mode::cont) // #23777
 		    {
 			// message popup
-			UI::MessagePopup(_("The configuration of the NIS client
+			Popup::Message(_("The configuration of the NIS client
 was saved and can be used."));
 		    }
 		}
 		else
 		{
 		    // message popup
-		    UI::MessagePopup(_("The configuration of the NIS
+		    Popup::Message(_("The configuration of the NIS
 client was saved."));
 		}
 	    }
@@ -275,8 +276,8 @@ automatically.</p>");
 	Wizard::SetContentsButtons (
 	    // dialog title
 	    _("Configuration of NIS client"), con, help_text,
-	    BackButtonLabel (),
-	    (yp_client || Mode::cont)? NextButtonLabel (): FinishButtonLabel ());
+	    Label::BackButton (),
+	    (yp_client || Mode::cont)? Label::NextButton (): Label::FinishButton ());
 
 	// during installation, only enabling makes sence (#23831)
 	if (Mode::cont)
@@ -299,11 +300,11 @@ automatically.</p>");
 	    {
 		UI::ChangeWidget (
 		    `id (`next), `Label,
-		    (yp_client || Mode::cont)? NextButtonLabel(): FinishButtonLabel ());
+		    (yp_client || Mode::cont)? Label::NextButton(): Label::FinishButton ());
 	    }
 	}
 	until (result == `back || result == `next ||
-	       (result == `abort && UI::ReallyAbortPopup (Nis::touched)));
+	       (result == `abort && Popup::ReallyAbort (Nis::touched)));
 
 	if (result == `next)
 	{
@@ -331,7 +332,7 @@ automatically.</p>");
 	if (!Nis::dhcp_possible)
 	{
 	    // Translators: warning popup
-	    UI::WarningPopup (_("NIS configuration is not currently provided by DHCP.
+	    Popup::Warning (_("NIS configuration is not currently provided by DHCP.
 Change the DHCP server configuration to provide it.
 "));
 	}
@@ -356,9 +357,9 @@ Change the DHCP server configuration to provide it.
 		    ),
 		`HBox (
 		    `PushButton (`id (`ok), `opt (`default, `key_F10),
-				 OKButtonLabel ()),
+				 Label::OKButton ()),
 		    `PushButton (`id (`cancel), `opt (`key_F9),
-				 CancelButtonLabel())
+				 Label::CancelButton())
 		    )
 		));
 	UI::SetFocus (`id (`items));
@@ -497,7 +498,7 @@ by separating their addresses with spaces.</p>
 	Wizard::SetContentsButtons (
 	    // dialog title
 	    _("Configuration of NIS client"), con, help_text,
-	    BackButtonLabel (), Mode::cont? NextButtonLabel():FinishButtonLabel ());
+	    Label::BackButton (), Mode::cont? Label::NextButton():Label::FinishButton ());
 
 	any result = nil;
 	repeat
@@ -537,7 +538,7 @@ by separating their addresses with spaces.</p>
 		    !Nis::check_nisdomainname (yp_domain))
 		{
 		    UI::SetFocus (`id (`ypd));
-		    UI::ErrorPopup (Nis::valid_nisdomainname ());
+		    Popup::Error (Nis::valid_nisdomainname ());
 		    result = nil;
 		    continue;
 		}
@@ -550,7 +551,7 @@ by separating their addresses with spaces.</p>
 			   ``(!Nis::check_address_nis (a))) != nil))
 		{
 		    UI::SetFocus (`id (`ypa));
-		    UI::MessagePopup (Nis::valid_address_nis ());
+		    Popup::Message (Nis::valid_address_nis ());
 		    result = nil;
 		    continue;
 		}
@@ -558,7 +559,7 @@ by separating their addresses with spaces.</p>
 	}
 	until (result == `back || result == `next || result == `expert ||
 	       result == `multiple ||
-	       (result == `abort && UI::ReallyAbortPopup (Nis::touched)));
+	       (result == `abort && Popup::ReallyAbort (Nis::touched)));
 
 	if (contains ([`next, `expert, `multiple], result))
 	{
@@ -625,7 +626,7 @@ by separating their addresses with spaces.</p>
 	Wizard::SetContentsButtons (
 	    // dialog title
 	    _("Expert settings"), contents, help_text,
-	    BackButtonLabel (), OKButtonLabel ());
+	    Label::BackButton (), Label::OKButton ());
 
 	any result = nil;
 	repeat
@@ -646,13 +647,13 @@ by separating their addresses with spaces.</p>
 		if (false && some_error)
 		{
 		    // error popup label
-		    UI::MessagePopup (_("The domain name is not correct."));
+		    Popup::Message (_("The domain name is not correct."));
 		    result = nil;
 		}
 	    }
 	}
 	until (result == `back || result == `next ||
-	       (result == `abort && UI::ReallyAbortPopup (Nis::touched)));
+	       (result == `abort && Popup::ReallyAbort (Nis::touched)));
 
 	if (result == `next)
 	{
@@ -799,7 +800,7 @@ This check box only appears if it is turned on.</p>
 		     _("Configuration of NIS client"),
 		     // dialog subtitle
 		     _("Multiple domains")), contents, help_text,
-	    BackButtonLabel (), Mode::cont? NextButtonLabel():FinishButtonLabel ());
+	    Label::BackButton (), Mode::cont? Label::NextButton():Label::FinishButton ());
 
 	//UI::ChangeWidget (`id (`domains), `CurrentItem, current_d);
 
@@ -903,7 +904,7 @@ This check box only appears if it is turned on.</p>
 		    Wizard::SetScreenShotName ("nis-client-2b-del-dfl");
 		    // do not delete the default domain, just the servers
 		    // Translators: a yes-no popup
-		    if (UI::YesNoPopup (_("Really delete the server list
+		    if (Popup::YesNo (_("Really delete the server list
 for the default domain?")))
 		    {
 			all_servers = add (all_servers, "", [[], false]);
@@ -916,7 +917,7 @@ for the default domain?")))
 		{
 		    Wizard::SetScreenShotName ("nis-client-2b-del-dom");
 		    // Translators: a yes-no popup
-		    if (UI::YesNoPopup (_("Really delete this domain?")))
+		    if (Popup::YesNo (_("Really delete this domain?")))
 		    {
 			all_servers = filter (string k, list v,
 					      all_servers, ``(k != d0));
@@ -940,7 +941,7 @@ for the default domain?")))
 		{
 		    UI::SetFocus (`id (`domain));
 		    Wizard::SetScreenShotName ("nis-client-2b1-err");
-		    UI::ErrorPopup (Nis::valid_nisdomainname ());
+		    Popup::Error (Nis::valid_nisdomainname ());
 		    Wizard::RestoreScreenShotName ();
 		}
 		else
@@ -950,7 +951,7 @@ for the default domain?")))
 		    //  or warn before checking?
 		    if (result != `single ||
 			size (all_servers) <= 1 ||
-			UI::ContinueCancelPopup(
+			Popup::ContinueCancel(
 // Translators: Continue/Cancel popup
 _("The settings for all domains except
 the default domain will be lost.")))
@@ -960,7 +961,7 @@ the default domain will be lost.")))
 		}
 	    }
 	    else if (result == `back || (result == `abort &&
-					 UI::ReallyAbortPopup (Nis::touched)))
+					 Popup::ReallyAbort (Nis::touched)))
 	    {
 		break;
 	    }
@@ -1078,9 +1079,9 @@ the default domain will be lost.")))
 		    t_servers,
 		    `VSpacing(0.2),
 		    `HBox (`PushButton (`id (`ok), `opt (`default, `key_F10),
-					OKButtonLabel ()),
+					Label::OKButton ()),
 			   `PushButton (`id (`cancel), `opt (`key_F9),
-					CancelButtonLabel ())),
+					Label::CancelButton ())),
 		    `VSpacing(0.2)
 		    ),
 		`HSpacing(1)
@@ -1122,14 +1123,14 @@ the default domain will be lost.")))
 		if (!Nis::check_nisdomainname (domain)) //also disallows ""
 		{
 		    UI::SetFocus (`id (`domain));
-		    UI::ErrorPopup (Nis::valid_nisdomainname ());
+		    Popup::Error (Nis::valid_nisdomainname ());
 		}
 		else if (init != "" && domain != init &&
 			 contains (existing, domain))
 		{
 		    UI::SetFocus (`id (`domain));
 		    // Translators: error message
-		    UI::ErrorPopup (_("This domain is already defined."));
+		    Popup::Error (_("This domain is already defined."));
 		}
 		else if (bad_server != nil)
 		{
@@ -1137,7 +1138,7 @@ the default domain will be lost.")))
 		    string msg = sformat (
 			// Translators: error message
 			_("The format of server address '%1' is not correct."), bad_server);
-		    UI::ErrorPopup (msg + "\n\n" + Nis::valid_address_nis ());
+		    Popup::Error (msg + "\n\n" + Nis::valid_address_nis ());
 		}
 		else
 		{
@@ -1209,7 +1210,7 @@ the default domain will be lost.")))
 	// continue-cancel popup
 	string message1 = _("The configuration of the NIS client will be saved.\n");
 	string message2 = Nis::ProbePackages ();
-	//boolean ret = UI::ContinueCancelPopup (message1 + message2);
+	//boolean ret = Popup::ContinueCancel (message1 + message2);
 	boolean ret = true;
 
 	Wizard::RestoreScreenShotName ();
