@@ -20,14 +20,14 @@
 {
     textdomain "nis";
 
-    import "Wizard";
-    import "Nis";
-    import "Mode";
-    import "Require";
-    import "Label";
-    import "Popup";
     import "Autologin";
+    import "Label";
+    import "Mode";
+    import "Nis";
+    import "Package";
+    import "Popup";
     import "Sequencer";
+    import "Wizard";
 
     /**
      * A Wizard Sequencer helper
@@ -1180,7 +1180,7 @@ automatically.</p>");
 	    if (size (Nis::install_packages) > 0 ||
 		size (Nis::remove_packages) > 0)
 	    {
-		Require::DoInstallAndRemove (Nis::install_packages,
+		Package::DoInstallAndRemove (Nis::install_packages,
 					     Nis::remove_packages);
 	    }
 
