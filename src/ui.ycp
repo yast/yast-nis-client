@@ -138,6 +138,7 @@ either locally or over NIS.</p>");
 	    BackButtonLabel (), FinishButtonLabel ());
 	UI::ChangeWidget (`id (`ypd), `Enabled, yp_client);
 	UI::ChangeWidget (`id (`ypa), `Enabled, yp_client);
+	UI::ChangeWidget (`id (`expert), `Enabled, yp_client);
 	UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 
 	any result = nil;
@@ -155,6 +156,7 @@ either locally or over NIS.</p>");
 	    {
 		UI::ChangeWidget (`id (`ypd), `Enabled, yp_client);
 		UI::ChangeWidget (`id (`ypa), `Enabled, yp_client);
+		UI::ChangeWidget (`id (`expert), `Enabled, yp_client);
 		UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 	    }
 
@@ -182,7 +184,7 @@ either locally or over NIS.</p>");
 	    }
 	}
 	until (result == `back || result == `next || result == `expert ||
-	       (result == `abort && UI::ReallyAbortPopup (Nis::Touched)));
+	       (result == `abort && UI::ReallyAbortPopup (Nis::touched)));
 
 	if (result == `next)
 	{
@@ -270,7 +272,7 @@ either locally or over NIS.</p>");
 	    }
 	}
 	until (result == `back || result == `next ||
-	       (result == `abort && UI::ReallyAbortPopup (Nis::Touched)));
+	       (result == `abort && UI::ReallyAbortPopup (Nis::touched)));
 
 	if (result == `next)
 	{
