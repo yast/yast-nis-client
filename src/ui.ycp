@@ -23,11 +23,13 @@
     import "Autologin";
     import "CWMFirewallInterfaces";
     import "Label";
+    import "Message";
     import "Mode";
     import "Nis";
     import "Package";
     import "Popup";
     import "Sequencer";
+    import "Stage";
     import "Wizard";
 
     /**
@@ -63,7 +65,7 @@ less frequently used settings.</p>
      */
     define boolean ReallyAbort (boolean touched) ``{
 
-	return (!Mode::cont)
+	return (!Stage::cont ())
 	    ? Popup::ReallyAbort (touched)
 	    : Popup::ConfirmAbort (`incomplete);
     }
@@ -154,7 +156,7 @@ Change the DHCP server configuration to provide it.
      */
     define string SelectNisServers (string domain) ``{
 	Wizard::SetScreenShotName ("nis-client-2a1-servers");
-	if (Mode::screen_shot)
+	if (Mode::screen_shot())
 	{
 	    found_servers[domain] = ["nis.example.com", "10.42.1.1", "10.42.1.2"];
 	}
@@ -224,7 +226,7 @@ either locally or over NIS.</p>");
 
 	// the default is the current status
 	// or true in case we were called during the installation
-	boolean yp_client = Mode::cont || Nis::start; // #23733
+	boolean yp_client = Stage::cont () || Nis::start; // #23733
 	boolean autofs = Nis::_start_autofs;
 
 	map<string,list> all_servers = mapmap (string d, list s, Nis::multidomain_servers,
@@ -314,10 +316,10 @@ either locally or over NIS.</p>");
 	Wizard::SetContentsButtons (
 	    // dialog title
 	    _("Configuration of NIS client"), con, help_text,
-	    Label::BackButton (), Mode::cont? Label::NextButton():Label::FinishButton ());
+	    Label::BackButton (), Stage::cont ()? Label::NextButton():Label::FinishButton ());
 
 	// during installation, only enabling makes sence
-	if (Mode::cont)
+	if (Stage::cont ())
 	{
 		UI::ChangeWidget (`id (`nisno), `Enabled, false);
 	}
@@ -823,10 +825,10 @@ This option is only available if the firewall is enabled.</p>
 		     _("Configuration of NIS client"),
 		     // dialog subtitle
 		     _("Additional Domains")), contents, help_text,
-	    Label::BackButton (), Mode::cont? Label::NextButton():Label::OKButton ());
+	    Label::BackButton (), Stage::cont ()? Label::NextButton():Label::OKButton ());
 
 	// sh: We don't use "Abort Installation" any more. Stick with the normal "Abort" button.
-	// if (Mode::cont)
+	// if (Stage::cont ())
 	//     Wizard::SetAbortButton(`abort, Label::AbortInstallationButton() );
 
 	any result = nil;
@@ -1055,7 +1057,7 @@ This option is only available if the firewall is enabled.</p>
 	Wizard::CreateDialog ();
 	Wizard::SetDesktopIcon("nis");
 
-	if (Mode::screen_shot)
+	if (Mode::screen_shot())
 	{
 	    Nis::Fake ();
 	}
@@ -1078,11 +1080,12 @@ This option is only available if the firewall is enabled.</p>
 
 	    // Install packages if needed.
 	    // Cannot do it in Write, autoinstall does it differently.
-	    if (size (Nis::install_packages) > 0 ||
-		size (Nis::remove_packages) > 0)
+	    if (size (Nis::install_packages) > 0)
 	    {
-		Package::DoInstallAndRemove (Nis::install_packages,
-					     Nis::remove_packages);
+		if (!Package::DoInstallAndRemove (Nis::install_packages, []))
+		{
+		    Popup::Error (Message::FailedToInstallPackages ());
+		}
 	    }
 
 	    if (Nis::Write ())

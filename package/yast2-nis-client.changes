@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Oct 29 09:04:36 CEST 2004 - jsuchome@suse.cz
+
+- adapted for new Mode:: interface
+- 2.11.0 
+
+-------------------------------------------------------------------
 Tue Sep 14 09:00:24 CEST 2004 - jsuchome@suse.cz
 
 - adapted testsuite to changes in yast2-firewall
