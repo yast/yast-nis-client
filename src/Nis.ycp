@@ -226,6 +226,18 @@ and it must be at most 64 characters long.
     boolean hosts_by_nis = false;
 
     /**
+     * Using NIS and LDAP simultaneously is not supported (#36981).
+     */
+    boolean users_by_ldap = false;
+
+    /**
+     * Used in the UI when NIS is turned on.
+     */
+    global define boolean UsersByLdap () ``{
+	return users_by_ldap;
+    }
+
+    /**
      * Describe a valid address - ip4 or name, names only if
      * nsswitch.conf does not have hosts: nis
      * @return a description
@@ -645,6 +657,12 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	_start_autofs = _autofs_allowed && Service::Enabled("autofs");
 
 	hosts_by_nis = contains (ReadNssDb ("hosts"), "nis");
+
+	list<string> nss_passwd = ReadNssDb ("passwd");
+	users_by_ldap =
+	    contains (nss_passwd, "ldap") ||
+	    (contains (nss_passwd, "compat") &&
+	     contains (ReadNssDb ("passwd_compat"), "ldap"));
 
 	Autologin::Read ();
 

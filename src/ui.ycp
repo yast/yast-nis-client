@@ -368,6 +368,21 @@ either locally or over NIS.</p>");
 	    }
 	    else if (contains ([`next, `expert], result))
 	    {
+		yp_client = ((symbol) UI::QueryWidget (`id (`rd), `CurrentButton) != `nisno);
+		
+		// Using NIS and LDAP simultaneously is not supported (#36981).
+		if (yp_client && !Nis::start && Nis::UsersByLdap ())
+		{
+		    // yes-no popup
+		    if (!Popup::YesNo (_("When you configure your machine as a NIS client,
+you cannot retrieve the user data from LDAP.
+Are you sure?")))
+		    {
+			result = nil;
+			continue;
+		    }
+		}
+
 		domain = (string) UI::QueryWidget (`id (`domain), `Value);
 		servers = (string) UI::QueryWidget (`id (`servers), `Value);
 		default_broadcast = (boolean) UI::QueryWidget (`id (`broadcast), `Value);
