@@ -7,6 +7,7 @@ ypserver 192.168.0.3
 domain mydomain broadcast
 domain yourdomain server 10.0.0.1
 ypserver 192.168.0.4	# lots of servers
+ypserver true
 domain other-domain.test  server   yp.other-domain.test
 domain other-domain.test   server  yp2.other-domain.test
 # broadcast will supplement specific servers instead of overriding
@@ -15,3 +16,5 @@ domain bad-domain server  bar.bad-domain.test
 domain bad-domain broadcast
 # broadcast for the default domain works too
 broadcast
+# typing problems (#21804)
+domain 911 server emergency.com

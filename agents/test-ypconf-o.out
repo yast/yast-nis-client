@@ -4,11 +4,14 @@
 # lots of servers
 # broadcast will supplement specific servers instead of overriding
 # broadcast for the default domain works too
+# typing problems (#21804)
 ypserver 192.168.0.1
 ypserver 192.168.0.2
 ypserver 192.168.0.3
 ypserver 192.168.0.4
+ypserver true
 broadcast
+domain 911 server emergency.com
 domain bad-domain server foo.bad-domain.test
 domain bad-domain server bar.bad-domain.test
 domain bad-domain broadcast
