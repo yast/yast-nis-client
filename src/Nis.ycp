@@ -479,6 +479,28 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	return summary;
     }
 
+    /**
+     * Create a short textual summary with configuration abstract
+     * It is called by "authentication/user sources" dialog in yast2-users
+     * @return summary of the current configuration
+     */
+    global define string ShortSummary() ``{
+
+	string summary = "";
+	string dhcp = _("by DHCP");
+	string nc = Summary::NotConfigured ();
+	// summary text
+	summary = sformat(_("<b>Servers</b>: %1<br>"), dhcp_wanted ? dhcp :
+	    ((servers !=[]) ? GetServers() : nc)) +
+	// summary text
+	sformat (_("<b>Domain</b>: %1<br>"), dhcp_wanted ? dhcp :
+	    ((domain != "") ? domain : nc)) +
+	// summary text (yes/no follows)
+	sformat(_("<b>Client Enabled</b>: %1<br>"), start ? _("Yes"):_("No"));
+
+	return summary;
+    }
+
     // copied from Mail.ycp
     // replace with a custom list
     /**
