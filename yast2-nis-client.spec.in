@@ -1,6 +1,5 @@
 @HEADER-COMMENT@
-
-# neededforbuild  yast2-devel-packages yast2-network yast2-packager yast2-pam
+# neededforbuild yast2-devel-packages yast2-network yast2-packager yast2-pam
 
 @HEADER@
 Requires:	yast2 yast2-network yast2-packager yast2-pam
@@ -35,7 +34,7 @@ Summary:	Configuration of NIS client
 @clientdir@/nis-client.ycp
 @clientdir@/nis_auto.ycp
 %dir @moduledir@
-@moduledir@/Nis.ycp
+@moduledir@/Nis.*
 %dir @configdir@
 @configdir@/nis.y2cc
 %dir @desktopdir@

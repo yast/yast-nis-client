@@ -9,7 +9,7 @@ Read (.)'
 # kludge: break up the output into lines
 S3='s/\([:,]\)/\1\
 /g'
-NORMALIZE="parseycp -n"
+NORMALIZE="ycpc -E -"
 
 echo "$AGPROG" | $AGENT | sed -e 1d | $NORMALIZE >$CASE.ycp.tmp
 sed -e "$S3" $CASE.ycp.tmp > $CASE-i.out.tmp
