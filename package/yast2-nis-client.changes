@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr 27 13:07:37 CEST 2004 - mvidner@suse.cz
+
+- fix parallel build by making a convenience library
+- 2.9.17
+
+-------------------------------------------------------------------
 Fri Apr 16 15:46:04 CEST 2004 - mvidner@suse.cz
 
 - show an improvised, dhcp provided domain as the default one (#35654)
