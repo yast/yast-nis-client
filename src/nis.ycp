@@ -91,7 +91,7 @@
             yp_domain = tolower(UI(`QueryWidget(`id(`ypd), `Value)));
             yp_address = UI(`QueryWidget(`id(`ypa), `Value));
             
-            if (!check_domain (yp_domain)) {
+            if (!check_domainname (yp_domain)) {
     		// error popup label
                 UI(`MessagePopup(_("The domain name is not correct.")));
                 result = nil;
