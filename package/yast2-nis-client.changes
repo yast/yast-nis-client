@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Jan 20 10:27:38 CET 2003 - mvidner@suse.de
+
+- Properly handle nsswitch for nis.
+- Restart nscd if running.
+- Fixed the agent fix for the "server foo broadcast" case.
+- 2.7.3
+
+-------------------------------------------------------------------
 Wed Jan 15 15:45:52 CET 2003 - mvidner@suse.de
 
 - Added function key shortcuts (try F1 in text mode).
