@@ -259,22 +259,58 @@
 	summary = Summary::AddLine(summary, (start) ? _("Yes") : nc);
 	summary = Summary::AddHeader(summary, _("NIS Domain"));
 	summary = Summary::AddLine(summary, (domain != "") ? domain : nc);
+	summary = Summary::AddHeader(summary, _("Broadcast"));
+	summary = Summary::AddLine(summary, (broadcast) ? _("Yes") : nc);
 	summary = Summary::AddHeader(summary, _("NIS Server"));
 	summary = Summary::AddLine(summary,(servers !=[]) ? mergestring(servers,"<br>") : nc);
-	summary = Summary::AddHeader(summary, _("Auto-mounter enabled"));
-	summary = Summary::AddLine(summary, (_start_autofs) ? _("Yes") : nc);
+	// TODO: a full list
+	summary = summary + ListItem (_("Other domains"), multidomain_servers);
 	summary = Summary::AddHeader(summary, _("Answer to local host only"));
 	summary = Summary::AddLine(summary, (local_only) ? _("Yes") : nc);
-	summary = Summary::AddHeader(summary, _("Use any server"));
-	summary = Summary::AddLine(summary, (broadcast) ? _("Yes") : nc);
 	summary = Summary::AddHeader(summary, _("Broken server"));
 	summary = Summary::AddLine(summary, (broken_server) ? _("Yes") : nc);
 	summary = Summary::AddHeader(summary, _("ypbind options"));
 	summary = Summary::AddLine(summary, (options!="") ? options : nc);
+	summary = Summary::AddHeader(summary, _("Auto-mounter enabled"));
+	summary = Summary::AddLine(summary, (_start_autofs) ? _("Yes") : nc);
 
 	return summary;
     }
 
+    // copied from Mail.ycp
+    // replace with a custom list
+    /**
+     * Summarizes a list of data
+     * @param title passed to Summary::AddHeader
+     * @param value a list (of scalars, lists or maps)
+     * @return Summary-formatted description
+     */
+    define string ListItem(string title, any value) ``{
+	string summary = "";
+	summary = Summary::AddHeader(summary, title);
+	//enhancement BEGIN
+	if (is (value, map))
+	{
+	    value = maplist (any k, any v, value, ``(k));
+	}
+	//enhancement END
+	if (is(value,list) && size(value)>0) {
+	    summary = Summary::OpenList(summary);
+	    foreach (`d, value, ``{
+		string entry = "";
+		if (is(d,map) || is (d,list))
+		    entry = sformat("%1 Entries configured", size(value));
+		else
+		    entry = d;
+
+		summary = Summary::AddListItem(summary, entry);
+	    });
+	    summary = Summary::CloseList(summary);
+	} else {
+	    summary = Summary::AddLine(summary,Summary::NotConfigured ());
+	}
+	return summary;
+    }
 
     /**
      * Reads NIS settings from the SCR
