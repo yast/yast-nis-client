@@ -14,8 +14,24 @@
     // testedfiles: Nis.ycp Autologin.ycp Require.ycp Service.ycp Report.ycp Testsuite.ycp Nsswitch.ycp
 
     include "testsuite.ycp";
+
+    map READ_INIT = $[
+	"target" : $[
+	    "size"	: 0,
+	],
+    ];
+    map EXEC_INIT = $[
+	"target" : $[
+	    "bash_output" : $[
+	    ],
+	],
+    ];
+
+    TESTSUITE_INIT ([READ_INIT, $[], EXEC_INIT], nil);
+
     import "Pkg"; // override
     import "Nis";
+
 
     map dhcp_yes = $[
 	"DHCLIENT_MODIFY_NIS_CONF": "yes",
