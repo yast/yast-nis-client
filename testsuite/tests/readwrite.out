@@ -42,6 +42,7 @@ Write	.sysconfig.ypbind nil true
 Write	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "no" true
 Write	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "no" true
 Write	.sysconfig.network.dhcp nil true
+Read	.sysconfig.displaymanager.DISPLAYMANAGER nil
 Read	.etc.nsswitch_conf."passwd" "compat"
 Write	.etc.nsswitch_conf."passwd_compat" nil true
 Read	.etc.nsswitch_conf."group" "compat"
@@ -108,6 +109,7 @@ Write	.sysconfig.ypbind nil true
 Write	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "yes" true
 Write	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes" true
 Write	.sysconfig.network.dhcp nil true
+Read	.sysconfig.displaymanager.DISPLAYMANAGER nil
 Read	.etc.nsswitch_conf."passwd" "compat"
 Write	.etc.nsswitch_conf."passwd_compat" nil true
 Read	.etc.nsswitch_conf."group" "compat"
