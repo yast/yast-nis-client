@@ -433,7 +433,7 @@ by separating their addresses with spaces.</p>
 
 		list temp_ad = filter (string a, splitstring (yp_address, " "),
 				       ``(a != ""));
-		if (!Nis::ServersByDhcpActual () &&
+		if (!Nis::ServersByDhcpActual () && result != `expert &&
 		    (size (temp_ad) == 0 ||
 		     find (string a, temp_ad,
 			   ``(!Nis::check_address_nis (a))) != nil))
@@ -966,7 +966,7 @@ the default domain will be lost.")))
 		`VBox(
 		    `VSpacing(0.2),
 		    // Translators: popup dialog heading
-		    `Heading (_("Domain settings")),
+		    `Heading (_("Domain Settings")),
 		    // Add a domain, Adding a domain? Edit...
 		    // Translators: text entry label
 		    `Left (`TextEntry (`id (`domain), _("&Domain name"), domain)),
@@ -1024,7 +1024,7 @@ the default domain will be lost.")))
 		    UI::SetFocus (`id (`servers));
 		    string msg = sformat (
 			// Translators: error message
-			_("Bad format of server address '%1'."), bad_server);
+			_("The format of server address '%1' is not correct."), bad_server);
 		    UI::ErrorPopup (msg + "\n\n" + Nis::valid_address_nis ());
 		}
 		else
