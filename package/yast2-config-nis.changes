@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Jan 16 17:15:00 CET 2002 - mvidner@suse.cz
+
+- Moved domainname.scr to yast2-lib-network. (2.5.10)
+
+-------------------------------------------------------------------
 Mon Jan 14 16:43:13 CET 2002 - mvidner@suse.cz
 
 - yp.conf now flushed.
