@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb  7 16:17:47 CET 2005 - jsuchome@suse.cz
+
+- merged texts from proofread
+- 2.11.6 
+
+-------------------------------------------------------------------
 Mon Jan 31 08:56:39 CET 2005 - jsuchome@suse.cz
 
 - fixed build (failing testsuite on SuSEFirewall initialization)

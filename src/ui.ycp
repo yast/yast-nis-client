@@ -198,8 +198,9 @@ Change the DHCP server configuration to provide it.
 	Wizard::SetScreenShotName ("nis-client-2a-single");
 
 	// help text
-	string help_text = _("<p>Enter your NIS domain (e.g, example.com)
- and the NIS server's address (e.g., nis.example.com or 10.20.1.1).</p>");
+	string help_text = _("<p>Enter your NIS domain, such as example.com,
+ and the NIS server's address, such as nis.example.com or 10.20.1.1.</p>
+");
 
 	// help text
 	help_text = help_text + _("<p>Specify multiple servers
@@ -262,7 +263,7 @@ either locally or over NIS.</p>");
 
 			   `VSpacing (0.2),
 			   // text entry label
-			   `TextEntry (`id (`domain), _("N&IS domain"), domain),
+			   `TextEntry (`id (`domain), _("N&IS Domain"), domain),
 			   `VSpacing (0.2),
 			   // text entry label
 			   `TextEntry (`id (`servers), _("&Addresses of NIS servers"), servers),
@@ -310,7 +311,7 @@ either locally or over NIS.</p>");
 		`PushButton (`id (`expert), `opt (`key_F7),
 		    // button label
 		    // (short for Expert settings)
-		    _("E&xpert ...")
+		    _("E&xpert...")
 		),
 		`VSpacing (0.5)
 	    );
@@ -473,7 +474,7 @@ This option is only available if the firewall is enabled.</p>
 	term firewall_layout = firewall_widget["custom_widget"]:`VBox ();
 
 	// help text 1/4
-	string help_text = _("<p>Normally, it is possible for any host to query which server a client is using. Disabling <b>Answer to the remote hosts</b> will restrict this only to the local host.</p>");
+	string help_text = _("<p>Normally, it is possible for any host to query which server a client is using. Disabling <b>Answer Remote Hosts</b> restricts this only to the local host.</p>");
 
 	// help text 2/4
 	// Check, ie. turn on a check box
@@ -496,7 +497,7 @@ This option is only available if the firewall is enabled.</p>
 		    `VBox (
 			`VSpacing (0.2),
 			// check box label
-			`Left (`CheckBox (`id (`remote), _("Ans&wer to the remote hosts"), !local_only)),
+			`Left (`CheckBox (`id (`remote), _("Ans&wer Remote Hosts"), !local_only)),
 			// check box label
 			`Left (`CheckBox (`id (`broken_server), _("Br&oken server"), broken_server)),
 			`VSpacing (0.2),
