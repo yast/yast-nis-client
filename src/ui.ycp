@@ -835,23 +835,20 @@ the default domain will be lost.")))
 
 	string domain = (init == nil)? "": (init == "")? default_d: init;
 	list servers = server_sp[0]:[];
+	string servers_s = mergestring (servers, "\n");
 	boolean broadcast = server_sp[1]:false;
 
 	term t_servers =
 	    `VBox (
-		`ReplacePoint (`id (`r_servers), ServerBox (servers)),
+		`MultiLineEdit(`id (`servers),
+			       // Translators: multilineedit label
+			       // comma: ","
+			       _("&Servers (separated by spaces or commas)"),
+			       servers_s),
 		`CheckBox (`id (`local_broadcast),
 			   // checkbox label
 			   _("&Broadcast"), broadcast),
-		`HBox (
-		    // button label
-		    `PushButton (`id (`add_s), _("&Add")),
-		    // button label
-		    `PushButton (`id (`edit_s), _("&Edit")),
-		    // button label
-		    //&Delete could be activated if the user wanted &Domain
-		    `PushButton (`id (`del_s), _("De&lete"))
-		    )
+		`Empty ()
 		);
 
 	term contents =
@@ -860,7 +857,7 @@ the default domain will be lost.")))
 		`VBox(
 		    `VSpacing(0.2),
 		    // Translators: popup dialog heading
-//		    `Heading (_("Domain name")),
+		    `Heading (_("Domain settings")),
 		    // Add a domain, Adding a domain? Edit...
 		    // Translators: text entry label
 		    `Left (`TextEntry (`id (`domain), _("&Domain name"), domain)),
@@ -880,10 +877,6 @@ the default domain will be lost.")))
 	any ui = nil;
 	while (true)
 	{
-	    boolean any_s = UI::QueryWidget (`id (`servers), `CurrentItem) != nil;
-	    UI::ChangeWidget (`id (`edit_s), `Enabled, any_s);
-	    UI::ChangeWidget (`id (`del_s), `Enabled, any_s);
-
 	    ui = UI::UserInput ();
 	    if (ui == `cancel)
 	    {
@@ -894,8 +887,14 @@ the default domain will be lost.")))
 		// Input validation
 		// all querywidgets done now for consistency
 		domain = UI::QueryWidget (`id (`domain), `Value);
-		// servers are kept up to date
+		servers_s = UI::QueryWidget (`id (`servers), `Value);
 		broadcast = UI::QueryWidget (`id (`local_broadcast), `Value);
+
+		servers = splitstring (servers_s, ", \n");
+		servers = filter (string s, servers, ``( s != "" ));
+		string bad_server = find (string s, servers, ``(
+					      !Nis::check_address_nis (s)
+					      ));
 
 		if (!Nis::check_nisdomainname (domain)) //also disallows ""
 		{
@@ -909,51 +908,18 @@ the default domain will be lost.")))
 		    // Translators: error message
 		    UI::ErrorPopup (_("This domain is already defined."));
 		}
+		else if (bad_server != nil)
+		{
+		    UI::SetFocus (`id (`servers));
+		    string msg = sformat (
+			// Translators: error message
+			_("Bad format of server address '%1'."), bad_server);
+		    UI::ErrorPopup (msg + "\n\n" + Nis::valid_address_nis ());
+		}
 		else
 		{
 		    // all checks OK, break the input loop
 		    break;
-		}
-	    }
-	    else if (ui == `add_s)
-	    {
-		string s = InputServer ("", servers);
-		if (s != nil)
-		{
-		    servers = add (servers, s);
-		    ServerBoxSet (servers);
-		    UI::ChangeWidget (`id (`servers), `CurrentItem, s);
-		}
-	    }
-	    else if (ui == `edit_s)
-	    {
-		string s0 = UI::QueryWidget (`id (`servers), `CurrentItem);
-		if (s0 != nil)
-		{
-		    string s = InputServer (s0, servers);
-		    if (s != nil)
-		    {
-			servers = maplist (string e, servers, ``(
-					       (e == s0)? s: e
-					       ));
-			ServerBoxSet (servers);
-			UI::ChangeWidget (`id (`servers), `CurrentItem, s);
-		    }
-		}
-	    }
-	    else if (ui == `del_s)
-	    {
-		string s0 = UI::QueryWidget (`id (`servers), `CurrentItem);
-		if (s0 != nil)
-		{
-		    // probably no confirmation.
-		    servers = filter (string e, servers, ``( e != s0 ));
-		    ServerBoxSet (servers);
-		    if (size (servers) > 0)
-		    {
-			s = servers[0]:"";
-			UI::ChangeWidget (`id (`servers), `CurrentItem, s);
-		    }
 		}
 	    }
 	}
@@ -1008,95 +974,6 @@ the default domain will be lost.")))
 			  DomainTableItems (default_d, all_servers));
 	UI::ChangeWidget (`id (`domains), `CurrentItem, d);
     }
-
-    /**
-     * Used for adding and editing a server
-     * @param init	initial value
-     * @param existing	current server list (excluding default?)
-     * @return a server or nil
-     */
-    global define string InputServer (string init, list(string) existing) ``{
-	Wizard::SetScreenShotName ("nis-client-2b11-server");
-	string server = init;
-
-	term contents =
-	    `HBox(
-		`HSpacing(1),
-		`VBox(
-		    `VSpacing(0.2),
-		    // Translators: popup dialog heading
-//		    `Heading (_("Server address")),
-		    // Translators: text entry label
-		    `Left (`TextEntry (`id (`server), _("&Server address"), server)),
-		    `VSpacing(0.2),
-		    `HBox(`PushButton(`id(`ok), `opt(`default), OKButtonLabel()),
-			  `PushButton(`id(`cancel), CancelButtonLabel())),
-		    `VSpacing(0.2)
-		    ),
-		`HSpacing(1)
-		);
-
-	UI::OpenDialog (`opt(`decorated), contents);
-	UI::SetFocus (`id (`server));
-
-	any ret = nil;
-	while (true)
-	{
-	    ret = UI::UserInput ();
-	    if (ret == `cancel)
-	    {
-		break;
-	    }
-	    else if (ret == `ok)
-	    {
-		// Input validation
-		server = UI::QueryWidget (`id (`server), `Value);
-
-		if (!Nis::check_address_nis (server))
-		{
-		    UI::SetFocus (`id (`server));
-		    UI::ErrorPopup (Nis::valid_address_nis ());
-		}
-		else if (contains (existing, server) && server != init)
-		{
-		    UI::SetFocus (`id (`server));
-		    // Translators: error message
-		    UI::ErrorPopup (_("This server is already specified."));
-		}
-		else
-		{
-		    // all checks OK, break the input loop
-		    break;
-		}
-	    }
-	}
-
-	UI::CloseDialog ();
-	Wizard::RestoreScreenShotName ();
-	return (ret == `ok)? server : nil;
-    }
-
-    /**
-     * Updates the server box when a domain has changed
-     * @param	servers	a server list
-     */
-    global define void ServerBoxSet (list(string) servers) ``{
-	UI::ReplaceWidget (`id (`r_servers), ServerBox (servers));
-    }
-
-    /**
-     * Constructs a whole SelectionBox
-     * because we cannot replace its items (#8826)
-     * @param	servers	a server list
-     * @return a SelectionBox
-     */
-    global define term ServerBox (list(string) servers) ``{
-	return `SelectionBox (
-	    `id (`servers), `opt (`notify/*, `shrinkable*/),
-	    _("&Servers"),
-	    servers);
-    }
-
 
     /**
      * Confirmation dialog
