@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jan 28 17:39:40 EST 2002 - nashif@suse.de
+
+- Adapted for automatic installation (2.5.12)
+
+-------------------------------------------------------------------
 Thu Jan 17 09:54:11 CET 2002 - mvidner@suse.cz
 
 - Fixed saving a new yp.conf (2.5.11)
