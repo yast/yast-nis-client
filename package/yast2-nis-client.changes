@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Aug 30 18:50:01 CEST 2004 - jsuchome@suse.cz
+
+- only enabling is possible during installation (#44476)
+
+-------------------------------------------------------------------
 Mon Aug 23 12:58:51 CEST 2004 - jsuchome@suse.cz
 
 - cmdline: always save status on 'enable' command,

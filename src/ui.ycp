@@ -189,6 +189,7 @@ Change the DHCP server configuration to provide it.
      * @return	`back, `abort, `next, `multiple or `expert
      */
     define symbol MainDialog () ``{
+
 	Wizard::SetScreenShotName ("nis-client-2a-single");
 
 	// help text
@@ -313,9 +314,13 @@ either locally or over NIS.</p>");
 	    // dialog title
 	    _("Configuration of NIS client"), con, help_text,
 	    Label::BackButton (), Mode::cont? Label::NextButton():Label::FinishButton ());
-	// sh: We don't use "Abort Installation" any more. Stick with the normal "Abort" button.
-	// if (Mode::cont)
-	//     Wizard::SetAbortButton(`abort, Label::AbortInstallationButton() );
+
+	// during installation, only enabling makes sence
+	if (Mode::cont)
+	{
+		UI::ChangeWidget (`id (`nisno), `Enabled, false);
+	}
+
 
 	UI::ChangeWidget (`id (`autofs), `Enabled, Nis::_autofs_allowed);
 
@@ -368,7 +373,7 @@ either locally or over NIS.</p>");
 	    else if (contains ([`next, `expert], result))
 	    {
 		yp_client = ((symbol) UI::QueryWidget (`id (`rd), `CurrentButton) != `nisno);
-		
+
 		// Using NIS and LDAP simultaneously is not supported (#36981).
 		if (yp_client && !Nis::start && Nis::UsersByLdap ())
 		{
@@ -487,10 +492,6 @@ Are you sure?")))
 	    _("Expert settings"), contents, help_text,
 	    Label::BackButton (), Label::OKButton ());
 
-	// sh: We don't use "Abort Installation" any more. Stick with the normal "Abort" button.
-	// if (Mode::cont)
-	//     Wizard::SetAbortButton(`abort, Label::AbortInstallationButton() );
-
 	any result = nil;
 	repeat
 	{
@@ -506,13 +507,6 @@ Are you sure?")))
 		broken_server = (boolean) UI::QueryWidget (`id (`broken_server), `Value);
 		// TODO: disallow " in options
 		options = (string) UI::QueryWidget (`id (`options), `Value);
-
-/*		if (false && some_error)
-		{
-		    // error popup label
-		    Popup::Message (_("The domain name is not correct."));
-		    result = nil;
-		}*/
 	    }
 	}
 	until (result == `back || result == `next ||
