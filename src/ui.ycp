@@ -150,7 +150,7 @@ client was saved."));
      * It is read-only now anyway.
      */
     global define void FitIntoSingle () ``{
-	if (Nis::servers_by_dhcp_actual && Nis::domain_by_dhcp_actual)
+	if (Nis::ServersByDhcpActual () && Nis::DomainByDhcpActual ())
 	{
 	    string d = Nis::GetDomain ();
 	    if (size (Nis::multidomain_servers) == 1)
@@ -330,7 +330,7 @@ This can be turned off in the Expert dialog.");
      * @return	`back, `abort, `next, `multiple or `expert
      */
     global define symbol NisDialog () ``{
-	if (Nis::domain_by_dhcp_actual || Nis::servers_by_dhcp_actual)
+	if (Nis::DomainByDhcpActual () || Nis::ServersByDhcpActual ())
 	{
 	    DhcpPopup ();
 	}
@@ -396,11 +396,11 @@ by separating their addresses with spaces.</p>
 	    _("Configuration of NIS client"), con, help_text,
 	    BackButtonLabel (), FinishButtonLabel ());
 
-	if (Nis::domain_by_dhcp_actual)
+	if (Nis::DomainByDhcpActual ())
 	{
 	    UI::ChangeWidget (`id (`ypd), `Enabled, false);
 	}
-	if (Nis::servers_by_dhcp_actual)
+	if (Nis::ServersByDhcpActual ())
 	{
 	    UI::ChangeWidget (`id (`ypa), `Enabled, false);
 	    UI::ChangeWidget (`id (`broadcast), `Enabled, false);
@@ -583,7 +583,7 @@ by separating their addresses with spaces.</p>
      * @return	`back, `abort or `next
      */
     global define symbol MultipleDialog () ``{
-	if (Nis::domain_by_dhcp_actual || Nis::servers_by_dhcp_actual)
+	if (Nis::DomainByDhcpActual () || Nis::ServersByDhcpActual ())
 	{
 	    DhcpPopup ();
 	}
@@ -703,11 +703,11 @@ This check box only appears if it is turned on.</p>
 	    BackButtonLabel (), FinishButtonLabel ());
 
 	//UI::ChangeWidget (`id (`domains), `CurrentItem, current_d);
-	if (Nis::domain_by_dhcp_actual)
+	if (Nis::DomainByDhcpActual ())
 	{
 	    UI::ChangeWidget (`id (`domain), `Enabled, false);
 	}
-	if (Nis::servers_by_dhcp_actual)
+	if (Nis::ServersByDhcpActual ())
 	{
 	    UI::ChangeWidget (`id (`multiple), `Enabled, false);
 	    UI::ChangeWidget (`id (`single), `Enabled, false);

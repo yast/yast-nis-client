@@ -122,11 +122,28 @@
     /**
      * Is yp.conf currently served by DHCP and thus disabled in the UI
      */
-    global boolean servers_by_dhcp_actual = false;
+    boolean servers_by_dhcp_actual = false;
     /**
      * Is domain currently served by DHCP and thus disabled in the UI
      */
-    global boolean domain_by_dhcp_actual = false;
+    boolean domain_by_dhcp_actual = false;
+    /**
+     * In autoinst mode, the _actual variables are overriden by their
+     * _wanted counterparts
+     */
+    boolean auto_mode = false;
+    /**
+     * Is yp.conf currently served by DHCP and thus disabled in the UI
+     */
+    global define boolean ServersByDhcpActual () ``{
+	return auto_mode? servers_by_dhcp_actual : servers_by_dhcp_wanted;
+    }
+    /**
+     * Is domain currently served by DHCP and thus disabled in the UI
+     */
+    global define boolean DomainByDhcpActual () ``{
+	return auto_mode? domain_by_dhcp_actual : domain_by_dhcp_wanted;
+    }
     /**
      * If *_by_dhcp_wanted changes, we need to restart the DHCP client
      */
@@ -321,9 +338,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 
 	domain_by_dhcp_wanted = settings["nis_domain_by_dhcp"]:false;
 	servers_by_dhcp_wanted = settings["nis_servers_by_dhcp"]:false;
-	// if they want it, assume the dhcp server will provide it
-	domain_by_dhcp_actual = domain_by_dhcp_wanted;
-	servers_by_dhcp_actual = servers_by_dhcp_wanted;
+	auto_mode = true;
 	// we don't know what the state will be before Write, so restart it
 	dhcp_restart = true;
 
@@ -717,7 +732,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    Runlevel::ServiceAdjust ("portmap", "enable");
 	    Runlevel::ServiceAdjust ("ypbind", "enable");
 
-	    if (!domain_by_dhcp_actual)
+	    if (!DomainByDhcpActual ())
 	    {
 		if (!SCR::Write (.etc.defaultdomain, domain))
 		{
@@ -727,7 +742,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		    return false;
 		}
 	    }
-	    if (!servers_by_dhcp_actual)
+	    if (!ServersByDhcpActual ())
 	    {
 		SCR::Write (.etc.yp_conf.servers, servers);
 		SCR::Write (.etc.yp_conf.defaultbroadcast, default_broadcast);
