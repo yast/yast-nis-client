@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Aug 26 16:13:49 CEST 2002 - mvidner@suse.cz
+
+- Adapted for the new packagemanager.
+- 2.6.14
+
+-------------------------------------------------------------------
 Thu Aug 22 13:23:34 CEST 2002 - mvidner@suse.cz
 
 - Use not only /etc/defaultdomain but also `ypdomainname`,
