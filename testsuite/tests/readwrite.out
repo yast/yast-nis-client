@@ -9,7 +9,6 @@ Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
 Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
 Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
 Read	.sysconfig.ypbind.YPBIND_OPTIONS ""
-Read	.targetpkg.installed "autofs" true
 Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Return	true
