@@ -29,24 +29,15 @@ Summary:	Configuration of NIS client
 %defattr(-,root,root)
 %dir @yncludedir@/nis
 @yncludedir@/nis/ui.ycp
-%dir @clientdir@
 @clientdir@/nis.ycp
 @clientdir@/nis-client.ycp
 @clientdir@/nis_auto.ycp
-%dir @moduledir@
 @moduledir@/Nis.*
-%dir @configdir@
-@configdir@/nis.y2cc
-%dir @desktopdir@
 @desktopdir@/nis.desktop
-%dir @agentdir@
 @agentdir@/ag_yp_conf
-%dir @plugindir@
 @plugindir@/libpy2ag_ypserv.so.*
-#devel
 @plugindir@/libpy2ag_ypserv.so
 @plugindir@/libpy2ag_ypserv.la
-%dir @scrconfdir@
 @scrconfdir@/cfg_ypbind.scr
 @scrconfdir@/yp_conf.scr
 @scrconfdir@/ypserv.scr
