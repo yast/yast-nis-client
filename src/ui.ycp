@@ -119,17 +119,20 @@
 		{
 		    if (Nis::DomainChanged ())
 		    {
+			// waring popup
 			UI::WarningPopup (_("The domain has changed.
 You must reboot for the changes to take effect."));
 		    }
 		    else
 		    {
+			// message popup
 			UI::MessagePopup(_("The configuration of the NIS client
 was saved and can be used."));
 		    }
 		}
 		else
 		{
+		    // message popup
 		    UI::MessagePopup(_("The configuration of the NIS
 client was saved."));
 		}
@@ -330,7 +333,9 @@ by separating their addresses with spaces.</p>
 			   `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Br&oadcast"), default_broadcast)),
 			   `VSpacing (0.2),
 			   `HBox (
+			       // button label
 			       `PushButton (`id (`expert), _("D&etails ...")),
+			       // button label
 			       `PushButton (`id (`multiple), _("&Multiple domains >>"))
 			       ),
 			   `VSpacing (0.2)
@@ -532,18 +537,28 @@ This check box therefore only appears if it is turned on.</p>
 	// build the dialog contents
 	term multiple =
 	    `Frame (
+		// frame label
 		`id (`multiple), _("Multiple domains"),
 		`VBox (
 		    `VSpacing (0.2),
 		    `Table (
 			`id (`domains),
 			`opt (`notify, `immediate),
-			`header (_("Domain"), `Center (_("Broadcast")), _("Servers")),
+			`header (
+			    // table header
+			    _("Domain"),
+			    // table header
+			    `Center (_("Broadcast")),
+			    // table header
+			    _("Servers")),
 			DomainTableItems (default_d, all_servers)
 			),
 		    `HBox (
+			// button label
 			`PushButton (`id (`add_d), _("&Add")),
+			// button label
 			`PushButton (`id (`edit_d), _("E&dit")),
+			// button label
 			`PushButton (`id (`del_d), _("De&lete"))
 			),
 		    `VSpacing (0.2)
@@ -562,15 +577,17 @@ This check box therefore only appears if it is turned on.</p>
 
 	term nis_vbox =
 	    `VBox (`VSpacing (0.2),
-		   // text entry label
 		   `TextEntry (`id (`domain), `opt (`notify),
+		   // text entry label
 			       _("Default NIS do&main"), default_d),
 		   `VSpacing (0.5),
 		   `Left (global_broadcast_t),
 		   multiple,
 		   `VSpacing (0.2),
 		   `HBox (
+		       // button label
 		       `PushButton (`id (`expert), _("D&etails ...")),
+		       // button label
 		       `PushButton (`id (`single), _("&Single domain <<"))
 		       ),
 		   `VSpacing (0.2)
@@ -584,8 +601,9 @@ This check box therefore only appears if it is turned on.</p>
 
 	Wizard::SetContentsButtons (
 	    sformat ("%1 - %2",
-	    // dialog title
+		     // dialog title
 		     _("Configuration of NIS client"),
+		     // dialog subtitle
 		     _("Multiple domains")), contents, help_text,
 	    BackButtonLabel (), FinishButtonLabel ());
 
@@ -818,10 +836,14 @@ the default domain will be lost.")))
 	    `VBox (
 		`ReplacePoint (`id (`r_servers), ServerBox (servers)),
 		`CheckBox (`id (`local_broadcast),
+			   // checkbox label
 			   _("&Broadcast"), broadcast),
 		`HBox (
+		    // button label
 		    `PushButton (`id (`add_s), _("&Add")),
+		    // button label
 		    `PushButton (`id (`edit_s), _("&Edit")),
+		    // button label
 		    //&Delete could be activated if the user wanted &Domain
 		    `PushButton (`id (`del_s), _("De&lete"))
 		    )
@@ -1077,6 +1099,7 @@ the default domain will be lost.")))
      */
     global define symbol SaveDialog () ``{
 	Wizard::SetScreenShotName ("nis-client-3-save");
+	// continue-cancel popup
 	string message1 = _("The configuration of the NIS client will be saved.\n");
 	string message2 = Nis::ProbePackages ();
 	boolean ret = UI::ContinueCancelPopup (message1 + message2);

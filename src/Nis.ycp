@@ -198,6 +198,7 @@ and it must be at most 64 characters long.
 	y2debug ("hosts_by_nis %1", hosts_by_nis);
 	if (hosts_by_nis)
 	{
+	    // message popup
 	    return _("Only an IP address can be used
 because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	}
@@ -392,23 +393,36 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	// too complicated to write by hand?
 	string summary = "";
 	string nc = Summary::NotConfigured ();
+	// summary header
 	summary = Summary::AddHeader(summary, _("NIS Client enabled"));
+	// summary item: an option is turned on
 	summary = Summary::AddLine(summary, (start) ? _("Yes") : nc);
+	// summary header
 	summary = Summary::AddHeader(summary, _("NIS Domain"));
 	summary = Summary::AddLine(summary, (domain != "") ? domain : nc);
+	// summary header
 	summary = Summary::AddHeader(summary, _("NIS Servers"));
 	summary = Summary::AddLine(summary,(servers !=[]) ? mergestring(servers,"<br>") : nc);
+	// summary header
 	summary = Summary::AddHeader(summary, _("Broadcast"));
+	// summary item: an option is turned on
 	summary = Summary::AddLine(summary, (default_broadcast) ? _("Yes") : nc);
 	// TODO: a full list
 	summary = summary + ListItem (_("Other domains"), multidomain_servers);
+	// summary header
 	summary = Summary::AddHeader(summary, _("Answer to local host only"));
+	// summary item: an option is turned on
 	summary = Summary::AddLine(summary, (local_only) ? _("Yes") : nc);
+	// summary header
 	summary = Summary::AddHeader(summary, _("Broken server"));
+	// summary item: an option is turned on
 	summary = Summary::AddLine(summary, (broken_server) ? _("Yes") : nc);
+	// summary header
 	summary = Summary::AddHeader(summary, _("ypbind options"));
 	summary = Summary::AddLine(summary, (options!="") ? options : nc);
+	// summary header
 	summary = Summary::AddHeader(summary, _("Automounter enabled"));
+	// summary item: an option is turned on
 	summary = Summary::AddLine(summary, (_start_autofs) ? _("Yes") : nc);
 
 	return summary;
@@ -495,6 +509,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 
 	    if (!SCR::Write (.etc.defaultdomain, domain))
 	    {
+		// error popup
 		Report::Error (sformat (_("Error writing file %1."), "/etc/defaultdomain"));
 		return false;
 	    }
@@ -504,6 +519,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    SCR::Write (.etc.yp_conf.broadcast, multidomain_broadcast);
 	    if (! SCR::Write (.etc.yp_conf, nil))
 	    {
+		// error popup
 		Report::Error (sformat (_("Error writing file %1."), "/etc/yp.conf"));
 		return false;
 	    }
@@ -513,6 +529,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    SCR::Write (.sysconfig.ypbind.YPBIND_OPTIONS, options);
 	    if (! SCR::Write (.sysconfig.ypbind, nil))
 	    {
+		// error popup
 		Report::Error (sformat (_("Error writing file %1."), "/etc/sysconfig/ypbind"));
 		return false;
 	    }
@@ -550,6 +567,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 		}
 		if (!ok)
 		{
+		// error popup
 		    Report::Error (sformat (_("Error writing file %1."), "/etc/nsswitch.conf"));
 		    return false;
 		}
@@ -675,6 +693,7 @@ because host names are resolved using NIS.\n\n") + valid_ip4 ();
 	    // TODO: backup?
 	    if (SCR::Execute (.target.bash, sformat ("/bin/echo '%1' >> %2", what, file)) != 0)
 	    {
+		// error popup
 		Report::Error (sformat (_("Error writing file %1."), file));
 		return false;
 	    }

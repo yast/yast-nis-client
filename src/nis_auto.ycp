@@ -64,12 +64,15 @@
 		  `RichText( `id(`summary), Nis::Summary()),
 		  `VSpacing(),
 		  `HBox(
+		      // button label
 			`PushButton(`id(`configure), _("&Configure NIS")),
 			`HStretch(),
+		      // button label
 			`PushButton(`id(`reset), _("&Reset Configuration"))
 			),
 		  `VSpacing()
 		  );
+	// dialog heading
 	Wizard::SetContents(_("NIS Configuration"),
 			    contents, "", true, true);
     }
