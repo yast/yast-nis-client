@@ -51,7 +51,7 @@
 
     if (result == `next)
     {
-	if (Nis::Write (false))
+	if (Nis::Write ())
 	{
 	    if (Nis::start)
 	    {
