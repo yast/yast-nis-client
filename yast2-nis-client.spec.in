@@ -30,12 +30,17 @@ Summary:	Configuration of NIS client
 %defattr(-,root,root)
 %dir @yncludedir@/nis
 @yncludedir@/nis/ui.ycp
+%dir @clientdir@
 @clientdir@/nis.ycp
 @clientdir@/nis_auto.ycp
 @clientdir@/nis_write.ycp
+%dir @moduledir@
 @moduledir@/Nis.ycp
+%dir @configdir@
 @configdir@/nis.y2cc
+%dir @agentdir@
 @agentdir@/ag_yp_conf
+%dir @scrconfdir@
 @scrconfdir@/cfg_ypbind.scr
 @scrconfdir@/yp_conf.scr
 %doc @docdir@
