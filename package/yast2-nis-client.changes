@@ -1,3 +1,11 @@
+-------------------------------------------------------------------
+Thu Jun 27 16:37:50 CEST 2002 - kkaempf@suse.de
+
+- Renamed to "yast2-nis-client".
+
+-------------------------------------------------------------------
+Thu Jun 27 16:37:24 CEST 2002 - mvidner@suse.cz
+
 - Added broadcast option of ypbind-1.12.
 - Adapted to changed any-agent interface.
 
