@@ -353,12 +353,11 @@ by separating their addresses with spaces.</p>
 		yp_address = UI::QueryWidget (`id (`ypa), `Value);
 		default_broadcast = UI::QueryWidget (`id (`broadcast), `Value);
 
-		//TODO check_nisdomainname
-		// Sun is permissive
-		if (!check_domainname (yp_domain))
+		if (!Nis::check_nisdomainname (yp_domain))
 		{
 		    // error popup label
-		    UI::MessagePopup (_("The domain name is not correct."));
+		    UI::SetFocus (`id (`ypd));
+		    UI::ErrorPopup (Nis::valid_nisdomainname ());
 		    result = nil;
 		    continue;
 		}
@@ -693,10 +692,10 @@ for the default domain?")))
 		// Input validation
 		default_d = UI::QueryWidget (`id (`domain), `Value);
 
-		if (!check_nisdomainname (default_d))
+		if (!Nis::check_nisdomainname (default_d))
 		{
 		    UI::SetFocus (`id (`domain));
-		    UI::ErrorPopup (valid_nisdomainname ());
+		    UI::ErrorPopup (Nis::valid_nisdomainname ());
 		}
 		else
 		{
@@ -850,10 +849,10 @@ the default domain will be lost.")))
 		// servers are kept up to date
 		broadcast = UI::QueryWidget (`id (`local_broadcast), `Value);
 
-		if (!check_nisdomainname (domain)) //also disallows ""
+		if (!Nis::check_nisdomainname (domain)) //also disallows ""
 		{
 		    UI::SetFocus (`id (`domain));
-		    UI::ErrorPopup (valid_nisdomainname ());
+		    UI::ErrorPopup (Nis::valid_nisdomainname ());
 		}
 		else if (init != "" && domain != init &&
 			 contains (existing, domain))
@@ -913,28 +912,6 @@ the default domain will be lost.")))
 
 	UI::CloseDialog ();
 	return (ui == `ok)? [domain, [servers, broadcast]] : nil;
-    }
-
-    /**
-     * Check syntax of a NIS domain name
-     * @param domain	a domain name
-     * @return		true if correct
-     */
-    global define boolean check_nisdomainname (string domain) ``{
-	// TODO
-	// disallow whitespace and special characters...
-	return domain != "" && domain != "(none)" && size (domain) <= 64;
-    }
-
-    /**
-     * @return describe a valid NIS domain name
-     */
-    global define string valid_nisdomainname () ``{
-	// Translators: do not translate (none)!
-	return _(
-"A NIS domain name must not be empty,
-it must not be \"(none)\"
-and it must be at most 64 characters long.");
     }
 
     /**
