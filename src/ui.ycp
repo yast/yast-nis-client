@@ -222,6 +222,8 @@ either locally or over NIS.</p>");
 	boolean default_broadcast =
 	    Nis::default_broadcast || Nis::global_broadcast;
 
+	// the default is the current status
+	// or true in case we were called during the installation
 	boolean yp_client = Mode::cont || Nis::start; // #23733
 	boolean autofs = Nis::_start_autofs;
 
@@ -399,6 +401,9 @@ either locally or over NIS.</p>");
 
 	if (contains ([`next, `expert], result))
 	{
+	    Nis::Touch (Nis::start != yp_client);
+	    Nis::start = yp_client;
+
 	    Nis::dhcp_restart = Nis::dhcp_restart ||
 		(Nis::dhcp_wanted != dhcp_wanted);
 	    Nis::Touch (Nis::dhcp_restart);
