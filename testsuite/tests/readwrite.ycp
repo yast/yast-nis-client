@@ -78,7 +78,9 @@
 		"YPBIND_BROKEN_SERVER": "no",
 		"YPBIND_OPTIONS": "",
 		],
-	    "dhcp": dhcp_no,
+	    "network": $[
+		"dhcp": dhcp_no,
+		],
 	    ],
 	];
 
@@ -102,7 +104,7 @@
     TEST (``(Nis::Write ()), [READ, WRITE, EXECUTE], nil);
 
     DUMP ("DHCP on");
-    READ["sysconfig", "dhcp"] = dhcp_yes;
+    READ["sysconfig", "network", "dhcp"] = dhcp_yes;
     TEST (``(Nis::Read ()), [READ, WRITE, EXECUTE], nil);
     TEST (``(Nis::Write ()), [READ, WRITE, EXECUTE], nil);
 }

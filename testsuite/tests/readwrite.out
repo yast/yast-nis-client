@@ -6,8 +6,8 @@ Read	.etc.yp_conf.defaultbroadcast false
 Read	.etc.yp_conf.domainservers $["otherdomain":["1.2.3.4"]]
 Read	.etc.yp_conf.broadcast $["otherdomain":true]
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Read	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "no"
-Read	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "no"
+Read	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "no"
+Read	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "no"
 Execute	.target.bash "test -f /var/run/dhcpcd-*.pid" 0
 Execute	.target.bash "/bin/grep -qs '^NISSERVERS' /var/lib/dhcpcd/dhcpcd-*.info" 0
 Execute	.target.bash "/bin/grep -qs '^NISDOMAIN' /var/lib/dhcpcd/dhcpcd-*.info" 0
@@ -39,9 +39,9 @@ Write	.sysconfig.ypbind.YPBIND_BROADCAST "no" true
 Write	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no" true
 Write	.sysconfig.ypbind.YPBIND_OPTIONS "" true
 Write	.sysconfig.ypbind nil true
-Write	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "no" true
-Write	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "no" true
-Write	.sysconfig.dhcp nil true
+Write	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "no" true
+Write	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "no" true
+Write	.sysconfig.network.dhcp nil true
 Read	.etc.nsswitch_conf."passwd" "compat"
 Write	.etc.nsswitch_conf."passwd_compat" nil true
 Read	.etc.nsswitch_conf."group" "compat"
@@ -79,8 +79,8 @@ Read	.etc.yp_conf.defaultbroadcast false
 Read	.etc.yp_conf.domainservers $["otherdomain":["1.2.3.4"]]
 Read	.etc.yp_conf.broadcast $["otherdomain":true]
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Read	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes"
-Read	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "yes"
+Read	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes"
+Read	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "yes"
 Execute	.target.bash "test -f /var/run/dhcpcd-*.pid" 0
 Execute	.target.bash "/bin/grep -qs '^NISSERVERS' /var/lib/dhcpcd/dhcpcd-*.info" 0
 Execute	.target.bash "/bin/grep -qs '^NISDOMAIN' /var/lib/dhcpcd/dhcpcd-*.info" 0
@@ -105,9 +105,9 @@ Write	.sysconfig.ypbind.YPBIND_BROADCAST "no" true
 Write	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no" true
 Write	.sysconfig.ypbind.YPBIND_OPTIONS "" true
 Write	.sysconfig.ypbind nil true
-Write	.sysconfig.dhcp.DHCLIENT_SET_DOMAINNAME "yes" true
-Write	.sysconfig.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes" true
-Write	.sysconfig.dhcp nil true
+Write	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "yes" true
+Write	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes" true
+Write	.sysconfig.network.dhcp nil true
 Read	.etc.nsswitch_conf."passwd" "compat"
 Write	.etc.nsswitch_conf."passwd_compat" nil true
 Read	.etc.nsswitch_conf."group" "compat"
