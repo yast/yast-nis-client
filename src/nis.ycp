@@ -107,7 +107,7 @@ by separating their addresses with spaces.</p>
 	}
 
 	if (result == `next && yp_client) {
-	    yp_domain = tolower(UI::QueryWidget(`id(`ypd), `Value));
+	    yp_domain =  UI::QueryWidget(`id(`ypd), `Value);
 	    yp_address = UI::QueryWidget(`id(`ypa), `Value);
 
 	    if (!check_domainname (yp_domain)) {
