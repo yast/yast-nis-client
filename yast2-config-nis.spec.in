@@ -42,7 +42,7 @@ Group:		System Environment/YaST
 @YAST2DIR@/clients/nis_write.ycp
 @YAST2DIR@/modules/Nis.ycp
 @YAST2DIR@/menuentries/menuentry_nis.y2cc
-@YAST2DIR@/menuentries/menuentry_nis.ycp
+@YAST2DIR@/menuentries/menuentry_nis.y2cc
 
 %files devel
 %defattr(-,root,root)
