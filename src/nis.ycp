@@ -10,6 +10,7 @@
  *
  * Authors:
  *   Dan Vesely <dan@suse.cz>
+ *   Martin Vidner <mvidner@suse.cz>
  *
  * $Id$
  *
@@ -25,10 +26,18 @@
 {
     textdomain "nis";
 
+    include "require.ycp";
     include "ui/wizard_dialog.ycp";
     include "ui/common_popups.ycp";
 
     include "network/dns.ycp";
+
+    if (!RequireAndConflict (["ypbind"], [], 
+_("<p>To access the Network Information Services, the <b>%1</b> package must be installed.</p>
+<p>Do you wish to install it now?</p>")))
+    {
+	return;
+    }
 
     UI (`CreateWizardDialog ());
     UI (`ReplaceWizardAbortButton(`Empty (`id (`empty))));
@@ -55,6 +64,7 @@ by separating their addresses by spaces.</p>"));
 
     boolean yp_client = (tolower(SCR(`Read (.rc.system.START_YPBIND))) == "yes");
     string yp_domain  = SCR(`Read (.rc.system.YP_DOMAINNAME));
+    string old_yp_domain = yp_domain;
     string yp_address = SCR(`Read (.rc.system.YP_SERVER));
     
 // frame label
@@ -117,16 +127,27 @@ by separating their addresses by spaces.</p>"));
         
     } while (result != `back && result != `next);
     
-    if (result == `next && 
-        CallFunction(`nis_write($[ "start_yp" : yp_client,
-                                            "yp_domain" : yp_domain,
-                                            "yp_address" : yp_address ]))) {
-        if (yp_client)
-            UI(`MessagePopup(_("The configuration of the NIS client
+    if (result == `next)
+    {
+	boolean yp_domain_changed = yp_domain != old_yp_domain && old_yp_domain != "";
+        if (CallFunction(`nis_write($[ "start_yp" : yp_client,
+				       "yp_domain" : yp_domain,
+				       "yp_domain_changed": yp_domain_changed,
+				       "yp_address" : yp_address ])))
+	{
+	    if (yp_client)
+	    {
+		if (yp_domain_changed)
+		    UI (`WarningPopup (_("The domain has changed.
+You must reboot for the changes to take effect.")));
+		else
+		    UI(`MessagePopup(_("The configuration of the NIS client
 was saved and can be used.")));
-        else
-            UI(`MessagePopup(_("The configuration of the NIS
+	    }
+	    else
+		UI(`MessagePopup(_("The configuration of the NIS
 client was saved.")));
+	}
     }
     
     return UI(`CloseDialog());
