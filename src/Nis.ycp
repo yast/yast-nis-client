@@ -51,6 +51,24 @@
 	servers = filter (`s, splitstring (servers_s, " \t"), ``(s != ""));
     }
 
+    /**
+     * Servers for a multiple-domain configuration.
+     * Keys are domains, values are lists of servers (strings).
+     * The domains must be the same as for multidomain_broadcast
+     * @see multidomain_broadcast
+     */
+    global map multidomain_servers = $[];
+
+    /**
+     * Servers for a multiple-domain configuration.
+     * Whether a broadcast will be done if the servers don't respond.
+     * Keys are domains, values are booleans.
+     * The domains must be the same as for multidomain_servers
+     * @see multidomain_servers
+     * @see broadcast
+     */
+    global map multidomain_broadcast = $[];
+
     string domain = "";
     string old_domain = nil;
     boolean domain_changed = false;
@@ -97,6 +115,7 @@
      * If this option is set, ypbind will ignore /etc/yp.conf and use
      * a broadcast call to find a NIS server in the local subnet. You
      * should avoid to use this, it is a big security risk.
+     * @see multidomain_broadcast
      */
     global boolean broadcast = false;
 
@@ -160,6 +179,8 @@
 	servers = lookup (settings, "nis_servers", []);
 	domain = lookup (settings, "nis_domain", "");
 	old_domain = domain;
+	multidomain_servers = lookup (settings, "multidomain_servers", $[]);
+	multidomain_broadcast = lookup (settings, "multidomain_broadcast", $[]);
 	local_only = lookup (settings, "nis.local_only", false);
 	broadcast = lookup (settings, "nis.broadcast", false);
 	broken_server = lookup (settings, "nis.broken_server", false);
@@ -169,6 +190,8 @@
 	_start_autofs = lookup (settings, "start_autofs", false);
     }
 
+    // TODO update the map keys
+    // better still: link to a current interface description
     /**
      * Get all the NIS configuration from a map.
      * When called by nis_auto (preparing autoinstallation data)
@@ -202,6 +225,8 @@
 	return true;
     }
 
+    // TODO update the map keys
+    // better still: link to a current interface description
     /**
      * Dump the NIS settings to a map, for autoinstallation use.
      * @return $["start":, "servers":[...], "domain":]
@@ -211,6 +236,8 @@
 			"start_nis": start,
 			"nis_servers": servers,
 			"nis_domain": domain,
+			"multidomain_servers": multidomain_servers,
+			"multidomain_broadcast": multidomain_broadcast,
 			"nis.local_only": local_only,
 			"nis.broadcast": broadcast,
 			"nis.broken_server": broken_server,
@@ -223,6 +250,9 @@
      * @return Html formatted configuration summary
      */
     global define string Summary () ``{
+	// TODO multidomain_servers, multidomain_broadcast
+	// OK, a dumb mapping is possible, but wouldn't it be
+	// too complicated to write by hand?
 	string summary = "";
 	string nc = Summary::NotConfigured ();
 	summary = Summary::AddHeader(summary, _("NIS Client enabled"));
@@ -239,7 +269,7 @@
 	summary = Summary::AddLine(summary, (broadcast) ? _("Yes") : nc);
 	summary = Summary::AddHeader(summary, _("Broken server"));
 	summary = Summary::AddLine(summary, (broken_server) ? _("Yes") : nc);
-	summary = Summary::AddHeader(summary, _("ybind options"));
+	summary = Summary::AddHeader(summary, _("ypbind options"));
 	summary = Summary::AddLine(summary, (options!="") ? options : nc);
 
 	return summary;
@@ -253,7 +283,10 @@
     global define boolean Read () ``{
 	start = Runlevel::ServiceEnabled ("ypbind");
 	servers = SCR::Read (.etc.yp_conf.servers);
+	multidomain_servers = SCR::Read (.etc.yp_conf.domainservers);
+	multidomain_broadcast = SCR::Read (.etc.yp_conf.broadcast);
 	domain  = SCR::Read (.etc.defaultdomain);
+	//TODO: ypdomainname (dhcpcd does not use defaultdomain)
 	old_domain = domain;
 	local_only = SCR::Read (.sysconfig.ypbind.YPBIND_LOCAL_ONLY) == "yes";
 	broadcast = SCR::Read (.sysconfig.ypbind.YPBIND_BROADCAST) == "yes";
@@ -283,6 +316,8 @@
 		return false;
 	    }
 	    SCR::Write (.etc.yp_conf.servers, servers);
+	    SCR::Write (.etc.yp_conf.domainservers, multidomain_servers);
+	    SCR::Write (.etc.yp_conf.broadcast, multidomain_broadcast);
 	    if (! SCR::Write (.etc.yp_conf, nil))
 	    {
 		Report::Error (sformat (_("Error writing file %1."), "/etc/yp.conf"));
