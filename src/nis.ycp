@@ -23,7 +23,7 @@
  */
 
 {
-    textdomain "lan";
+    textdomain "nis";
 
     include "ui/wizard_dialog.ycp";
     include "ui/common_popups.ycp";

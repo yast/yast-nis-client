@@ -25,7 +25,7 @@
 
 {
 
-    textdomain "lan";
+    textdomain "nis";
 
   map yp_conf = Args(0);
 
