@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Dec 15 15:48:09 CET 2003 - mvidner@suse.cz
+
+- Made compilable by the new interpreter (jhumpol)
+- Added yast2-pam to neededforbuild (jsuchome)
+- 2.9.2
+
+-------------------------------------------------------------------
 Tue Oct 14 13:49:23 CEST 2003 - mvidner@suse.cz
 
 - Got a more reliable way of finding NIS servers,
