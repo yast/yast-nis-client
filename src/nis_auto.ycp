@@ -54,6 +54,7 @@ else if (func == "Export") {
 }
 else if (func == "Packages") {
 	ret = Nis::required_packages;
+y2internal ("ret: %1", ret);
 }
 else if (func == "Write") {
     import "Progress";
