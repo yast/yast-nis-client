@@ -1,5 +1,5 @@
 @HEADER-COMMENT@
-# neededforbuild yast2-devel-packages yast2-network yast2-packager yast2-pam
+# neededforbuild gpp libgpp yast2-devel-packages yast2-network yast2-packager yast2-pam
 
 @HEADER@
 Requires:	yast2 yast2-network yast2-packager yast2-pam
