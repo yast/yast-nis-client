@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep  1 17:25:31 CEST 2003 - jsuchome@suse.de
+
+- patched .descktop file
+
+-------------------------------------------------------------------
 Fri Aug 22 02:42:02 CEST 2003 - nashif@suse.de
 
 - Add variable for required packages and return them in auto client
