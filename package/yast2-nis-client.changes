@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jul 29 17:22:13 CEST 2003 - mvidner@suse.cz
+
+- Cancel in the server selection popup now works.
+- Added screenshot mode: "/sbin/yast2 nis screenshots"
+- 2.8.2
+
+-------------------------------------------------------------------
 Thu Jul 10 11:07:33 CEST 2003 - jsuchome@suse.de
 
 - added ShortSummary()
