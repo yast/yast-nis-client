@@ -966,12 +966,14 @@ the default domain will be lost.")))
 	    boolean default_broadcast = nil;
 	    map multidomain_servers = nil;
 	    map multidomain_broadcast = nil;
+	    map slpdomain = nil;
 	    if (result == `single)
 	    {
 		//TODO default_broadcast
 		default_broadcast = false;
 		multidomain_servers = $[];
 		multidomain_broadcast = $[];
+		slpdomain = $[];
 	    }
 	    else
 	    {
@@ -988,6 +990,8 @@ the default domain will be lost.")))
 	    Nis::servers = servers;
 	    Nis::Touch (Nis::default_broadcast != default_broadcast);
 	    Nis::default_broadcast = default_broadcast;
+	    Nis::Touch (Nis::slp_domain != slpdomain);
+	    Nis::slp_domain = slpdomain;
 	    Nis::Touch (false); //TODO need to know earlier for abort?
 	    Nis::multidomain_servers = multidomain_servers;
 	    Nis::Touch (false); //TODO need to know earlier for abort?

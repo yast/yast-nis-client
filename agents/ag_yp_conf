@@ -25,6 +25,7 @@ my $comment;
 my @servers;
 my %domainservers;
 my %broadcast;
+my %slp;
 my $defaultbroadcast;
 
 my $filename;
@@ -55,6 +56,13 @@ sub complete_maps ()
 	}
     }
     foreach $domain (keys %broadcast)
+    {
+	if (!defined $domainservers{$domain})
+	{
+	    $domainservers{$domain} = [];
+	}
+    }
+    foreach $domain (keys %slp)
     {
 	if (!defined $domainservers{$domain})
 	{
@@ -98,6 +106,10 @@ sub parse_file ()
 	elsif (/^domain\s+(\S+)\s+broadcast\b/)
 	{
 	    $broadcast{$1} = perl_to_br (1);
+	}
+	elsif (/^domain\s+(\S+)\s+slp\b/)
+	{
+	    $slp{$1} = perl_to_br (1);
 	}
 	elsif (/^broadcast\b/)
 	{
@@ -143,6 +155,10 @@ sub write_file ()
 	if (br_to_perl ($broadcast{$domain}))
 	{
 	    print FILE "domain $domain broadcast\n";
+	}
+	if (br_to_perl ($slp{$domain}))
+	{
+	    print FILE "domain $domain slp\n";
 	}
     }
     close (FILE);
@@ -199,7 +215,8 @@ while ( <STDIN> )
 			  "comment",
 			  "defaultbroadcast",
 			  "domainservers",
-			  "servers"
+			  "servers",
+			  "slp"
 			 ]);
 	}
 	else
@@ -244,6 +261,17 @@ while ( <STDIN> )
 	    }
 	    $modified = 1;
 	}
+	elsif ($path eq ".slp" && ref ($argument) eq "HASH")
+	{
+	    # broadcast must be maintained as boolean references
+	    my %slp_norefs = %{$argument};
+	    %slp = ();
+	    while (my ($k, $v) = each %slp_norefs)
+	    {
+		$slp{$k} = perl_to_br ($v);
+	    }
+	    $modified = 1;
+	}
 	elsif ($path eq ".defaultbroadcast" && !ref ($argument))
 	{
 	    $defaultbroadcast = $argument;
@@ -271,6 +299,13 @@ while ( <STDIN> )
 	    {
 		$broadcast{$k} = perl_to_br ($v);
 	    }
+	    # slp must be maintained as boolean references
+	    my %slp_norefs = %{$argument->{"slp"}};
+	    %slp = ();
+	    while (my ($k, $v) = each %slp_norefs)
+	    {
+		$slp{$k} = perl_to_br ($v);
+	    }
 	    $defaultbroadcast = $argument->{"defaultbroadcast"};
 	    $modified = 1;
 	}
@@ -297,6 +332,10 @@ while ( <STDIN> )
 	{
 	    ycp::Return (\%broadcast, 1);
 	}
+	elsif ($path eq ".slp")
+	{
+	    ycp::Return (\%slp, 1);
+	}
 	elsif ($path eq ".defaultbroadcast")
 	{
 	    ycp::Return (perl_to_br ($defaultbroadcast), 1);
@@ -314,6 +353,7 @@ while ( <STDIN> )
 			  "broadcast" => \%broadcast,
 			  "defaultbroadcast" => perl_to_br ($defaultbroadcast),
 			  "servers" => \@servers,
+			  "slp" => \%slp,
 			  }, 1);
 	}
 	else

@@ -12,10 +12,12 @@ ypserver 192.168.0.4
 ypserver true
 broadcast
 domain 911 server emergency.com
+domain abcd slp
 domain bad-domain server foo.bad-domain.test
 domain bad-domain server bar.bad-domain.test
 domain bad-domain broadcast
 domain mydomain broadcast
 domain other-domain.test server yp.other-domain.test
 domain other-domain.test server yp2.other-domain.test
+domain slpdomain slp
 domain yourdomain server 10.0.0.1
