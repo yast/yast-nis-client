@@ -15,9 +15,10 @@ YaST2 configuration module</h1>
 
 <h2>Features</h2>
 
-<p>The NIS client config module manages relevant variables in
-/erc/rc.config and starts and stops the necessary init scripts: ypbind
-and portmap. Runs SuSEconfig module ypclient.
+<p>The NIS client config module manages /etc/yp.conf,
+/etc/defaultdomain, the relevant variables in
+/etc/sysconfig/ypbind and starts and stops the necessary init scripts: ypbind
+and portmap.
 
 <h2>Background Documentation</h2>
 
@@ -37,19 +38,40 @@ of ypdomainname</a> <i>FIXME:</i> put it into ypdomainname man page.
 <p>The help text and the input box label mention multiple servers.
 See <a href="http://bugzilla.suse.de/show_bug.cgi?id=9559">bug #9559</a>.
 
+<h3>Changes since SL 7.3</h3>
+
+<p>Added a quick automounter switch
+See <a href="http://bugzilla.suse.de/show_bug.cgi?id=6092">bug #6092</a>.
+
+<h3>Changes since SL 8.0</h3>
+
+<p>Added a Details dialog.
+See <a href="http://bugzilla.suse.de/show_bug.cgi?id=15666">bug #15666</a>.
+<p>Added a Multiple domains dialog
+See <a href="http://bugzilla.suse.de/show_bug.cgi?id=15665">bug #15665</a>.
+<p>Work in progress: configuration over DHCP.
+
 <h3>Individual dialogs</h3>
 
-<p><img src="nis1-h.png">
-
-<p><img src="nis2.png">
-
-<p>An older version, not mentioning multiple servers:
-<p><img src="nis1.png">
-
-<p>Another variant: Multiple servers in a list box.
-Should they be in a separate dialog?
-(PushButton "More servers...")
-<p><img src="nis1-l.png">
+<p><img src="nis1.png" />
+<p><img src="nis2a.png" />
+<p><img src="nis2b.png" />
+<p>Delete:
+<p><img src="nis2b_del_dfl.png" />
+&nbsp;<img src="nis2b_del_dom.png" />
+<p>Add/Edit:
+<p><img src="nis2b1.png" />
+<p><img src="nis2b1_err.png" />
+<font color="red">TODO: other restrictions?</font>
+<p>Add/Edit server:
+<p><img src="nis2b11.png" />
+<p>This refers to a server DNS domain name. TODO: Allow IPs (names?)
+and describe them.
+<p><img src="nis2b11_err.png" />
+<p>Switching from the multiple domain dialog to the single domain dialog:
+<p><img src="nis2b_m_s.png" />
+<p><img src="nis2c.png" />
+<p><img src="nis3.png" />
 
 <h2>Implementation</h2>
 
