@@ -187,8 +187,9 @@ in the local network to find a server after the specified servers
 fail to respond. It is a security risk.</p>
 ");
 
-    global /*const*/ string details_help =
-	_("<p><b>Details</b> gives access to some
+    global /*const*/ string expert_help =
+	// Translators: short for Expert settings
+	_("<p><b>Expert</b> gives access to some
 less frequently used settings.</p>
 ");
 
@@ -349,7 +350,7 @@ by separating their addresses with spaces.</p>
 	help_text = help_text + broadcast_help;
 
 	// help text 3/3
-	help_text = help_text + details_help;
+	help_text = help_text + expert_help;
 
 	// help text 2/3
 	help_text = help_text + _("<p>If you need to access
@@ -621,7 +622,7 @@ This check box only appears if it is turned on.</p>
 	}
 
 	// help text
-	help_text = help_text + details_help;
+	help_text = help_text + expert_help;
 
 	// help text
 	help_text = help_text + _("<p>If you do not need multiple domains, use <b>Single domain</b> to switch to a simpler dialog.</p>");
