@@ -255,11 +255,13 @@
 		if (_start_autofs && !enabled)
 		{
 		    ok = SCR::Write (.etc.nsswitch_conf.automount, automount_s + " nis");
+		    ok = ok && SCR::Write (.etc.nsswitch_conf, nil);
 		}
 		else if (!_start_autofs && enabled)
 		{
 		    automount_l = filter (string s, automount_l, ``(s != "nis"));
 		    ok = SCR::Write (.etc.nsswitch_conf.automount, mergestring (automount_l, " "));
+		    ok = ok && SCR::Write (.etc.nsswitch_conf, nil);
 		}
 		if (!ok)
 		{
