@@ -26,5 +26,5 @@
 .sysconfig.ypbind
 
 `ag_ini(
-  SysConfigFile("/etc/sysconfig/ypbind")
+  `SysConfigFile("/etc/sysconfig/ypbind")
 )
