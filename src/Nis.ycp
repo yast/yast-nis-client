@@ -87,7 +87,7 @@
      */
     global boolean _autofs_allowed = false;
     /**
-     * Just that. No other setup is done. (Bug 6092)
+     * Start automounter and import the settings from NIS. (Bug 6092)
      */
     global boolean _start_autofs = false;
 
@@ -155,11 +155,13 @@
 	domain  = SCR::Read (.etc.defaultdomain);
 	old_domain = domain;
 
-	_autofs_allowed = SCR::Read (.targetpkg.installed, "autofs");
+	_autofs_allowed =
+	    SCR::Read (.targetpkg.installed, "autofs") ||
+	    SCR::Read (.targetpkg.installed, "autofs4");
 	_start_autofs = Runlevel::ServiceEnabled ("autofs");
 	return true;
     }
-    
+
     /**
      * Only write new configuration w/o starting any scripts
      * @return true on success
@@ -167,10 +169,10 @@
     global define boolean WriteOnly()``{
 	return (Write(true));
     }
-    
+
     /**
      * Saves NIS configuration.
-     * (No parameters because it is too short to abort)
+     * @param writeonly	 true for autoinstal - don't start the service yet
      * @return true on success
      */
     global define boolean Write (boolean writeonly) ``{
@@ -195,7 +197,7 @@
 	if (start)
 	{
 	    WritePluses ();
-	    SCR::Execute(.target.bash, "/bin/ypdomainname $DOMAIN", $["DOMAIN" : domain]);
+
 	    if (!writeonly && Runlevel::ServiceStatus ("portmap") != 0 )
 	    {
 		// portmap must not be started if it is running already (see bug # 9999)
@@ -229,11 +231,26 @@
 		if (!writeonly)
 		    Runlevel::RunInitScript ("autofs", "stop");
 
+		// nsswitch automount:
+		// bracket options not allowed, order does not matter
+		string automount_s = SCR::Read (.etc.nsswitch_conf.automount);
+		list(string) automount_l = filter (`s, splitstring (automount_s, " \t"), ``(s != ""));
+		boolean enabled = find (string s, automount_l, ``(s == "nis")) != nil;
+		if (_start_autofs && !enabled)
+		{
+		    SCR::Write (.etc.nsswitch_conf.automount, automount_s + " nis");
+		}
+		else if (!_start_autofs && enabled)
+		{
+		    automount_l = filter (string s, automount_l, ``(s != "nis"));
+		    SCR::Write (.etc.nsswitch_conf.automount, mergestring (automount_l, " "));
+		}
+
 		if (_start_autofs && !writeonly)
 		    Runlevel::RunInitScript ("autofs", "start");
 
 		if (_start_autofs)
-		{		    
+		{
 		    Runlevel::ServiceAdjust ("autofs", "enable");
 		}
 		else
@@ -245,7 +262,10 @@
 	return true;
     }
 
-    /*!global*/
+    /**
+     * Add "+" lines to system files so that NIS entries get merged in.
+     * (Formerly this was done in SuSEconfig.ypclient)
+     */
     define void WritePluses () ``{
 	list(string) files = [];
 	if (SCR::Read (.etc.nsswitch_conf.passwd) == "compat")
@@ -268,11 +288,16 @@
 	});
     }
 
+    /**
+     * If a file does not contain a NIS entry, add it.
+     * @param	file	pathname
+     * @param	what	a "+" line without a '\n'
+     */
     define void WritePlusesTo (string file, string what) ``{
 	if (SCR::Execute (.target.bash, "/usr/bin/grep -q '^[+-]' " + file) != 0)
 	{
 	    // not there, add it
-	    // TODO: backup? 
+	    // TODO: backup?
 	    SCR::Execute (.target.bash, sformat ("/bin/echo '%1' >> %2", what, file));
 	}
     }
