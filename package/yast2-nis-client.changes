@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jun 17 10:37:38 CEST 2004 - mvidner@suse.cz
+
+- Added "testedfiles" to test cases to make it work with the new testsuite.
+- 2.10.0
+
+-------------------------------------------------------------------
 Tue May 18 16:03:35 CEST 2004 - mvidner@suse.cz
 
 - The last change would do more harm than good, reverted (#40571).
