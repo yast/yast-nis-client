@@ -17,7 +17,6 @@
 # The interface is not very pretty, but it works
 # and Nis::Read beautifies it for YaST2 anyway.
 
-use lib "/usr/lib/YaST2/agents_non_y2";
 use ycp;
 use strict;
 use Errno qw(ENOENT);
