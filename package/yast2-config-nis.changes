@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Sep 14 17:50:44 CEST 2001 - mvidner@suse.cz
+
+- Delay when restarting ypbind (bug #10428). (2.4.10)
+
+-------------------------------------------------------------------
 Thu Sep 13 14:28:13 CEST 2001 - mvidner@suse.cz
 
 - Improved ncurses layout. (2.4.9)
