@@ -258,54 +258,50 @@ either locally or over NIS.</p>");
 	y2debug("additional_domains: %1", additional_domains);
 
 	term con = nil;
-	term nis_frame =
-
-	    // frame label
-	    `Frame (_("NIS client"),
-		    `VBox (`VSpacing (0.2),
-
-			   `RadioButtonGroup (
-			       `id (`dhcpg),
-			       `VBox (
-				   // radio button label
-				   `Left (`RadioButton (`id (`dhcpyes), `opt (`notify), _("Au&tomatic Setup (via DHCP)"), dhcp_wanted)),
-				   // radio button label
-				   `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static Setup"), !dhcp_wanted))
-				   )),
-
-
-			   `VSpacing (0.2),
-			   // text entry label
-			   `TextEntry (`id (`domain), _("N&IS Domain"), domain),
-			   `VSpacing (0.2),
-			   // text entry label
-			   `TextEntry (`id (`servers), _("&Addresses of NIS servers"), servers),
-			   `HBox (
-			       // check box label
-			       `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Br&oadcast"), default_broadcast)),
-			       // pushbutton label, find nis servers
-			       // Shortcut must not conflict with Finish and Next (#29960)
-			       `Right (`PushButton (`id (`find), _("Fin&d")))
-			       ),
-			    `HBox(
-				`VBox(
-				    `Left(`Label(_("Additional NIS Domains"))),
-				    `HBox(
-					`HSpacing(1),
-					`Label(`id (`adddomains), `opt(`outputField, `hstretch), mergestring(additional_domains, ", "))
-				    )
-				),
-				`HSpacing(1.2),
-				`VBox(
-				    `Label(""),
-				    `PushButton (`id (`edit), _("&Edit"))
-				)
-			    )
+	// frame label
+	term nis_frame = `Frame (_("NIS client"),
+	    `VBox (
+		`VSpacing (0.2),
+		`RadioButtonGroup (`id (`dhcpg), `VBox (
+		    // radio button label
+		    `Left (`RadioButton (`id (`dhcpyes), `opt (`notify), _("Au&tomatic Setup (via DHCP)"), dhcp_wanted)),
+		    // radio button label
+		    `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static Setup"), !dhcp_wanted))
+		)),
+		`VSpacing (0.2),
+		// text entry label
+		`TextEntry (`id (`domain), _("N&IS Domain"), domain),
+		`VSpacing (0.2),
+		// text entry label
+		`TextEntry (`id (`servers), _("&Addresses of NIS servers"), servers),
+		`HBox (
+		    // check box label
+		    `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Br&oadcast"), default_broadcast)),
+		    // pushbutton label, find nis servers
+		    // Shortcut must not conflict with Finish and Next (#29960)
+		    `Right (`PushButton (`id (`find), _("Fin&d")))
+		),
+		`HBox(
+		    `VBox(
+			`Left(`Label(_("Additional NIS Domains"))),
+			`HBox(
+			    `HSpacing(1),
+			    `Label(`id (`adddomains), `opt(`outputField, `hstretch), mergestring(additional_domains, ", "))
 			)
-		);
+		    ),
+		    `HSpacing(1.2),
+		    `VBox(
+			`Label(""),
+			`PushButton (`id (`edit), _("&Edit"))
+		    )
+		),
+		`VSpacing (0.3)
+	    )
+	);
 
-	con =
-	    `VBox (`VSpacing (0.5),
+	con = `VCenter (
+	    `VBox (
+		`VSpacing (0.4),
 		`RadioButtonGroup (
 		    `id (`rd),
 		    `Left (
@@ -318,7 +314,7 @@ either locally or over NIS.</p>");
 				)))),
 		`VSpacing (1.2),
 		nis_frame,
-		`VSpacing (0.5),
+		`VSpacing (0.4),
 		`CheckBox (`id(`autofs), _("Start Auto&mounter"), autofs),
 		`VSpacing (0.5),
 		`PushButton (`id (`expert), `opt (`key_F7),
@@ -326,8 +322,8 @@ either locally or over NIS.</p>");
 		    // (short for Expert settings)
 		    _("E&xpert...")
 		),
-		`VSpacing (0.5)
-	    );
+		`VSpacing (0.4)
+	));
 
 	Wizard::SetContentsButtons (
 	    // dialog title
