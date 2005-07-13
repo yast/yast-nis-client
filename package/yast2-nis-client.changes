@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jul 12 14:48:43 CEST 2005 - jsuchome@suse.cz
+
+- install autofs by default (not autofs4) - bug #95970
+- 2.12.0
+
+-------------------------------------------------------------------
 Thu Mar  3 11:04:12 CET 2005 - jsuchome@suse.cz
 
 - do not default to 'always start' when called from users
