@@ -20,7 +20,7 @@ Icon=yast-nis
 Exec=/sbin/yast2 nis 
 
 Name=NIS Client
-GenericName=Configure NIS client
+GenericName=Configure a NIS client
 Name[cs]=Klient NIS
 GenericName[cs]=Konfigurace klienta NIS
 Name[de]=NIS-Client
