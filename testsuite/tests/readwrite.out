@@ -73,6 +73,12 @@ Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+/sbin/nologin@+@' /etc/sh
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/group" 0
 Execute	.target.bash "/bin/grep -q '^+:::/sbin/nologin' /etc/group" 0
 Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+:::/sbin/nologin@+:::@' /etc/group" 0
+Read	.etc.nsswitch_conf."services" "files"
+Write	.etc.nsswitch_conf."services" "files nis" true
+Read	.etc.nsswitch_conf."netgroup" "files"
+Write	.etc.nsswitch_conf."netgroup" "nis" true
+Read	.etc.nsswitch_conf."aliases" "files"
+Write	.etc.nsswitch_conf."aliases" "files nis" true
 Write	.etc.nsswitch_conf nil true
 Read	.etc.nsswitch_conf."automount" "files"
 Write	.etc.nsswitch_conf."automount" "files nis" true
@@ -159,6 +165,12 @@ Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+/sbin/nologin@+@' /etc/sh
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/group" 0
 Execute	.target.bash "/bin/grep -q '^+:::/sbin/nologin' /etc/group" 0
 Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+:::/sbin/nologin@+:::@' /etc/group" 0
+Read	.etc.nsswitch_conf."services" "files"
+Write	.etc.nsswitch_conf."services" "files nis" true
+Read	.etc.nsswitch_conf."netgroup" "files"
+Write	.etc.nsswitch_conf."netgroup" "nis" true
+Read	.etc.nsswitch_conf."aliases" "files"
+Write	.etc.nsswitch_conf."aliases" "files nis" true
 Write	.etc.nsswitch_conf nil true
 Read	.etc.nsswitch_conf."automount" "files"
 Write	.etc.nsswitch_conf."automount" "files nis" true

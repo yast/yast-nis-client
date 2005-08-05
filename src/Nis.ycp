@@ -775,8 +775,9 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
      * according to chosen settings
      * @return success?
      */
-    global define boolean WriteNssUsers () ``{
+    global define boolean WriteNssConf () {
 	list<string> dbs = ["passwd", "group", "shadow"];
+	list<string> nis_dbs	= [ "services" ,"netgroup", "aliases" ];
 	// Why bother with both compat and nis?
 	// If there's no plus, we don't have to write passwd etc.
 	// And it's supposed to be faster.
@@ -806,11 +807,22 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 		});
 		y2milestone("Writing pluses");
 		WritePluses ();
+		foreach (string db, nis_dbs, {
+		    list<string> db_l = Nsswitch::ReadDb (db);
+		    if (!contains (db_l, "nis"))
+		    {
+			if (db == "netgroup")
+			    db_l	= ["nis"];
+			else
+			    db_l        = ["files", "nis"];
+			Nsswitch::WriteDb (db, db_l);
+		    }
+		});
 	}
 	else // not start
 	{
 
-	y2milestone("not writing pluses");
+	    y2milestone("not writing pluses");
 	    boolean have_plus = HavePlus ();
 
 	    if (!have_plus)
@@ -825,6 +837,13 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 		    Nsswitch::WriteDb (db, db_l);
 		});
 	    }
+	    foreach (string db, nis_dbs, {
+		list<string> db_l = Nsswitch::ReadDb (db);
+		db_l = filter (string s, db_l, ``(s != "nis"));
+		if (db_l == [])
+		    db_l	= ["files"];
+		Nsswitch::WriteDb (db, db_l);
+	    });
 	}
 
 	if (!SCR::Write (.etc.nsswitch_conf, nil))
@@ -898,7 +917,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 
 	// TODO do as much as possible if one thing fails
 	// especially WRT nis/autofs independence
-	WriteNssUsers ();
+	WriteNssConf ();
 
 	if (_autofs_allowed)
 	{
