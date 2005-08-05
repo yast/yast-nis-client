@@ -88,6 +88,9 @@
 		"group": "compat",
 		"hosts": "files dns6",
 		"automount": "files",
+		"services"	: "files",
+		"netgroup"	: "files",
+		"aliases"	: "files",
 		],
 	    ],
 	"sysconfig": $[
