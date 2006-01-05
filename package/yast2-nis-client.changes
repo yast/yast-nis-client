@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jan  4 15:41:29 CET 2006 - jsuchome@suse.cz
+
+- fixed testsuite (firewall initialization)
+- 2.12.3
+
+-------------------------------------------------------------------
 Thu Aug  4 14:28:34 CEST 2005 - jsuchome@suse.cz
 
 - update also "services", "netgroup" and "aliases" entries (#100205)
