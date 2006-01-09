@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jan  9 11:05:04 CET 2006 - jsuchome@suse.cz
+
+- new version for new product
+- 2.13.0 
+
+-------------------------------------------------------------------
 Wed Jan  4 15:41:29 CET 2006 - jsuchome@suse.cz
 
 - fixed testsuite (firewall initialization)
