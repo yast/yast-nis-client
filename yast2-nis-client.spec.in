@@ -1,7 +1,7 @@
 @HEADER-COMMENT@
-# neededforbuild gpp libgpp yast2-devel-packages yast2-pam
 
 @HEADER@
+BuildRequires:	gcc-c++ yast2-devel-packages yast2-pam
 Requires:	yast2 yast2-pam
 # .net.hostnames.rpc
 Requires:	yast2-core >= 2.8.0
