@@ -611,6 +611,11 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	multidomain_servers = (map<string,list<string> >) SCR::Read (.etc.yp_conf.domainservers);
 	multidomain_broadcast = (map) SCR::Read (.etc.yp_conf.broadcast);
 	slp_domain = (map) SCR::Read (.etc.yp_conf.slp);
+	if (servers == nil) servers = [];
+	if (default_broadcast == nil) default_broadcast = false;
+	if (multidomain_servers == nil) multidomain_servers = $[];
+	if (multidomain_broadcast == nil) multidomain_broadcast = $[];
+	if (slp_domain == nil) slp_domain = $[];
 
 	map out = (map) SCR::Execute (.target.bash_output, "/bin/ypdomainname");
 	domain = deletechars (out["stdout"]:"", "\n");

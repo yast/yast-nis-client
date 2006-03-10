@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Mar 10 17:08:30 CET 2006 - jsuchome@suse.cz
+
+- added checks for nil output from agents (#155439)
+- fixed BuildRequires
+- 2.13.2 
+
+-------------------------------------------------------------------
 Tue Jan 17 10:26:13 CET 2006 - visnov@suse.cz
 
 - fix testsuite
