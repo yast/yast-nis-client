@@ -21,6 +21,7 @@
     textdomain "nis";
 
     import "Autologin";
+    import "Confirm";
     import "CWMFirewallInterfaces";
     import "Label";
     import "Message";
@@ -1066,6 +1067,13 @@ This option is only available if the firewall is enabled.</p>
 
 	Wizard::CreateDialog ();
 	Wizard::SetDesktopIcon("nis");
+
+	// checking for root permissions (#158483)
+	if (!Confirm::MustBeRoot())
+	{
+	    UI::CloseDialog();
+	    return `abort;
+	}
 
 	if (Mode::screen_shot())
 	{
