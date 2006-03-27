@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Mar 27 09:36:15 CEST 2006 - jsuchome@suse.cz
+
+- added checking for root permissions (#158483)
+- 2.13.3
+
+-------------------------------------------------------------------
 Fri Mar 10 17:08:30 CET 2006 - jsuchome@suse.cz
 
 - added checks for nil output from agents (#155439)
