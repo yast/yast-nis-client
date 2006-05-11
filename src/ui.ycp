@@ -26,6 +26,7 @@
     import "Label";
     import "Message";
     import "Mode";
+    import "NetworkService";
     import "Nis";
     import "Package";
     import "Popup";
@@ -77,7 +78,8 @@ less frequently used settings.</p>
      * Pop up a warning if dhcp does not provide nis configuration
      */
     define void WarnIfDhcpNotServed () ``{
-	if (!Nis::dhcp_possible)
+	// do not error message for NM (#152262)
+	if (!Nis::dhcp_possible && !NetworkService::IsManaged ())
 	{
 	    // Translators: warning popup
 	    Report::Warning (_("NIS configuration is not currently provided by DHCP.
