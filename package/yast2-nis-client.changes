@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Aug 22 09:32:35 CEST 2006 - jsuchome@suse.cz
+
+- behave as DHCP supports NIS when NetworkManager is enabled (#186179)
+- 2.13.5
+
+-------------------------------------------------------------------
 Thu May 11 16:32:33 CEST 2006 - jsuchome@suse.cz
 
 - do not show message that DHCP doesn't support NIS when using

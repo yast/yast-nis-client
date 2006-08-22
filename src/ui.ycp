@@ -222,7 +222,7 @@ either locally or over NIS.</p>");
 
 
 
-	boolean dhcp_wanted = Nis::dhcp_wanted;
+	boolean dhcp_wanted = Nis::dhcp_wanted || NetworkService::IsManaged ();
 	string domain  = Nis::GetDomain ();
 	string servers = Nis::GetServers ();
 
@@ -260,14 +260,20 @@ either locally or over NIS.</p>");
 	y2debug("all_servers: %1", all_servers);
 	y2debug("additional_domains: %1", additional_domains);
 
+	string automatic_label	= NetworkService::IsManaged () ?
+	    // radio button label
+	    _("Au&tomatic Setup (via NetworkManager and DHCP)") :
+	    // radio button label
+	    _("Au&tomatic Setup (via DHCP)");
+
 	term con = nil;
 	// frame label
 	term nis_frame = `Frame (_("NIS client"),
 	    `VBox (
 		`VSpacing (0.2),
 		`RadioButtonGroup (`id (`dhcpg), `VBox (
-		    // radio button label
-		    `Left (`RadioButton (`id (`dhcpyes), `opt (`notify), _("Au&tomatic Setup (via DHCP)"), dhcp_wanted)),
+		    `Left (`RadioButton (`id (`dhcpyes), `opt (`notify),
+			automatic_label, dhcp_wanted)),
 		    // radio button label
 		    `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static Setup"), !dhcp_wanted))
 		)),
@@ -295,6 +301,7 @@ either locally or over NIS.</p>");
 		    `HSpacing(1.2),
 		    `VBox(
 			`Label(""),
+			// button label
 			`PushButton (`id (`edit), _("&Edit"))
 		    )
 		),
