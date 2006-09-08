@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Sep  4 11:36:03 CEST 2006 - jsuchome@suse.cz
+
+- removed dia from doc/Makefiles
+- 2.13.6
+
+-------------------------------------------------------------------
 Tue Aug 22 09:32:35 CEST 2006 - jsuchome@suse.cz
 
 - behave as DHCP supports NIS when NetworkManager is enabled (#186179)
