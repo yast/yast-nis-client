@@ -41,4 +41,5 @@ Summary:	Configuration of NIS client
 @scrconfdir@/cfg_ypbind.scr
 @scrconfdir@/yp_conf.scr
 @scrconfdir@/ypserv.scr
+@schemadir@/autoyast/rnc/nis.rnc
 %doc @docdir@
