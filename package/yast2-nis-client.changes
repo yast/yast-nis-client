@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Nov  6 10:21:22 CET 2006 - jsuchome@suse.cz
+
+- new version for new product
+- 2.14.0
+
+-------------------------------------------------------------------
 Thu Oct 26 16:30:32 CEST 2006 - jsuchome@suse.cz
 
 - added schema name to desktop file (#215249)
