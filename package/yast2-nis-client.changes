@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jan 30 08:03:57 CET 2007 - jsuchome@suse.cz
+
+- fixed testsuite failure caused by new rpm parameter in Package::Installed
+- 2.15.0 
+
+-------------------------------------------------------------------
 Mon Nov  6 10:21:22 CET 2006 - jsuchome@suse.cz
 
 - new version for new product
