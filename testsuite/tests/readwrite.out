@@ -23,7 +23,6 @@ Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."passwd_compat" nil
 Read	.target.size "/etc/sysconfig/displaymanager" 0
 Read	.sysconfig.displaymanager.DISPLAYMANAGER "kdm"
-Execute	.target.bash "rpm -q --whatprovides kdebase3-kdm" 0
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Read	.init.scripts.exists "SuSEfirewall2_init" true
@@ -126,7 +125,6 @@ Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."passwd_compat" nil
 Read	.target.size "/etc/sysconfig/displaymanager" 0
 Read	.sysconfig.displaymanager.DISPLAYMANAGER "kdm"
-Execute	.target.bash "rpm -q --whatprovides kdebase3-kdm" 0
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Return	true

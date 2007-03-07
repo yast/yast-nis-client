@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Mar  7 15:58:22 CET 2007 - jsuchome@suse.cz
+
+- fixed failing testsuite by removing PackageSystem from testedfiles
+- 2.15.1
+
+-------------------------------------------------------------------
 Tue Jan 30 08:03:57 CET 2007 - jsuchome@suse.cz
 
 - fixed testsuite failure caused by new rpm parameter in Package::Installed
