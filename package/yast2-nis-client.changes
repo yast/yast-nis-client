@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Mar 29 11:05:36 CEST 2007 - jsuchome@suse.cz
+
+- changed dependency tag for yast2-core (#252988)
+- 2.15.2
+
+-------------------------------------------------------------------
 Wed Mar  7 15:58:22 CET 2007 - jsuchome@suse.cz
 
 - fixed failing testsuite by removing PackageSystem from testedfiles
