@@ -4,7 +4,7 @@
 BuildRequires:	gcc-c++ perl-XML-Writer doxygen yast2-devtools yast2-core-devel yast2 yast2-testsuite yast2-pam update-desktop-files
 Requires:	yast2 yast2-pam
 # .net.hostnames.rpc
-Requires:	yast2-core >= 2.8.0
+Conflicts:      yast2-core < 2.8.0
 
 Provides:	yast2-config-nis yast2-config-nis-devel
 Obsoletes:	yast2-config-nis yast2-config-nis-devel
