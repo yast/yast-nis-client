@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri May 25 13:30:04 CEST 2007 - jsrain@suse.cz
+
+- removed outdated translations from .desktop-files (#271209)
+
+-------------------------------------------------------------------
 Thu Mar 29 11:05:36 CEST 2007 - jsuchome@suse.cz
 
 - changed dependency tag for yast2-core (#252988)
