@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Aug 27 16:29:32 CEST 2007 - jsuchome@suse.cz
+
+- install nfs-client together with autofs (#304309)
+- 2.15.3 
+
+-------------------------------------------------------------------
 Fri May 25 13:30:04 CEST 2007 - jsrain@suse.cz
 
 - removed outdated translations from .desktop-files (#271209)
