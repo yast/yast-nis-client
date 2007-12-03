@@ -262,7 +262,7 @@ either locally or over NIS.</p>");
 
 	string automatic_label	= NetworkService::IsManaged () ?
 	    // radio button label
-	    _("Au&tomatic Setup (via NetworkManager and DHCP)") :
+	    _("Au&tomatic Setup (Via NetworkManager and DHCP)") :
 	    // radio button label
 	    _("Au&tomatic Setup (via DHCP)");
 
