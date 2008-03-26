@@ -534,7 +534,7 @@ This option is only available if the firewall is enabled.</p>
 	Wizard::SetContentsButtons (
 	    // dialog title
 	    _("Expert settings"), contents, help_text,
-	    Label::CancelButton (), Label::AcceptButton ());
+	    Label::CancelButton (), Label::OKButton ());
 	Wizard::HideAbortButton ();
 
 	CWMFirewallInterfaces::OpenFirewallInit (firewall_widget, "");
@@ -848,7 +848,7 @@ This option is only available if the firewall is enabled.</p>
 		     _("Configuration of NIS client"),
 		     // dialog subtitle
 		     _("Additional Domains")), contents, help_text,
-	    Label::CancelButton (), Label::AcceptButton ());
+	    Label::CancelButton (), Label::OKButton ());
 	Wizard::HideAbortButton ();
 
 	any result = nil;
