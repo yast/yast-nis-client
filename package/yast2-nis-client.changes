@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr 15 10:00:07 CEST 2008 - jsuchome@suse.cz
+
+- disabling during installation makes sense with current workflow
+- 2.16.2 
+
+-------------------------------------------------------------------
 Wed Mar 26 10:48:56 CET 2008 - jsuchome@suse.cz
 
 - use OK button label instead of Accept (fate #120373)
