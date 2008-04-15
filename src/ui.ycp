@@ -341,13 +341,6 @@ either locally or over NIS.</p>");
 	    Label::BackButton (), Stage::cont ()? Label::NextButton():Label::FinishButton ());
 	Wizard::RestoreAbortButton ();
 
-	// during installation, only enabling makes sence
-	if (Stage::cont () && !contains (WFM::Args (), "from_users"))
-	{
-	    UI::ChangeWidget (`id (`nisno), `Enabled, false);
-	}
-
-
 	UI::ChangeWidget (`id (`autofs), `Enabled, Nis::_autofs_allowed);
 
 	symbol result = nil;
