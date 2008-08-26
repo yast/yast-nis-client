@@ -68,7 +68,7 @@
     /**
      * IP addresses of NIS servers.
      */
-    global list<string> servers = [];
+    global list <string> servers = [];
 
     /**
      * @return Access the servers as a string
@@ -111,10 +111,250 @@
 
     global map slp_domain = $[];
 
+	global boolean manual = false;
+
+	global string policy = "auto";
+	
     string domain = "";
     string old_domain = nil;
     boolean domain_changed = false;
 
+	list<string> static_keylist = [];
+	
+	global define void getNetconfigValues() ``{
+
+		y2milestone("getNetconfigValues called");
+
+		policy = (string)SCR::Read(.sysconfig.network.config.NETCONFIG_NIS_POLICY);
+		
+		map<string, map<string, string> > staticVals = $[];
+		
+		list<string> keylist = SCR::Dir(.sysconfig.network.config);
+
+		y2milestone("KEYLIST: %1", keylist);
+		
+		foreach (string key, keylist, ``{
+											 if (!issubstring(key, "NETCONFIG_NIS_STATIC_DOMAIN") &&
+												 !issubstring(key, "NETCONFIG_NIS_STATIC_SERVERS"))
+												 continue;
+
+										 
+											 string value = (string)SCR::Read(add(.sysconfig.network.config, key));
+
+											 y2milestone("Found %1 = %2", key, value);
+											 
+											 string num = "";
+											 
+											 if(key == "NETCONFIG_NIS_STATIC_DOMAIN")
+											 {
+												 staticVals["0"] = add(staticVals["0"]:$[], "DOMAIN", value );
+											 }
+											 else if (key == "NETCONFIG_NIS_STATIC_SERVERS")
+											 {
+												 staticVals["0"] = add(staticVals["0"]:$[], "SERVERS", value );
+											 }
+											 else
+											 {
+												 static_keylist = add(static_keylist, key);
+												 
+												 num = regexpsub(key, "^NETCONFIG_STATIC_NIS_(DOMAIN|SERVERS)_(.*)", "\\2");
+
+												 y2milestone("try to get the number: %1", num);
+												 
+												 if( issubstring(key, "NETCONFIG_NIS_STATIC_DOMAIN"))
+												 {
+													 staticVals[num] = add(staticVals[num]:$[], "DOMAIN", value );
+												 }
+												 else if( issubstring(key, "NETCONFIG_NIS_STATIC_SERVERS"))
+												 {
+													 staticVals[num] = add(staticVals[num]:$[], "SERVERS", value );
+												 }
+											 }
+										 });
+
+		y2milestone("STATIC VALS: %1", staticVals);
+		
+		foreach (string key, map<string, string> value, staticVals, ``{
+																		   if(value["DOMAIN"]:nil == "")
+																		   {
+																			   if(value["SERVERS"]:"" != "")
+																			   {
+																				   string sr = GetServers()+" "+value["SERVERS"]:"" ;
+																				   SetServers(sr);
+																			   }
+																		   }
+																		   else if(value["DOMAIN"]:nil == "broadcast")
+																		   {
+																			   default_broadcast = true;
+																		   }
+																		   else if(value["DOMAIN"]:"" != "")
+																		   {
+																			   if(value["SERVERS"]:nil == "broadcast")
+																			   {
+																				   multidomain_broadcast = add(multidomain_broadcast, value["DOMAIN"]:"", true);
+																			   }
+																			   else if(value["SERVERS"]:nil == "slp")
+																			   {
+																				   slp_domain = add(slp_domain, value["DOMAIN"]:"", true);
+																			   }
+																			   else if(value["SERVERS"]:"" != "")
+																			   {
+																				   multidomain_servers = add(multidomain_servers, value["DOMAIN"]:"",
+																											 splitstring(value["SERVERS"]:"", " "));
+																			   }
+																		   }
+																	   });
+		foreach (string domain, list<string> value, multidomain_servers, ``{
+																		 if(!haskey(multidomain_broadcast, domain))
+																		 {
+																			 multidomain_broadcast = add(multidomain_broadcast, domain, false);
+																		 }
+																	 });
+
+		foreach (string domain, any value, (map<string,any>)multidomain_broadcast, ``{
+																	  if(!haskey(multidomain_servers, domain))
+																	  {
+																		  multidomain_servers = add(multidomain_servers, domain, []);
+																	  }
+																  });
+
+		foreach (string domain, any value, (map<string,any>)slp_domain, ``{
+														   if(!haskey(multidomain_servers, domain))
+														   {
+															   multidomain_servers = add(multidomain_servers, domain, []);
+														   }
+													   });
+
+		y2milestone("Servers: %1", servers);
+		y2milestone("multidomain_servers: %1", multidomain_servers);
+		y2milestone("multidomain_broadcast: %1", multidomain_broadcast);
+		y2milestone("slp_domain: %1", slp_domain);
+		y2milestone("default_broadcast: %1", default_broadcast);
+		
+	}
+
+
+	global define void setNetconfigValues() ``{
+
+		SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_POLICY, policy);
+		
+		foreach (string domain, list value, (map<string, list>)multidomain_servers, ``{
+																		 if(!haskey(multidomain_broadcast, domain))
+																		 {
+																			 multidomain_broadcast = add(multidomain_broadcast, domain, false);
+																		 }
+																	 });
+
+		foreach (string domain, boolean value, (map<string, boolean>)multidomain_broadcast, ``{
+																	  if(!haskey(multidomain_servers, domain))
+																	  {
+																		  multidomain_servers = add(multidomain_servers, domain, []);
+																	  }
+																  });
+
+		foreach (string domain, boolean value, (map<string, boolean>)slp_domain, ``{
+														   if(!haskey(multidomain_servers, domain))
+														   {
+															   multidomain_servers = add(multidomain_servers, domain, []);
+														   }
+													   });
+
+		foreach(string key, static_keylist, ``{
+												   y2milestone("Remove : %1", key);
+												   SCR::Write(add(.sysconfig.network.config, key), nil);
+											   });
+        /* remove the content of this */
+		SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN, ""); 
+		SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS, "");
+
+		integer cnt = 0;
+
+		y2milestone("Servers: %1", servers);
+		y2milestone("multidomain_servers: %1", multidomain_servers);
+		y2milestone("multidomain_broadcast: %1", multidomain_broadcast);
+		y2milestone("slp_domain: %1", slp_domain);
+		y2milestone("default_broadcast: %1", default_broadcast);
+		
+		if(size(servers) > 0)
+		{
+			SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN, ""); 
+			SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS, mergestring(servers, " "));
+			cnt = cnt + 1;
+		}
+		
+		foreach( string dom, list<string> srvs, multidomain_servers, ``{
+																			if(dom == "")
+																				continue;
+
+																			if(size(srvs) > 0)
+																			{
+																				if(cnt == 0)
+																				{
+																					SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN, dom); 
+																					SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS, mergestring(srvs, " "));
+																				}
+																				else
+																				{
+																					SCR::Write(add(.sysconfig.network.config, "NETCONFIG_NIS_STATIC_DOMAIN_"+cnt), dom); 
+																					SCR::Write(add(.sysconfig.network.config, "NETCONFIG_NIS_STATIC_SERVERS_"+cnt), mergestring(srvs, " "));
+																				}
+																				cnt = cnt + 1;
+																			}
+
+																			if(multidomain_broadcast[dom]:false == true)
+																			{
+																				if(cnt == 0)
+																				{
+																					SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN, dom); 
+																					SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS, "broadcast");
+																				}
+																				else
+																				{
+																					SCR::Write(add(.sysconfig.network.config, "NETCONFIG_NIS_STATIC_DOMAIN_"+cnt), dom); 
+																					SCR::Write(add(.sysconfig.network.config, "NETCONFIG_NIS_STATIC_SERVERS_"+cnt), "broadcast");
+																				}
+																				cnt = cnt + 1;
+																			}
+																			
+																			if(slp_domain[dom]:false == true)
+																			{
+																				if(cnt == 0)
+																				{
+																					SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN, dom); 
+																					SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS, "slp");
+																				}
+																				else
+																				{
+																					SCR::Write(add(.sysconfig.network.config, "NETCONFIG_NIS_STATIC_DOMAIN_"+cnt), dom); 
+																					SCR::Write(add(.sysconfig.network.config, "NETCONFIG_NIS_STATIC_SERVERS_"+cnt), "slp");
+																				}
+																				cnt = cnt + 1;
+																			}
+
+																		});
+		if(default_broadcast == true)
+		{
+			if(cnt == 0)
+			{
+				SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN, "broadcast"); 
+				SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS, "");
+			}
+			else
+			{
+				SCR::Write(add(.sysconfig.network.config, "NETCONFIG_NIS_STATIC_DOMAIN_"+cnt), "broadcast"); 
+				SCR::Write(add(.sysconfig.network.config, "NETCONFIG_NIS_STATIC_SERVERS_"+cnt), "");
+			}
+			cnt = cnt + 1;
+		}
+		
+		if (! SCR::Write(.sysconfig.network.config, nil))
+		{
+		    Report::Error (Message::ErrorWritingFile ("/etc/sysconfig/network/config"));
+		}
+	}
+
+	
+	
     /**
      * If the domain has changed from a nonempty one, it may only be
      * changed at boot time. Use this to warn the user.
@@ -151,7 +391,7 @@
      * It will be turned off if dhcp_possible is off
      * (the user can override it)
      */
-    global boolean dhcp_wanted = false;
+    /* global boolean dhcp_wanted = false; */
 
     /**
      * #35654: if the server is running and sysconfig wants NIS data,
@@ -367,7 +607,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	domain = settings["nis_domain"]:"";
 	old_domain = domain;
 
-	dhcp_wanted = settings["nis_by_dhcp"]:false;
+	//dhcp_wanted = settings["nis_by_dhcp"]:false;
 	// we have to hope the config will be available
 	dhcp_possible = true;
 	// we don't know what the state will be before Write, so restart it
@@ -468,7 +708,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 
 	    "nis_other_domains": other_domains,
 
-	    "nis_by_dhcp": dhcp_wanted,
+	    //"nis_by_dhcp": dhcp_wanted,
 
 	    "nis_local_only": local_only,
 	    "nis_broken_server": broken_server,
@@ -535,14 +775,12 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	summary = Summary::AddLine(summary, (start) ? _("Yes") : nc);
 	// summary header
 	summary = Summary::AddHeader(summary, _("NIS Domain"));
-	summary = Summary::AddLine(summary,
-				   dhcp_wanted ? dhcp :
-				   ((domain != "") ? domain : nc));
-	// summary header
+	summary = Summary::AddLine(summary,((domain != "") ? domain : nc));
+		
+				   
+		// summary header
 	summary = Summary::AddHeader(summary, _("NIS Servers"));
-	summary = Summary::AddLine(summary,
-				   dhcp_wanted ? dhcp :
-				   ((servers !=[]) ? mergestring(servers,"<br>") : nc));
+	summary = Summary::AddLine(summary, ((servers !=[]) ? mergestring(servers,"<br>") : nc));
 	// summary header
 	summary = Summary::AddHeader(summary, _("Broadcast"));
 	// summary item: an option is turned on
@@ -592,11 +830,9 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	string nc = Summary::NotConfigured ();
 	summary =
 	    // summary item
-	    BrItem (_("Servers"), dhcp_wanted ? dhcp :
-		    ((servers !=[]) ? GetServers() : nc)) +
+	    BrItem (_("Servers"), ((servers !=[]) ? GetServers() : nc)) +
 	    // summary item
-	    BrItem (_("Domain"), dhcp_wanted ? dhcp :
-		    ((domain != "") ? domain : nc)) +
+	    BrItem (_("Domain"), ((domain != "") ? domain : nc)) +
 	    // summary item (yes/no follows)
 	    BrItem (_("Client Enabled"), start ? _("Yes"): _("No"));
 
@@ -610,11 +846,8 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
     global define boolean Read () ``{
 	start = Service::Enabled("ypbind");
 
-	servers = (list<string>) SCR::Read (.etc.yp_conf.servers);
-	default_broadcast = (boolean) SCR::Read (.etc.yp_conf.defaultbroadcast);
-	multidomain_servers = (map<string,list<string> >) SCR::Read (.etc.yp_conf.domainservers);
-	multidomain_broadcast = (map) SCR::Read (.etc.yp_conf.broadcast);
-	slp_domain = (map) SCR::Read (.etc.yp_conf.slp);
+	getNetconfigValues();
+
 	if (servers == nil) servers = [];
 	if (default_broadcast == nil) default_broadcast = false;
 	if (multidomain_servers == nil) multidomain_servers = $[];
@@ -625,11 +858,12 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	domain = deletechars (out["stdout"]:"", "\n");
 	old_domain = domain;
 
+	
 	boolean servers_by_dhcp_wanted = SCR::Read (
 	    .sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF) == "yes";
 	boolean domain_by_dhcp_wanted = SCR::Read (
 	    .sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME) == "yes";
-	dhcp_wanted = servers_by_dhcp_wanted && domain_by_dhcp_wanted;
+	//dhcp_wanted = servers_by_dhcp_wanted && domain_by_dhcp_wanted;
 
 	dhcpcd_running =
 	    SCR::Execute (.target.bash, "ls /var/run/dhcpcd-*.pid") == 0;
@@ -641,12 +875,14 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	dhcp_possible = servers_by_dhcp_possible && domain_by_dhcp_possible;
 	// we do it here instead of in the ui so that the user can override it
 	// in the ui or switch single/multiple domains
+	/*
 	if (dhcp_wanted && !dhcp_possible)
 	{
 	    dhcp_wanted = false;
 	    Touch (true);
 	}
-
+	*/
+	
 	local_only = SCR::Read (.sysconfig.ypbind.YPBIND_LOCAL_ONLY) == "yes";
 	global_broadcast = SCR::Read (.sysconfig.ypbind.YPBIND_BROADCAST) == "yes";
 	broken_server = SCR::Read (.sysconfig.ypbind.YPBIND_BROKEN_SERVER) == "yes";
@@ -691,7 +927,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    ];
 	domain = "example.com";
 	old_domain = domain;
-	dhcp_wanted = false;
+	//dhcp_wanted = false;
 	dhcp_possible = false; // to see the warning popup
 	local_only = false;
 	global_broadcast = false;
@@ -873,8 +1109,10 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    Service::Enable("portmap");
 	    Service::Enable("ypbind");
 
+		/*
 	    if (!dhcp_wanted)
 	    {
+		*/
 		if (!SCR::Write (.etc.defaultdomain, domain))
 		{
 		    Report::Error (
@@ -885,17 +1123,11 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 		// so that dhcpcd cannot restore it
 		SCR::Execute (.target.remove, "/etc/yp.conf.sv");
 
-		SCR::Write (.etc.yp_conf.servers, servers);
-		SCR::Write (.etc.yp_conf.defaultbroadcast, default_broadcast);
-		SCR::Write (.etc.yp_conf.domainservers, multidomain_servers);
-		SCR::Write (.etc.yp_conf.broadcast, multidomain_broadcast);
-		SCR::Write (.etc.yp_conf.slp, slp_domain);
-		if (! SCR::Write (.etc.yp_conf, nil))
-		{
-		    Report::Error (Message::ErrorWritingFile ("/etc/yp.conf"));
-		    return false;
-		}
-	    }
+		setNetconfigValues();
+
+		SCR::Execute(.target.bash, "/sbin/netconfig update");
+		
+	    //}
 	    SCR::Write (.sysconfig.ypbind.YPBIND_LOCAL_ONLY, local_only? "yes":"no");
 	    SCR::Write (.sysconfig.ypbind.YPBIND_BROADCAST, global_broadcast? "yes":"no");
 	    SCR::Write (.sysconfig.ypbind.YPBIND_BROKEN_SERVER, broken_server? "yes":"no");
@@ -908,9 +1140,9 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    }
 
 	    SCR::Write (.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME,
-			dhcp_wanted? "yes":"no");
-	    SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF,
-			dhcp_wanted? "yes":"no");
+			!manual? "yes":"no");
+	    SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF, "no");
+
 	    if (! SCR::Write (.sysconfig.network.dhcp, nil))
 	    {
 		Report::Error (Message::ErrorWritingFile (

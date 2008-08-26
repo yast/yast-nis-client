@@ -104,8 +104,8 @@ define boolean NisEnableHandler (map options ) {
 
     boolean ret = NisChangeConfiguration (options);
     Nis::start = true;
-    if (Nis::GetDomain () == "" || Nis::GetServers () == "")
-	Nis::dhcp_wanted	= true;
+    //if (Nis::GetDomain () == "" || Nis::GetServers () == "")
+	//Nis::dhcp_wanted	= true;
     return true;
 }
 

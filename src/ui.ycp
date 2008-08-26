@@ -238,7 +238,7 @@ either locally or over NIS.</p>");
 	help_text = help_text + firewall_widget["help"]:"";
 
 
-	boolean dhcp_wanted = Nis::dhcp_wanted || NetworkService::IsManaged ();
+		//boolean dhcp_wanted = Nis::dhcp_wanted || NetworkService::IsManaged ();
 	string domain  = Nis::GetDomain ();
 	string servers = Nis::GetServers ();
 
@@ -287,12 +287,23 @@ either locally or over NIS.</p>");
 	term nis_frame = `Frame (_("NIS client"), `HBox (`HSpacing (0.4),
 	    `VBox (
 		`VSpacing (0.2),
-		`RadioButtonGroup (`id (`dhcpg), `VBox (
-		    `Left (`RadioButton (`id (`dhcpyes), `opt (`notify),
-			automatic_label, dhcp_wanted)),
-		    // radio button label
-		    `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static Setup"), !dhcp_wanted))
-		)),
+		`HBox (
+			   `ComboBox(`id(`policy), `opt (`notify), _("Nis &Policy"),
+						 [`item(`id(`nomodify), "manual"),
+						  `item(`id(`auto), "auto"),
+						  `item(`id(`custom), "custom")]),
+			   `TextEntry(`id(`custompolicy), `opt(`hstrech), _("C&ustom Policy"), "")
+			  ),
+   
+	
+// 		`RadioButtonGroup (`id (`dhcpg), `VBox (
+// 		    `Left (`RadioButton (`id (`dhcpyes), `opt (`notify),
+// 			automatic_label, dhcp_wanted)),
+// 		    radio button label
+// 		    `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static Setup"), !dhcp_wanted))
+// 		)),
+
+		
 		`VSpacing (0.2),
 		// text entry label
 		`TextEntry (`id (`domain), _("N&IS Domain"), domain),
@@ -364,38 +375,81 @@ either locally or over NIS.</p>");
 
 	UI::ChangeWidget (`id (`autofs), `Enabled, Nis::_autofs_allowed);
 
+	if(Nis::policy == "")
+	{
+		UI::ChangeWidget (`id (`policy), `Value, `id(`nomodify));
+		UI::ChangeWidget (`id (`custompolicy), `Enabled, false);
+	}
+	else if(Nis::policy == "auto" || Nis::policy == "STATIC *")
+	{
+		UI::ChangeWidget (`id (`policy), `Value, `id(`auto));
+		UI::ChangeWidget (`id (`custompolicy), `Enabled, false);
+	}
+	else
+	{
+		UI::ChangeWidget (`id (`policy), `Value, `id(`custom));
+		UI::ChangeWidget (`id (`custompolicy), `Enabled, true);
+		UI::ChangeWidget (`id (`custompolicy), `Value, Nis::policy);
+	}
+	
 	map event	= $[];
 	symbol result = nil;
 	repeat
 	{
+		y2milestone("LOOP: %1", result);
+		
 	    yp_client = ((symbol) UI::QueryWidget (`id (`rd), `CurrentButton) != `nisno);
 	    UI::ChangeWidget (`id (`expert), `Enabled, yp_client);
-	    UI::ChangeWidget (`id (`dhcpno), `Enabled, yp_client);
-	    UI::ChangeWidget (`id (`dhcpyes), `Enabled, yp_client);
+	    UI::ChangeWidget (`id (`policy), `Enabled, yp_client);
+	    //UI::ChangeWidget (`id (`custompolicy), `Enabled, yp_client);
 	    UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 
-	    dhcp_wanted = ((symbol) UI::QueryWidget (`id (`dhcpg), `CurrentButton) == `dhcpyes);
-	    UI::ChangeWidget (`id (`domain), `Enabled, !dhcp_wanted && yp_client);
-	    UI::ChangeWidget (`id (`servers), `Enabled, !dhcp_wanted && yp_client);
-	    UI::ChangeWidget (`id (`broadcast), `Enabled, !dhcp_wanted && yp_client);
-	    UI::ChangeWidget (`id (`find), `Enabled, !dhcp_wanted && yp_client);
-	    UI::ChangeWidget (`id (`edit), `Enabled, !dhcp_wanted && yp_client);
-	    UI::ChangeWidget (`id (`adddomains), `Enabled, !dhcp_wanted && yp_client);
+	    //dhcp_wanted = ((symbol) UI::QueryWidget (`id (`dhcpg), `CurrentButton) == `dhcpyes);
 
+		Nis::manual = ((symbol) UI::QueryWidget (`id (`policy), `Value) == `nomodify);
+	    UI::ChangeWidget (`id (`domain), `Enabled, !Nis::manual && yp_client);
+	    UI::ChangeWidget (`id (`servers), `Enabled, !Nis::manual && yp_client);
+	    UI::ChangeWidget (`id (`broadcast), `Enabled, !Nis::manual && yp_client);
+	    UI::ChangeWidget (`id (`find), `Enabled, !Nis::manual && yp_client);
+	    UI::ChangeWidget (`id (`edit), `Enabled, !Nis::manual && yp_client);
+	    UI::ChangeWidget (`id (`adddomains), `Enabled, !Nis::manual && yp_client);
+
+		if(result == `policy)
+		{
+			symbol mode = (symbol)UI::QueryWidget(`id(`policy), `Value);
+			y2milestone("mode: %1", mode);
+			if(mode == `nomodify || mode == `auto)
+			{
+				y2milestone("Disable custompolicy");
+				UI::ChangeWidget (`id (`custompolicy), `Value, "");
+				UI::ChangeWidget (`id (`custompolicy), `Enabled, false);
+			}
+			else
+			{
+				y2milestone("Enable custompolicy");
+				UI::ChangeWidget (`id (`custompolicy), `Value, Nis::policy);
+				UI::ChangeWidget (`id (`custompolicy), `Enabled, (true && yp_client));
+			}
+		}
+		
 	    event	= UI::WaitForEvent ();
 	    result	= (symbol) event["ID"]:nil;
 	    CWMFirewallInterfaces::OpenFirewallHandle(firewall_widget,"",event);
 
-	    if (result == `cancel)
+		if (result == `cancel)
 	    {
 		result = `abort;
 	    }
 
+		/*
 	    if (result == `dhcpyes)
 	    {
 		WarnIfDhcpNotServed ();
 	    }
-	    else if (result == `find)
+	    else
+		*/
+		
+		if (result == `find)
 	    {
 		domain =  (string) UI::QueryWidget (`id (`domain), `Value);
 		if (domain == "")
@@ -432,11 +486,24 @@ Are you sure?")))
 		    }
 		}
 
+		if(UI::QueryWidget (`id (`policy), `Value) == `custom)
+		{
+			Nis::policy = (string)UI::QueryWidget (`id (`custompolicy), `Value);
+		}
+		else if(UI::QueryWidget (`id (`policy), `Value) == `auto)
+		{
+			Nis::policy = "auto";
+		}
+		else
+		{
+			Nis::policy = "";
+		}
+		
 		domain = (string) UI::QueryWidget (`id (`domain), `Value);
 		servers = (string) UI::QueryWidget (`id (`servers), `Value);
 		default_broadcast = (boolean) UI::QueryWidget (`id (`broadcast), `Value);
 
-		if (yp_client && !dhcp_wanted &&
+		if (yp_client && !Nis::manual &&
 		    !Nis::check_nisdomainname (domain))
 		{
 		    UI::SetFocus (`id (`domain));
@@ -447,7 +514,7 @@ Are you sure?")))
 
 		list<string> temp_ad = filter (
 		    string a, splitstring (servers, " "), ``(a != ""));
-		if (yp_client && !dhcp_wanted && !default_broadcast &&
+		if (yp_client && !Nis::manual && !default_broadcast &&
 		    (size (temp_ad) == 0 ||
 		     find (string a, temp_ad,
 			   ``(!Nis::check_address_nis (a))) != nil))
@@ -471,11 +538,14 @@ Are you sure?")))
 	    Nis::Touch (Nis::start != yp_client);
 	    Nis::start = yp_client;
 
+		Nis::dhcp_restart = false;
+		/*
 	    Nis::dhcp_restart = Nis::dhcp_restart ||
 		(Nis::dhcp_wanted != dhcp_wanted);
 	    Nis::Touch (Nis::dhcp_restart);
 	    Nis::dhcp_wanted = dhcp_wanted;
-
+		*/
+		
 	    Nis::SetDomain (domain);
 	    Nis::SetServers (servers);
 	    Nis::Touch (Nis::default_broadcast != default_broadcast);
@@ -1043,7 +1113,7 @@ Are you sure?")))
      * It is done only after read.
      */
     define void FitIntoSingle () ``{
-	if (Nis::dhcp_wanted && Nis::dhcpcd_running)
+	if (!Nis::manual && Nis::dhcpcd_running)
 	{
 	    string d = Nis::GetDomain ();
 	    if (size (Nis::multidomain_servers) == 1)

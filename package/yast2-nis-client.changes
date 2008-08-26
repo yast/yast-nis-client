@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Aug 26 14:21:23 CEST 2008 - mc@suse.de
+
+- 2.17.0
+- Netconfig patch for fine-grained merging of static and
+  DHCP-supplied data 
+
+-------------------------------------------------------------------
 Tue May 20 15:27:26 CEST 2008 - jsuchome@suse.cz
 
 - pass correct service name to SuSEFirewallServices
