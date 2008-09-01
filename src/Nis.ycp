@@ -858,13 +858,6 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	domain = deletechars (out["stdout"]:"", "\n");
 	old_domain = domain;
 
-	
-	boolean servers_by_dhcp_wanted = SCR::Read (
-	    .sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF) == "yes";
-	boolean domain_by_dhcp_wanted = SCR::Read (
-	    .sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME) == "yes";
-	//dhcp_wanted = servers_by_dhcp_wanted && domain_by_dhcp_wanted;
-
 	dhcpcd_running =
 	    SCR::Execute (.target.bash, "ls /var/run/dhcpcd-*.pid") == 0;
 	string di = "/var/lib/dhcpcd/dhcpcd-*.info";
@@ -1139,8 +1132,8 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 		return false;
 	    }
 
-	    SCR::Write (.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME,
-			!manual? "yes":"no");
+	    SCR::Write (.sysconfig.network.config.NETCONFIG_NIS_SETDOMAINNAME,
+			manual? "no" : "yes");
 	    SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF, "no");
 
 	    if (! SCR::Write (.sysconfig.network.dhcp, nil))
