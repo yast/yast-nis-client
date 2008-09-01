@@ -130,6 +130,9 @@
 	y2milestone("getNetconfigValues called");
 
 	policy = (string)SCR::Read(.sysconfig.network.config.NETCONFIG_NIS_POLICY);
+	y2milestone("policy : %1", policy);
+	if (policy == nil) policy = "";
+
 	map<string, map<string, string> > staticVals = $[];
 	list<string> keylist = SCR::Dir (.sysconfig.network.config);
 

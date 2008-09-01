@@ -279,16 +279,16 @@ either locally or over NIS.</p>");
 			`item(`id(`auto), "auto"),
 			`item(`id(`custom), "custom")
 		    ]),
-		    `InputField (`id(`custompolicy), `opt (`hstrech),
+		    `InputField (`id(`custompolicy), `opt (`hstretch),
 			// text entry label
 			_("C&ustom Policy"), "")
 		),
 		`VSpacing (0.2),
 		// text entry label
-		`InputField (`id (`domain), `opt (`hstrech), _("N&IS Domain"),
+		`InputField (`id (`domain), `opt (`hstretch), _("N&IS Domain"),
 		    domain),
 		`VSpacing (0.2),
-		`InputField (`id (`servers), `opt (`hstrech),
+		`InputField (`id (`servers), `opt (`hstretch),
 		    // text entry label
 		    _("&Addresses of NIS servers"), servers),
 		`HBox (
@@ -320,16 +320,16 @@ either locally or over NIS.</p>");
 	con = `HBox (`HSpacing (0.5), `VCenter (
 	    `VBox (
 		`VSpacing (0.4),
-		`RadioButtonGroup (
-		    `id (`rd),
-		    `Left (
-			`HVSquash (
-			    `VBox (
-				// radio button label
-				`Left (`RadioButton (`id (`nisno), `opt (`notify), _("Do &not use NIS"), !yp_client)),
-				// radio button label
-				`Left (`RadioButton (`id (`nisyes), `opt (`notify), _("&Use NIS"), yp_client))
-				)))),
+		`RadioButtonGroup (`id (`rd), `Left ( `HVSquash (`VBox (
+		    `Left (`RadioButton (`id (`nisno), `opt (`notify),
+			// radio button label
+			_("Do &not use NIS"), !yp_client)
+		    ),
+		    `Left (`RadioButton (`id (`nisyes), `opt (`notify),
+			// radio button label
+			_("&Use NIS"), yp_client)
+		    )
+		)))),
 		`VSpacing (1.2),
 		nis_frame,
 		`VSpacing (0.4),
@@ -356,30 +356,28 @@ either locally or over NIS.</p>");
 
 	UI::ChangeWidget (`id (`autofs), `Enabled, Nis::_autofs_allowed);
 
-	if(Nis::policy == "")
+	if (Nis::policy == "")
 	{
-		UI::ChangeWidget (`id (`policy), `Value, `id(`nomodify));
-		UI::ChangeWidget (`id (`custompolicy), `Enabled, false);
+	    UI::ChangeWidget (`id (`policy), `Value, `id(`nomodify));
+	    UI::ChangeWidget (`id (`custompolicy), `Enabled, false);
 	}
 	else if(Nis::policy == "auto" || Nis::policy == "STATIC *")
 	{
-		UI::ChangeWidget (`id (`policy), `Value, `id(`auto));
-		UI::ChangeWidget (`id (`custompolicy), `Enabled, false);
+	    UI::ChangeWidget (`id (`policy), `Value, `id(`auto));
+	    UI::ChangeWidget (`id (`custompolicy), `Enabled, false);
 	}
 	else
 	{
-		UI::ChangeWidget (`id (`policy), `Value, `id(`custom));
-		UI::ChangeWidget (`id (`custompolicy), `Enabled, true);
-		UI::ChangeWidget (`id (`custompolicy), `Value, Nis::policy);
+	    UI::ChangeWidget (`id (`policy), `Value, `id(`custom));
+	    UI::ChangeWidget (`id (`custompolicy), `Enabled, true);
+	    UI::ChangeWidget (`id (`custompolicy), `Value, Nis::policy);
 	}
-	
 	map event	= $[];
 	symbol result = nil;
 	repeat
 	{
-		y2milestone("LOOP: %1", result);
-		
-	    yp_client = ((symbol) UI::QueryWidget (`id (`rd), `CurrentButton) != `nisno);
+	    y2milestone("LOOP: %1", result);
+	    yp_client = (UI::QueryWidget (`id (`rd), `CurrentButton) != `nisno);
 	    UI::ChangeWidget (`id (`expert), `Enabled, yp_client);
 	    UI::ChangeWidget (`id (`policy), `Enabled, yp_client);
 	    //UI::ChangeWidget (`id (`custompolicy), `Enabled, yp_client);
@@ -558,7 +556,7 @@ Are you sure?")))
 			// check box label
 			`Left (`CheckBox (`id (`broken_server), _("Br&oken server"), broken_server)),
 			`VSpacing (0.2),
-			`InputField (`id (`options), `opt (`hstrech),
+			`InputField (`id (`options), `opt (`hstretch),
 			    // text entry label (do not translate 'ypbind')
 			    _("Other &ypbind options"), options),
 			`VSpacing (0.2)
