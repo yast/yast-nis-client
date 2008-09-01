@@ -75,20 +75,6 @@ less frequently used settings.</p>
     }
 
     /**
-     * Pop up a warning if dhcp does not provide nis configuration
-     */
-    define void WarnIfDhcpNotServed () ``{
-	// do not error message for NM (#152262)
-	if (!Nis::dhcp_possible && !NetworkService::IsManaged ())
-	{
-	    // Translators: warning popup
-	    Report::Warning (_("NIS configuration is not currently provided by DHCP.
-Change the DHCP server configuration to provide it.
-"));
-	}
-    }
-
-    /**
      * Let the user choose some of a list of items
      * @param title	selectionbox title
      * @param items	a list of items
@@ -226,7 +212,7 @@ by separating their addresses with spaces.</p>
 
 	help_text = help_text + broadcast_help;
 
-	help_text = help_text + dhcp_help;
+//	help_text = help_text + dhcp_help;
 
 	// help text
 	help_text = help_text + _("<p>Automounter is a daemon that mounts directories automatically,
@@ -238,7 +224,6 @@ either locally or over NIS.</p>");
 	help_text = help_text + firewall_widget["help"]:"";
 
 
-		//boolean dhcp_wanted = Nis::dhcp_wanted || NetworkService::IsManaged ();
 	string domain  = Nis::GetDomain ();
 	string servers = Nis::GetServers ();
 
@@ -288,28 +273,24 @@ either locally or over NIS.</p>");
 	    `VBox (
 		`VSpacing (0.2),
 		`HBox (
-			   `ComboBox(`id(`policy), `opt (`notify), _("Nis &Policy"),
-						 [`item(`id(`nomodify), "manual"),
-						  `item(`id(`auto), "auto"),
-						  `item(`id(`custom), "custom")]),
-			   `TextEntry(`id(`custompolicy), `opt(`hstrech), _("C&ustom Policy"), "")
-			  ),
-   
-	
-// 		`RadioButtonGroup (`id (`dhcpg), `VBox (
-// 		    `Left (`RadioButton (`id (`dhcpyes), `opt (`notify),
-// 			automatic_label, dhcp_wanted)),
-// 		    radio button label
-// 		    `Left (`RadioButton (`id (`dhcpno), `opt (`notify), _("&Static Setup"), !dhcp_wanted))
-// 		)),
-
-		
+		    // combo box label
+		    `ComboBox(`id(`policy), `opt (`notify), _("Nis &Policy"), [
+			`item(`id(`nomodify), "manual"),
+			`item(`id(`auto), "auto"),
+			`item(`id(`custom), "custom")
+		    ]),
+		    `InputField (`id(`custompolicy), `opt (`hstrech),
+			// text entry label
+			_("C&ustom Policy"), "")
+		),
 		`VSpacing (0.2),
 		// text entry label
-		`TextEntry (`id (`domain), _("N&IS Domain"), domain),
+		`InputField (`id (`domain), `opt (`hstrech), _("N&IS Domain"),
+		    domain),
 		`VSpacing (0.2),
-		// text entry label
-		`TextEntry (`id (`servers), _("&Addresses of NIS servers"), servers),
+		`InputField (`id (`servers), `opt (`hstrech),
+		    // text entry label
+		    _("&Addresses of NIS servers"), servers),
 		`HBox (
 		    // check box label
 		    `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Br&oadcast"), default_broadcast)),
@@ -404,9 +385,7 @@ either locally or over NIS.</p>");
 	    //UI::ChangeWidget (`id (`custompolicy), `Enabled, yp_client);
 	    UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 
-	    //dhcp_wanted = ((symbol) UI::QueryWidget (`id (`dhcpg), `CurrentButton) == `dhcpyes);
-
-		Nis::manual = ((symbol) UI::QueryWidget (`id (`policy), `Value) == `nomodify);
+	    Nis::manual = ((symbol) UI::QueryWidget (`id (`policy), `Value) == `nomodify);
 	    UI::ChangeWidget (`id (`domain), `Enabled, !Nis::manual && yp_client);
 	    UI::ChangeWidget (`id (`servers), `Enabled, !Nis::manual && yp_client);
 	    UI::ChangeWidget (`id (`broadcast), `Enabled, !Nis::manual && yp_client);
@@ -431,25 +410,16 @@ either locally or over NIS.</p>");
 				UI::ChangeWidget (`id (`custompolicy), `Enabled, (true && yp_client));
 			}
 		}
-		
 	    event	= UI::WaitForEvent ();
 	    result	= (symbol) event["ID"]:nil;
 	    CWMFirewallInterfaces::OpenFirewallHandle(firewall_widget,"",event);
 
-		if (result == `cancel)
+	    if (result == `cancel)
 	    {
 		result = `abort;
 	    }
 
-		/*
-	    if (result == `dhcpyes)
-	    {
-		WarnIfDhcpNotServed ();
-	    }
-	    else
-		*/
-		
-		if (result == `find)
+	    if (result == `find)
 	    {
 		domain =  (string) UI::QueryWidget (`id (`domain), `Value);
 		if (domain == "")
@@ -537,15 +507,7 @@ Are you sure?")))
 	{
 	    Nis::Touch (Nis::start != yp_client);
 	    Nis::start = yp_client;
-
-		Nis::dhcp_restart = false;
-		/*
-	    Nis::dhcp_restart = Nis::dhcp_restart ||
-		(Nis::dhcp_wanted != dhcp_wanted);
-	    Nis::Touch (Nis::dhcp_restart);
-	    Nis::dhcp_wanted = dhcp_wanted;
-		*/
-		
+	    Nis::dhcp_restart = false;
 	    Nis::SetDomain (domain);
 	    Nis::SetServers (servers);
 	    Nis::Touch (Nis::default_broadcast != default_broadcast);
@@ -596,9 +558,9 @@ Are you sure?")))
 			// check box label
 			`Left (`CheckBox (`id (`broken_server), _("Br&oken server"), broken_server)),
 			`VSpacing (0.2),
-			// text entry label
-			// ypbind is the daemon name
-			`TextEntry (`id (`options), _("Other &ypbind options"), options),
+			`InputField (`id (`options), `opt (`hstrech),
+			    // text entry label (do not translate 'ypbind')
+			    _("Other &ypbind options"), options),
 			`VSpacing (0.2)
 			)
 		    ),
@@ -750,7 +712,7 @@ Are you sure?")))
 		    `Heading (_("Domain Settings")),
 		    // Add a domain, Adding a domain? Edit...
 		    // Translators: text entry label
-		    `Left (`TextEntry (`id (`domain), _("&Domain name"), domain)),
+		    `Left (`InputField (`id (`domain), _("&Domain name"), domain)),
 		    `VSpacing(0.5),
 		    t_servers,
 		    `VSpacing(0.2),
@@ -1118,7 +1080,7 @@ Are you sure?")))
 	    string d = Nis::GetDomain ();
 	    if (size (Nis::multidomain_servers) == 1)
 	    {
-		list<string> s = Nis::multidomain_servers[d]:[];
+		list<string> s = (list<string>) Nis::multidomain_servers[d]:[];
 		// if there's only one entry, for the correct domain
 		if (size (s) > 0)
 		{
