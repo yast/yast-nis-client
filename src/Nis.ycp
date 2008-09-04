@@ -165,7 +165,7 @@
 	    else
 	    {
 		static_keylist = add (static_keylist, key);
-		num = regexpsub(key, "^NETCONFIG_STATIC_NIS_(DOMAIN|SERVERS)_(.*)", "\\2");
+		num = regexpsub(key, "^NETCONFIG_NIS_STATIC_(DOMAIN|SERVERS)_(.*)", "\\2");
 		y2milestone("try to get the number: %1", num);
 		if (issubstring(key, "NETCONFIG_NIS_STATIC_DOMAIN"))
 		{
