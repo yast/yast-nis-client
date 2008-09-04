@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Sep  4 15:02:19 CEST 2008 - mc@suse.de
+
+- fix typo in variable name 
+
+-------------------------------------------------------------------
 Thu Sep  4 14:43:20 CEST 2008 - jsuchome@suse.cz
 
 - rpcbind is default instead of portmap (bnc#423026)
