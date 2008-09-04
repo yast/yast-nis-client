@@ -4,11 +4,7 @@ Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3
 Read	.sysconfig.network.config.NETCONFIG_NIS_POLICY nil
 Dir	.sysconfig.network.config: []
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Read	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "no"
-Read	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "no"
 Execute	.target.bash "ls /var/run/dhcpcd-*.pid" 0
-Execute	.target.bash "/bin/grep -qs '^NISSERVERS' /var/lib/dhcpcd/dhcpcd-*.info" 0
-Execute	.target.bash "/bin/grep -qs '^NISDOMAIN' /var/lib/dhcpcd/dhcpcd-*.info" 0
 Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
 Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
 Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
@@ -39,7 +35,7 @@ Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3
 Read	.init.scripts.comment "ypbind" $["autofs":$[], "portmap":$[], "ypbind":$[]]
 Write	.etc.defaultdomain "mydomain" true
 Execute	.target.remove "/etc/yp.conf.sv" true
-Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY nil true
+Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY "" true
 Write	.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN "" true
 Write	.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS "" true
 Write	.sysconfig.network.config nil true
@@ -49,7 +45,7 @@ Write	.sysconfig.ypbind.YPBIND_BROADCAST "no" true
 Write	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no" true
 Write	.sysconfig.ypbind.YPBIND_OPTIONS "" true
 Write	.sysconfig.ypbind nil true
-Write	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "yes" true
+Write	.sysconfig.network.config.NETCONFIG_NIS_SETDOMAINNAME "yes" true
 Write	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "no" true
 Write	.sysconfig.network.dhcp nil true
 Read	.etc.nsswitch_conf."passwd" "compat"
@@ -98,11 +94,7 @@ Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3
 Read	.sysconfig.network.config.NETCONFIG_NIS_POLICY nil
 Dir	.sysconfig.network.config: []
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Read	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "yes"
-Read	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "yes"
 Execute	.target.bash "ls /var/run/dhcpcd-*.pid" 0
-Execute	.target.bash "/bin/grep -qs '^NISSERVERS' /var/lib/dhcpcd/dhcpcd-*.info" 0
-Execute	.target.bash "/bin/grep -qs '^NISDOMAIN' /var/lib/dhcpcd/dhcpcd-*.info" 0
 Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
 Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
 Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
@@ -130,7 +122,7 @@ Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3
 Read	.init.scripts.comment "ypbind" $["autofs":$[], "portmap":$[], "ypbind":$[]]
 Write	.etc.defaultdomain "mydomain" true
 Execute	.target.remove "/etc/yp.conf.sv" true
-Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY nil true
+Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY "" true
 Write	.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN "" true
 Write	.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS "" true
 Write	.sysconfig.network.config nil true
@@ -140,7 +132,7 @@ Write	.sysconfig.ypbind.YPBIND_BROADCAST "no" true
 Write	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no" true
 Write	.sysconfig.ypbind.YPBIND_OPTIONS "" true
 Write	.sysconfig.ypbind nil true
-Write	.sysconfig.network.dhcp.DHCLIENT_SET_DOMAINNAME "yes" true
+Write	.sysconfig.network.config.NETCONFIG_NIS_SETDOMAINNAME "yes" true
 Write	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "no" true
 Write	.sysconfig.network.dhcp nil true
 Read	.etc.nsswitch_conf."passwd" "compat"
