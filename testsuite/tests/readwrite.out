@@ -1,6 +1,6 @@
 Dump	DHCP off
 Read	.init.scripts.exists "ypbind" true
-Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.sysconfig.network.config.NETCONFIG_NIS_POLICY nil
 Dir	.sysconfig.network.config: []
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
@@ -10,7 +10,7 @@ Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
 Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
 Read	.sysconfig.ypbind.YPBIND_OPTIONS ""
 Read	.init.scripts.exists "autofs" true
-Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.etc.nsswitch_conf."hosts" "files dns6"
 Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."passwd_compat" nil
@@ -19,20 +19,20 @@ Read	.sysconfig.displaymanager.DISPLAYMANAGER "kdm"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Read	.init.scripts.exists "SuSEfirewall2_init" true
-Read	.init.scripts.runlevel "SuSEfirewall2_init" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.runlevel "SuSEfirewall2_init" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.init.scripts.exists "SuSEfirewall2_init" true
 Execute	.target.bash "/etc/init.d/SuSEfirewall2_init status" $["TERM":"raw"] 0
 Return	true
-Read	.init.scripts.exists "portmap" true
-Read	.init.scripts.exists "portmap" true
-Read	.init.scripts.exists "portmap" true
-Read	.init.scripts.runlevel "portmap" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "portmap" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Read	.init.scripts.exists "rpcbind" true
+Read	.init.scripts.exists "rpcbind" true
+Read	.init.scripts.exists "rpcbind" true
+Read	.init.scripts.runlevel "rpcbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "rpcbind" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
 Read	.init.scripts.exists "ypbind" true
 Read	.init.scripts.exists "ypbind" true
 Read	.init.scripts.exists "ypbind" true
-Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "ypbind" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "ypbind" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
 Write	.etc.defaultdomain "mydomain" true
 Execute	.target.remove "/etc/yp.conf.sv" true
 Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY "" true
@@ -77,12 +77,12 @@ Write	.etc.nsswitch_conf nil true
 Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.exists "autofs" true
-Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "autofs" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "autofs" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
 Read	.init.scripts.exists "ypbind" true
 Execute	.target.bash "/etc/init.d/ypbind stop" $["TERM":"raw"] 0
-Read	.init.scripts.exists "portmap" true
-Execute	.target.bash "/etc/init.d/portmap status" $["TERM":"raw"] 0
+Read	.init.scripts.exists "rpcbind" true
+Execute	.target.bash "/etc/init.d/rpcbind status" $["TERM":"raw"] 0
 Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
 Read	.init.scripts.exists "SuSEfirewall2_init" true
@@ -90,7 +90,7 @@ Execute	.target.bash "/etc/init.d/SuSEfirewall2_init status" $["TERM":"raw"] 0
 Return	true
 Dump	DHCP on
 Read	.init.scripts.exists "ypbind" true
-Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.sysconfig.network.config.NETCONFIG_NIS_POLICY nil
 Dir	.sysconfig.network.config: []
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
@@ -100,7 +100,7 @@ Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
 Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
 Read	.sysconfig.ypbind.YPBIND_OPTIONS ""
 Read	.init.scripts.exists "autofs" true
-Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.etc.nsswitch_conf."hosts" "files dns6"
 Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."passwd_compat" nil
@@ -110,16 +110,16 @@ Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Return	true
 Return	nil
-Read	.init.scripts.exists "portmap" true
-Read	.init.scripts.exists "portmap" true
-Read	.init.scripts.exists "portmap" true
-Read	.init.scripts.runlevel "portmap" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "portmap" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Read	.init.scripts.exists "rpcbind" true
+Read	.init.scripts.exists "rpcbind" true
+Read	.init.scripts.exists "rpcbind" true
+Read	.init.scripts.runlevel "rpcbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "rpcbind" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
 Read	.init.scripts.exists "ypbind" true
 Read	.init.scripts.exists "ypbind" true
 Read	.init.scripts.exists "ypbind" true
-Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "ypbind" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "ypbind" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
 Write	.etc.defaultdomain "mydomain" true
 Execute	.target.remove "/etc/yp.conf.sv" true
 Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY "" true
@@ -164,12 +164,12 @@ Write	.etc.nsswitch_conf nil true
 Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.exists "autofs" true
-Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "portmap":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "autofs" $["autofs":$[], "portmap":$[], "ypbind":$[]]
+Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
+Read	.init.scripts.comment "autofs" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
 Read	.init.scripts.exists "ypbind" true
 Execute	.target.bash "/etc/init.d/ypbind stop" $["TERM":"raw"] 0
-Read	.init.scripts.exists "portmap" true
-Execute	.target.bash "/etc/init.d/portmap status" $["TERM":"raw"] 0
+Read	.init.scripts.exists "rpcbind" true
+Execute	.target.bash "/etc/init.d/rpcbind status" $["TERM":"raw"] 0
 Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
 Read	.init.scripts.exists "autofs" true

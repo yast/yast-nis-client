@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Sep  4 14:43:20 CEST 2008 - jsuchome@suse.cz
+
+- rpcbind is default instead of portmap (bnc#423026)
+- DHCLIENT_SET_DOMAINNAME replaced by NETCONFIG_NIS_SETDOMAINNAME
+- 2.17.1
+
+-------------------------------------------------------------------
 Tue Aug 26 14:21:23 CEST 2008 - mc@suse.de
 
 - 2.17.0

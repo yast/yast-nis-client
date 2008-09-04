@@ -116,6 +116,9 @@
     // netconfig policy
     global string policy = "auto";
 
+    // which service mapper is used (rpcbind/portmap)
+    string rpc_mapper	= "rpcbind";
+
     string domain = "";
     string old_domain = nil;
     boolean domain_changed = false;
@@ -1066,7 +1069,12 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
     global define boolean WriteOnly()``{
 	if (start)
 	{
-	    Service::Enable("portmap");
+	    if (Package::Installed ("rpcbind"))
+		rpc_mapper	= "rpcbind";
+	    else
+		rpc_mapper	= "portmap";
+
+	    Service::Enable (rpc_mapper);
 	    Service::Enable("ypbind");
 
 	    if (!SCR::Write (.etc.defaultdomain, domain))
@@ -1181,13 +1189,11 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 
 	if (start)
 	{
-	    if (Service::Status("portmap") != 0 )
+	    if (Service::Status (rpc_mapper) != 0 )
 	    {
-		// portmap must not be started if it is running already (see bug # 9999)
-		if (Service::Start("portmap") == false)
+		if (Service::Start (rpc_mapper) == false)
 		{
-		    // error popup message
-		    Report::Error (_("Error while running portmapper."));
+		    Message::CannotStartService (rpc_mapper);
 		    return false;
 		}
 	    }

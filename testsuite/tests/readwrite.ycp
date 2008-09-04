@@ -48,7 +48,7 @@
 	    "scripts": $[
 		"exists": true,
 		"runlevel": $[
-		    "portmap": $[
+		    "rpcbind": $[
 			"start": [ "3", "5"],
 			"stop":	 [ "3", "5"],
 			],
@@ -63,7 +63,7 @@
 		    ],
 		// their contents is not important for ServiceAdjust
 		"comment": $[
-		    "portmap": $[],
+		    "rpcbind": $[],
 		    "ypbind": $[],
 		    "autofs": $[],
 		    ],
