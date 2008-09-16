@@ -50,11 +50,6 @@ in the local network to find a server after the specified servers
 fail to respond. It is a security risk.</p>
 ");
 
-    /*const*/ string dhcp_help =
-	// Translators: help text
-	// DHCP = Dynamic host configuration protocol
-	_("<p>If you are using <b>DHCP</b> and the server provides the NIS domain name or servers, you can enable their use here. DHCP itself can be set up in the network module.</p>");
-
     /*const*/ string expert_help =
 	// Translators: short for Expert settings
 	_("<p><b>Expert</b> gives access to some
@@ -203,7 +198,11 @@ This option is only available if the firewall is enabled.</p>
 	// help text
 	string help_text = _("<p>Enter your NIS domain, such as example.com,
  and the NIS server's address, such as nis.example.com or 10.20.1.1.</p>
-");
+") +
+
+	// help text for netconfig part
+	_("<p>Select the way how NIS configuration  will be modified. Normally, it is handled by netconfig script which merges the data statically defined here with those obtained dynamically (e.g. from DHCP client, NetworkManager etc.). This is the default, Default Policy option and it is sufficient for most of the configurations.
+By choosing Only Manual Changes option, netconfig will no longer be allowed to modify configuration. You can however edit the file manually. By choosing Custom Policy option, you may specify a custom policy string, which consists of space-separated list of interface names, including wildcards, with STATIC/STATIC_FALLBACK as predefined special values. For more information, see netconfig manual page.</p>");
 
 	// help text
 	help_text = help_text + _("<p>Specify multiple servers
@@ -211,8 +210,6 @@ by separating their addresses with spaces.</p>
 ");
 
 	help_text = help_text + broadcast_help;
-
-//	help_text = help_text + dhcp_help;
 
 	// help text
 	help_text = help_text + _("<p>Automounter is a daemon that mounts directories automatically,
@@ -273,11 +270,15 @@ either locally or over NIS.</p>");
 	    `VBox (
 		`VSpacing (0.2),
 		`HBox (
-		    // combo box label
-		    `ComboBox(`id(`policy), `opt (`notify), _("Nis &Policy"), [
-			`item(`id(`nomodify), "manual"),
-			`item(`id(`auto), "auto"),
-			`item(`id(`custom), "custom")
+		    `ComboBox(`id(`policy), `opt (`notify),
+			// combo box label
+			_("Netconfig NIS &Policy"), [
+			// combo box item
+			`item (`id (`nomodify), _("Only Manual Changes")),
+			// combo box item
+			`item (`id (`auto), _("Default Policy")),
+			// combo box item
+			`item (`id (`custom), _("Custom Policy"))
 		    ]),
 		    `InputField (`id(`custompolicy), `opt (`hstretch),
 			// text entry label
@@ -454,23 +455,25 @@ Are you sure?")))
 		    }
 		}
 
-		if(UI::QueryWidget (`id (`policy), `Value) == `custom)
+		if (UI::QueryWidget (`id (`policy), `Value) == `custom)
 		{
-			Nis::policy = (string)UI::QueryWidget (`id (`custompolicy), `Value);
+		    Nis::policy = (string)
+			UI::QueryWidget (`id (`custompolicy), `Value);
 		}
-		else if(UI::QueryWidget (`id (`policy), `Value) == `auto)
+		else if (UI::QueryWidget (`id (`policy), `Value) == `auto)
 		{
-			Nis::policy = "auto";
+		    Nis::policy = "auto";
 		}
 		else
 		{
-			Nis::policy = "";
+		    Nis::policy = "";
 		}
 		domain = (string) UI::QueryWidget (`id (`domain), `Value);
 		servers = (string) UI::QueryWidget (`id (`servers), `Value);
 		default_broadcast = (boolean) UI::QueryWidget (`id (`broadcast), `Value);
 
 		if (yp_client && !Nis::manual &&
+		    domain != "" &&
 		    !Nis::check_nisdomainname (domain))
 		{
 		    UI::SetFocus (`id (`domain));
@@ -481,10 +484,13 @@ Are you sure?")))
 
 		list<string> temp_ad = filter (
 		    string a, splitstring (servers, " "), ``(a != ""));
+
 		if (yp_client && !Nis::manual && !default_broadcast &&
-		    (size (temp_ad) == 0 ||
-		     find (string a, temp_ad,
-			   ``(!Nis::check_address_nis (a))) != nil))
+		    servers != "" &&
+		    (size (temp_ad) == 0 || find (string a, temp_ad,
+		     ``(!Nis::check_address_nis (a))) != nil
+		    )
+		)
 		{
 		    UI::SetFocus (`id (`servers));
 		    Popup::Message (Nis::valid_address_nis ());
