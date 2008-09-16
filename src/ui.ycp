@@ -391,23 +391,23 @@ either locally or over NIS.</p>");
 	    UI::ChangeWidget (`id (`edit), `Enabled, !Nis::manual && yp_client);
 	    UI::ChangeWidget (`id (`adddomains), `Enabled, !Nis::manual && yp_client);
 
-		if(result == `policy)
+	    if (result == `policy)
+	    {
+		symbol mode = (symbol)UI::QueryWidget(`id(`policy), `Value);
+		y2milestone("mode: %1", mode);
+		if(mode == `nomodify || mode == `auto)
 		{
-			symbol mode = (symbol)UI::QueryWidget(`id(`policy), `Value);
-			y2milestone("mode: %1", mode);
-			if(mode == `nomodify || mode == `auto)
-			{
-				y2milestone("Disable custompolicy");
-				UI::ChangeWidget (`id (`custompolicy), `Value, "");
-				UI::ChangeWidget (`id (`custompolicy), `Enabled, false);
-			}
-			else
-			{
-				y2milestone("Enable custompolicy");
-				UI::ChangeWidget (`id (`custompolicy), `Value, Nis::policy);
-				UI::ChangeWidget (`id (`custompolicy), `Enabled, (true && yp_client));
-			}
+		    y2milestone("Disable custompolicy");
+		    UI::ChangeWidget (`id (`custompolicy), `Value, "");
+		    UI::ChangeWidget (`id (`custompolicy), `Enabled, false);
 		}
+		else
+		{
+		    y2milestone("Enable custompolicy");
+		    UI::ChangeWidget (`id (`custompolicy), `Value, Nis::policy);
+		    UI::ChangeWidget (`id (`custompolicy), `Enabled, (true && yp_client));
+		}
+	    }
 	    event	= UI::WaitForEvent ();
 	    result	= (symbol) event["ID"]:nil;
 	    CWMFirewallInterfaces::OpenFirewallHandle(firewall_widget,"",event);
@@ -466,7 +466,6 @@ Are you sure?")))
 		{
 			Nis::policy = "";
 		}
-		
 		domain = (string) UI::QueryWidget (`id (`domain), `Value);
 		servers = (string) UI::QueryWidget (`id (`servers), `Value);
 		default_broadcast = (boolean) UI::QueryWidget (`id (`broadcast), `Value);
