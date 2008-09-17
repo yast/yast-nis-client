@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Sep 16 16:13:06 CEST 2008 - jsuchome@suse.cz
+
+- do not require entering server with 'auto' policy (bnc#425433)
+- help text and widget labels for policy configuration (bnc#423025)
+- 2.17.2
+
+-------------------------------------------------------------------
 Thu Sep  4 15:02:19 CEST 2008 - mc@suse.de
 
 - fix typo in variable name 
