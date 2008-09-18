@@ -46,7 +46,6 @@ Write	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no" true
 Write	.sysconfig.ypbind.YPBIND_OPTIONS "" true
 Write	.sysconfig.ypbind nil true
 Write	.sysconfig.network.config.NETCONFIG_NIS_SETDOMAINNAME "yes" true
-Write	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "no" true
 Write	.sysconfig.network.dhcp nil true
 Read	.etc.nsswitch_conf."passwd" "compat"
 Write	.etc.nsswitch_conf."passwd_compat" nil true
@@ -133,7 +132,6 @@ Write	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no" true
 Write	.sysconfig.ypbind.YPBIND_OPTIONS "" true
 Write	.sysconfig.ypbind nil true
 Write	.sysconfig.network.config.NETCONFIG_NIS_SETDOMAINNAME "yes" true
-Write	.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF "no" true
 Write	.sysconfig.network.dhcp nil true
 Read	.etc.nsswitch_conf."passwd" "compat"
 Write	.etc.nsswitch_conf."passwd_compat" nil true

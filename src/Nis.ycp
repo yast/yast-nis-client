@@ -1103,7 +1103,6 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 
 	    SCR::Write (.sysconfig.network.config.NETCONFIG_NIS_SETDOMAINNAME,
 			manual? "no" : "yes");
-	    SCR::Write (.sysconfig.network.dhcp.DHCLIENT_MODIFY_NIS_CONF, "no");
 
 	    if (! SCR::Write (.sysconfig.network.dhcp, nil))
 	    {
