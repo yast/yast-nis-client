@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Sep 18 10:31:15 CEST 2008 - jsuchome@suse.cz
+
+- DHCLIENT_MODIFY_NIS_CONF is not used any more
+- 2.17.3 
+
+-------------------------------------------------------------------
 Tue Sep 16 16:13:06 CEST 2008 - jsuchome@suse.cz
 
 - do not require entering server with 'auto' policy (bnc#425433)
