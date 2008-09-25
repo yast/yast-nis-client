@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Sep 25 10:25:53 CEST 2008 - jsuchome@suse.cz
+
+- reset netconfig settings before reading (bnc#427630)
+- 2.17.4
+
+-------------------------------------------------------------------
 Thu Sep 18 10:31:15 CEST 2008 - jsuchome@suse.cz
 
 - DHCLIENT_MODIFY_NIS_CONF is not used any more
