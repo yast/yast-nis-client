@@ -126,11 +126,17 @@
     list<string> static_keylist = [];
 
     /**
-     * Read Netconfig conmfiguration
+     * Read Netconfig configuration
      */
     global void getNetconfigValues() {
 
 	y2milestone("getNetconfigValues called");
+
+	// reset the values
+	multidomain_servers	= $[];
+	multidomain_broadcast	= $[];
+	slp_domain		= $[];
+	servers			= [];
 
 	policy = (string)SCR::Read(.sysconfig.network.config.NETCONFIG_NIS_POLICY);
 	y2milestone("policy : %1", policy);
