@@ -384,13 +384,13 @@ either locally or over NIS.</p>");
 	    //UI::ChangeWidget (`id (`custompolicy), `Enabled, yp_client);
 	    UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
 
-	    Nis::manual = ((symbol) UI::QueryWidget (`id (`policy), `Value) == `nomodify);
-	    UI::ChangeWidget (`id (`domain), `Enabled, !Nis::manual && yp_client);
-	    UI::ChangeWidget (`id (`servers), `Enabled, !Nis::manual && yp_client);
-	    UI::ChangeWidget (`id (`broadcast), `Enabled, !Nis::manual && yp_client);
-	    UI::ChangeWidget (`id (`find), `Enabled, !Nis::manual && yp_client);
-	    UI::ChangeWidget (`id (`edit), `Enabled, !Nis::manual && yp_client);
-	    UI::ChangeWidget (`id (`adddomains), `Enabled, !Nis::manual && yp_client);
+	    boolean manual = (UI::QueryWidget(`id(`policy),`Value)== `nomodify);
+	    UI::ChangeWidget (`id (`domain), `Enabled, !manual && yp_client);
+	    UI::ChangeWidget (`id (`servers), `Enabled, !manual && yp_client);
+	    UI::ChangeWidget (`id (`broadcast), `Enabled, !manual && yp_client);
+	    UI::ChangeWidget (`id (`find), `Enabled, !manual && yp_client);
+	    UI::ChangeWidget (`id (`edit), `Enabled, !manual && yp_client);
+	    UI::ChangeWidget (`id (`adddomains), `Enabled,!manual && yp_client);
 
 	    if (result == `policy)
 	    {
@@ -472,7 +472,7 @@ Are you sure?")))
 		servers = (string) UI::QueryWidget (`id (`servers), `Value);
 		default_broadcast = (boolean) UI::QueryWidget (`id (`broadcast), `Value);
 
-		if (yp_client && !Nis::manual &&
+		if (yp_client && !manual &&
 		    domain != "" &&
 		    !Nis::check_nisdomainname (domain))
 		{
@@ -485,7 +485,7 @@ Are you sure?")))
 		list<string> temp_ad = filter (
 		    string a, splitstring (servers, " "), ``(a != ""));
 
-		if (yp_client && !Nis::manual && !default_broadcast &&
+		if (yp_client && !manual && !default_broadcast &&
 		    servers != "" &&
 		    (size (temp_ad) == 0 || find (string a, temp_ad,
 		     ``(!Nis::check_address_nis (a))) != nil
@@ -1078,7 +1078,7 @@ Are you sure?")))
      * It is done only after read.
      */
     define void FitIntoSingle () ``{
-	if (!Nis::manual && Nis::dhcpcd_running)
+	if (Nis::policy != "" && Nis::dhcpcd_running)
 	{
 	    string d = Nis::GetDomain ();
 	    if (size (Nis::multidomain_servers) == 1)
