@@ -1,7 +1,7 @@
 nis =
   element nis {
     element start_nis { BOOLEAN }? &
-    element nis_by_dhcp {BOOLEAN }? &
+    element netconfig_policy {BOOLEAN }? &
     nis_domain? &		# may be set by dhcp
     nis_servers? &
     nis_broadcast? &
@@ -17,7 +17,10 @@ nis =
     element nis_local_only { BOOLEAN }? &
     element nis_options { text }? &
 
-    element start_autofs { BOOLEAN }?
+    element start_autofs { BOOLEAN }? &
+    element slp_domain {
+                Anything?
+    }?
   }
 
 nis_domain =
