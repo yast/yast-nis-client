@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Sep 26 11:01:04 CEST 2008 - ug@suse.de
+
+- rnc file fixed
+
+-------------------------------------------------------------------
 Thu Sep 25 10:25:53 CEST 2008 - jsuchome@suse.cz
 
 - reset netconfig settings before reading (bnc#427630)
