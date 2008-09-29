@@ -33,15 +33,6 @@
     import "Nis";
 
 
-    map dhcp_yes = $[
-	"DHCLIENT_MODIFY_NIS_CONF": "yes",
-	"DHCLIENT_SET_DOMAINNAME": "yes",
-	];
-    map dhcp_no = $[
-	"DHCLIENT_MODIFY_NIS_CONF": "no",
-	"DHCLIENT_SET_DOMAINNAME": "no",
-	];
-
     map READ = $[
 	// Runlevel:
 	"init": $[
@@ -101,8 +92,10 @@
 		"YPBIND_OPTIONS": "",
 		],
 	    "network": $[
-		"dhcp": dhcp_no,
+		"config": $[
+		    "NETCONFIG_NIS_POLICY"	: ""
 		],
+	    ],
 	    "displaymanager": $[
 		"DISPLAYMANAGER": "kdm",
 		"DISPLAYMANAGER_AUTOLOGIN": "no",
@@ -129,12 +122,12 @@
 	    ],
 	];
 
-    DUMP ("DHCP off");
+    DUMP ("no policy");
     TEST (``(Nis::Read ()), [READ, WRITE, EXECUTE], nil);
     TEST (``(Nis::Write ()), [READ, WRITE, EXECUTE], nil);
 
-    DUMP ("DHCP on");
-    READ["sysconfig", "network", "dhcp"] = dhcp_yes;
+    DUMP ("auto policy");
+    READ["sysconfig", "network", "config", "NETCONFIG_NIS_POLICY"] = "auto";
     TEST (``(Nis::Read ()), [READ, WRITE, EXECUTE], nil);
     TEST (``(Nis::Touch (true)), [], nil);
     TEST (``(Nis::Write ()), [READ, WRITE, EXECUTE], nil);

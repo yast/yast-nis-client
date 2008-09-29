@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Sep 29 09:31:32 CEST 2008 - jsuchome@suse.cz
+
+- autoyast API updated for network policy (bnc#429162) 
+- 2.17.5
+
+-------------------------------------------------------------------
 Fri Sep 26 11:01:04 CEST 2008 - ug@suse.de
 
 - rnc file fixed
