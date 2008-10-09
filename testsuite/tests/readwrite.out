@@ -79,7 +79,7 @@ Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.init.scripts.comment "autofs" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
 Read	.init.scripts.exists "ypbind" true
-Execute	.target.bash "/etc/init.d/ypbind stop" $["TERM":"raw"] 0
+Execute	.target.bash_output "/etc/init.d/ypbind stop" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Read	.init.scripts.exists "rpcbind" true
 Execute	.target.bash "/etc/init.d/rpcbind status" $["TERM":"raw"] 0
 Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
@@ -165,15 +165,15 @@ Read	.init.scripts.exists "autofs" true
 Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.init.scripts.comment "autofs" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
 Read	.init.scripts.exists "ypbind" true
-Execute	.target.bash "/etc/init.d/ypbind stop" $["TERM":"raw"] 0
+Execute	.target.bash_output "/etc/init.d/ypbind stop" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Read	.init.scripts.exists "rpcbind" true
 Execute	.target.bash "/etc/init.d/rpcbind status" $["TERM":"raw"] 0
 Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
 Read	.init.scripts.exists "autofs" true
-Execute	.target.bash "/etc/init.d/autofs stop" $["TERM":"raw"] 0
+Execute	.target.bash_output "/etc/init.d/autofs stop" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Read	.init.scripts.exists "autofs" true
-Execute	.target.bash "/etc/init.d/autofs start" $["TERM":"raw"] 0
+Execute	.target.bash_output "/etc/init.d/autofs start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Read	.init.scripts.exists "SuSEfirewall2_init" true
 Execute	.target.bash "/etc/init.d/SuSEfirewall2_init status" $["TERM":"raw"] 0
 Return	true

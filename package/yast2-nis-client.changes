@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Oct  9 11:02:05 CEST 2008 - jsuchome@suse.cz
+
+- fixed failing testsuite
+- 2.17.6 
+
+-------------------------------------------------------------------
 Mon Sep 29 09:31:32 CEST 2008 - jsuchome@suse.cz
 
 - autoyast API updated for network policy (bnc#429162) 
