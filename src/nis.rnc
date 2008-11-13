@@ -1,7 +1,7 @@
 nis =
   element nis {
     element start_nis { BOOLEAN }? &
-    element netconfig_policy {BOOLEAN }? &
+    element netconfig_policy { text }? &
     nis_domain? &		# may be set by dhcp
     nis_servers? &
     nis_broadcast? &
