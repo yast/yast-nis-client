@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Jan 14 11:01:51 CET 2009 - jsuchome@suse.cz
+
+- no exit confirmation popup if no changes were made (bnc#458319) 
+
+-------------------------------------------------------------------
 Thu Nov 13 16:33:43 CET 2008 - ug@suse.de
 
 - rnc file fixed

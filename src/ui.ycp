@@ -63,10 +63,9 @@ less frequently used settings.</p>
      */
     define boolean ReallyAbort (boolean touched) ``{
 
-	return
-	(!Stage::cont () || contains (WFM::Args (), "from_users"))
-	    ? Popup::ReallyAbort (touched)
-	    : Popup::ConfirmAbort (`incomplete);
+	if (Stage::cont () && !contains (WFM::Args (), "from_users"))
+	    return Popup::ConfirmAbort (`incomplete);
+	return touched ? Popup::ReallyAbort (true) : true;
     }
 
     /**
@@ -502,9 +501,9 @@ Are you sure?")))
 			firewall_widget,"",event);
 	    }
 	}
-	until (result == `back || result == `next || result == `expert ||
-	       result == `edit ||
-	       (result == `abort && ReallyAbort (Nis::touched)));
+	until (result == `edit || result == `next || result == `expert ||
+	       (result == `abort && ReallyAbort (Nis::touched)) ||
+	       (result == `back && (Stage::cont () || ReallyAbort (Nis::touched))));
 
 	if (contains ([`next, `expert, `edit], result))
 	{
