@@ -1,7 +1,8 @@
 -------------------------------------------------------------------
-Wed Jan 14 11:01:51 CET 2009 - jsuchome@suse.cz
+Wed Jan 14 11:58:34 CET 2009 - jsuchome@suse.cz
 
 - no exit confirmation popup if no changes were made (bnc#458319) 
+- used Button box in popup for adding domain (bnc#455740)
 
 -------------------------------------------------------------------
 Thu Nov 13 16:33:43 CET 2008 - ug@suse.de

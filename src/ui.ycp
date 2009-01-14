@@ -717,11 +717,12 @@ Are you sure?")))
 		    `Left (`InputField (`id (`domain), _("&Domain name"), domain)),
 		    `VSpacing(0.5),
 		    t_servers,
-		    `VSpacing(0.2),
-		    `HBox (`PushButton (`id (`ok), `opt (`default, `key_F10),
-					Label::OKButton ()),
-			   `PushButton (`id (`cancel), `opt (`key_F9),
-					Label::CancelButton ())),
+		    `VSpacing(0.2), `ButtonBox (
+			`PushButton (`id (`ok), `opt (`default, `key_F10),
+			    Label::OKButton ()),
+			`PushButton (`id (`cancel), `opt (`key_F9),
+			    Label::CancelButton ())
+		    ),
 		    `VSpacing(0.2)
 		    ),
 		`HSpacing(1)
