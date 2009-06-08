@@ -109,6 +109,15 @@
      */
     global map<string,boolean> multidomain_broadcast = $[];
 
+    /**
+     * If this option is set, ypbind will ignore /etc/yp.conf and use
+     * a broadcast call to find a NIS server in the local subnet. You
+     * should avoid to use this, it is a big security risk.
+     * @see multidomain_broadcast
+     * @see default_broadcast
+     */
+    global boolean global_broadcast = false;
+
     global map slp_domain = $[];
 
     // netconfig policy
@@ -194,12 +203,16 @@
 	    }
 	    else if (value["DOMAIN"]:nil == "broadcast")
 	    {
-		default_broadcast = true;
+		global_broadcast	= true;
 	    }
 	    else if (value["DOMAIN"]:"" != "")
 	    {
 		if (value["SERVERS"]:nil == "broadcast")
 		{
+		    if (key == "0")
+		    {
+			default_broadcast = true;
+		    }
 		    multidomain_broadcast[value["DOMAIN"]:""]	= true;
 		}
 		else if (value["SERVERS"]:nil == "slp")
@@ -348,6 +361,20 @@
 	{
 	    if (cnt == 0)
 	    {
+		SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN, domain);
+		SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS, "broadcast");
+	    }
+	    else
+	    {
+		SCR::Write(add(.sysconfig.network.config, "NETCONFIG_NIS_STATIC_DOMAIN_"+cnt), domain);
+		SCR::Write(add(.sysconfig.network.config, "NETCONFIG_NIS_STATIC_SERVERS_"+cnt), "broadcast");
+	    }
+	    cnt = cnt + 1;
+	}
+	else if (global_broadcast == true)
+	{
+	    if (cnt == 0)
+	    {
 		SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN, "broadcast");
 		SCR::Write(.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS, "");
 	    }
@@ -418,14 +445,6 @@
      */
     global boolean local_only = false;
 
-    /**
-     * If this option is set, ypbind will ignore /etc/yp.conf and use
-     * a broadcast call to find a NIS server in the local subnet. You
-     * should avoid to use this, it is a big security risk.
-     * @see multidomain_broadcast
-     * @see default_broadcast
-     */
-    global boolean global_broadcast = false;
 
     /**
      * You should set this to "yes" if you have a NIS server in your
