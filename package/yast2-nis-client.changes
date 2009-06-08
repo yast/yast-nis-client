@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jun  8 10:17:49 CEST 2009 - jsuchome@suse.cz
+
+- correctly read set domain specific broadcast (bnc#503184)
+- 2.18.0
+
+-------------------------------------------------------------------
 Wed Jan 14 11:58:34 CET 2009 - jsuchome@suse.cz
 
 - no exit confirmation popup if no changes were made (bnc#458319) 
