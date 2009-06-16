@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jun 16 14:27:42 CEST 2009 - mvidner@suse.cz
+
+- Using autodocs-ycp.ami, which contains a fix for automake 1.11.
+
+-------------------------------------------------------------------
 Mon Jun  8 10:17:49 CEST 2009 - jsuchome@suse.cz
 
 - correctly read set domain specific broadcast (bnc#503184)
