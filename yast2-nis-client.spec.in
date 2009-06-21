@@ -15,7 +15,8 @@ Provides:	yast2-config-network:/usr/lib/YaST2/clients/lan_ypclient.ycp
 Summary:	YaST2 - Network Information Services (NIS, YP) Configuration
 
 %description
--
+The YaST2 component for NIS configuration. NIS is a service similar to
+yellow pages.
 
 @PREP@
 
