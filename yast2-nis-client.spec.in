@@ -12,7 +12,7 @@ Provides:	yast2-trans-nis
 Obsoletes:	yast2-trans-nis
 Provides:	yast2-config-network:/usr/lib/YaST2/clients/lan_ypclient.ycp
 
-Summary:	Configuration of NIS client
+Summary:	YaST2 - Network Information Services (NIS, YP) Configuration
 
 %description
 -
