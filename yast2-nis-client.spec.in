@@ -1,6 +1,7 @@
 @HEADER-COMMENT@
 
 @HEADER@
+License: GPL v2 or later
 BuildRequires:	gcc-c++ perl-XML-Writer doxygen yast2-devtools yast2-core-devel yast2 yast2-testsuite yast2-pam update-desktop-files
 Requires:	yast2 yast2-pam
 # .net.hostnames.rpc
