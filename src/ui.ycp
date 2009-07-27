@@ -263,6 +263,8 @@ either locally or over NIS.</p>");
 	    // radio button label
 	    _("Au&tomatic Setup (via DHCP)");
 
+	boolean text_mode	= UI::GetDisplayInfo ()["TextMode"]:false;
+
 	term con = nil;
 	// frame label
 	term nis_frame = `Frame (_("NIS client"), `HBox (`HSpacing (0.4),
@@ -279,18 +281,26 @@ either locally or over NIS.</p>");
 			// combo box item
 			`item (`id (`custom), _("Custom Policy"))
 		    ]),
+		    `HSpacing (),
 		    `InputField (`id(`custompolicy), `opt (`hstretch),
 			// text entry label
 			_("C&ustom Policy"), "")
 		),
 		`VSpacing (0.2),
-		// text entry label
-		`InputField (`id (`domain), `opt (`hstretch), _("N&IS Domain"),
-		    domain),
-		`VSpacing (0.2),
-		`InputField (`id (`servers), `opt (`hstretch),
+		text_mode ? `HBox (
+		    `InputField (`id (`domain), `opt (`hstretch), _("N&IS Domain"), domain),
+		    `HSpacing (),
+		    `InputField (`id (`servers), `opt (`hstretch),
+			_("&Addresses of NIS servers"), servers)
+		) :
+		`VBox (
 		    // text entry label
-		    _("&Addresses of NIS servers"), servers),
+		    `InputField (`id (`domain), `opt (`hstretch), _("N&IS Domain"), domain),
+		    `VSpacing (0.2),
+		    `InputField (`id (`servers), `opt (`hstretch),
+			// text entry label
+			_("&Addresses of NIS servers"), servers)
+		),
 		`HBox (
 		    // check box label
 		    `Left (`CheckBox (`id (`broadcast), `opt (`notify), _("Br&oadcast"), default_broadcast)),
@@ -330,14 +340,14 @@ either locally or over NIS.</p>");
 			_("&Use NIS"), yp_client)
 		    )
 		)))),
-		`VSpacing (1.2),
+		`VSpacing (0.4),
 		nis_frame,
 		`VSpacing (0.4),
 		`Frame ("", `HBox (`HSpacing (0.4), firewall_layout)),
 		`VSpacing (0.4),
 		// checkbox label
 		`CheckBox (`id(`autofs), _("Start Auto&mounter"), autofs),
-		`VSpacing (0.5),
+		`VSpacing (0.4),
 		`PushButton (`id (`expert), `opt (`key_F7),
 		    // button label
 		    // (short for Expert settings)
