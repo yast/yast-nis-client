@@ -18,9 +18,8 @@ X-SuSE-YaST-AutoInstClonable=true
 X-SuSE-YaST-AutoInstSchema=nis.rnc
 
 Icon=yast-nis
-Exec=/sbin/yast2 nis 
+Exec=xdg-su -c "/sbin/yast2 nis"
 
 Name=NIS Client
 GenericName=Configure a NIS client
-X-KDE-SubstituteUID=true
 StartupNotify=true
