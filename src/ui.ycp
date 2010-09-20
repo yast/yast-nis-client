@@ -211,10 +211,13 @@ by separating their addresses with spaces.</p>
 	help_text = help_text + broadcast_help;
 
 	// help text
-	help_text = help_text + _("<p>Automounter is a daemon that mounts directories automatically,
+	help_text = help_text + _("<p><b>Automounter</b> is a daemon that mounts directories automatically,
 such as users' home directories.
 It is assumed that its configuration files (auto.*) already exist,
-either locally or over NIS.</p>");
+either locally or over NIS.</p>")
+
+	// help text
+	+ _("<p>NFS Settings which affects how the automouter operates could be set in NFS Client, which can be configured using <b>NFS Configuration</b> button.</p>");
 
 
 	help_text = help_text + firewall_widget["help"]:"";
@@ -348,10 +351,15 @@ either locally or over NIS.</p>");
 		// checkbox label
 		`CheckBox (`id(`autofs), _("Start Auto&mounter"), autofs),
 		`VSpacing (0.4),
-		`PushButton (`id (`expert), `opt (`key_F7),
-		    // button label
-		    // (short for Expert settings)
-		    _("E&xpert...")
+		`HBox (
+		    `PushButton (`id (`expert), `opt (`key_F7),
+			// button label (short for Expert settings)
+			_("E&xpert...")
+		    ),
+		    `PushButton (`id (`nfs), `opt (`key_F8),
+			// button label
+			_("NFS Configuration...")
+		    )
 		),
 		`VSpacing (0.4)
 	)), `HSpacing (0.5));
@@ -392,6 +400,7 @@ either locally or over NIS.</p>");
 	    UI::ChangeWidget (`id (`policy), `Enabled, yp_client);
 	    //UI::ChangeWidget (`id (`custompolicy), `Enabled, yp_client);
 	    UI::ChangeWidget (`id (`autofs), `Enabled, yp_client);
+	    UI::ChangeWidget (`id (`nfs), `Enabled, yp_client);
 
 	    boolean manual = (UI::QueryWidget(`id(`policy),`Value)== `nomodify);
 	    UI::ChangeWidget (`id (`domain), `Enabled, !manual && yp_client);
@@ -444,6 +453,13 @@ either locally or over NIS.</p>");
 		    {
 			UI::ChangeWidget (`id (`servers), `Value, servers);
 		    }
+		}
+	    }
+	    else if (result == `nfs)
+	    {
+		if (Package::InstallAll ( ["yast2-nfs-client"]))
+		{
+		    WFM::CallFunction ("nfs-client", []);
 		}
 	    }
 	    else if (contains ([`next, `edit, `expert], result))
