@@ -63,9 +63,7 @@ less frequently used settings.</p>
      */
     define boolean ReallyAbort (boolean touched) ``{
 
-	if (Stage::cont () && !contains (WFM::Args (), "from_users"))
-	    return Popup::ConfirmAbort (`incomplete);
-	return touched ? Popup::ReallyAbort (true) : true;
+	return (touched || Stage::cont ()) ? Popup::ReallyAbort (true) : true;
     }
 
     /**
