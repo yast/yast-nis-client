@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jul 15 12:13:23 CEST 2011 - jsuchome@suse.cz
+
+- fixed typo
+- 2.21.1 
+
+-------------------------------------------------------------------
 Wed Mar 23 12:35:14 CET 2011 - jsuchome@suse.cz
 
 - aborting in Stage::cont does not abort installation (bnc#678650)
