@@ -215,7 +215,7 @@ It is assumed that its configuration files (auto.*) already exist,
 either locally or over NIS.</p>")
 
 	// help text
-	+ _("<p>NFS Settings which affects how the automouter operates could be set in NFS Client, which can be configured using <b>NFS Configuration</b> button.</p>");
+	+ _("<p>NFS Settings which affects how the automounter operates could be set in NFS Client, which can be configured using <b>NFS Configuration</b> button.</p>");
 
 
 	help_text = help_text + firewall_widget["help"]:"";
