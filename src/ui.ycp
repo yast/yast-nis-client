@@ -1125,7 +1125,7 @@ Are you sure?")))
      * The normal workflow
      * @return `back, `abort or `next
      */
-    define symbol NormalSequence() ``{
+    symbol NormalSequence() {
 	map normal_override = $[
 	    "common-next": $[
 		`next: "end",
@@ -1133,7 +1133,7 @@ Are you sure?")))
 	    ];
 
 	Wizard::CreateDialog ();
-	Wizard::SetDesktopIcon("nis");
+	Wizard::SetDesktopTitleAndIcon("nis");
 
 	// checking for root permissions (#158483)
 	if (!Confirm::MustBeRoot())
@@ -1189,9 +1189,9 @@ Are you sure?")))
      * The autoinstallation workflow
      * @return `back, `abort or `next
      */
-    define symbol AutoSequence() ``{
+    symbol AutoSequence() {
 	Wizard::CreateDialog ();
-	Wizard::SetDesktopIcon("nis");
+	Wizard::SetDesktopTitleAndIcon("nis");
 	symbol ret = Sequencer::Run(Dialogs, Sequence);
 	UI::CloseDialog ();
 	return ret;
