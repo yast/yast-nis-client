@@ -13,7 +13,6 @@ Read	.etc.nsswitch_conf."hosts" "files dns6"
 Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."passwd_compat" nil
 Read	.target.size "/etc/sysconfig/displaymanager" 0
-Read	.sysconfig.displaymanager.DISPLAYMANAGER "kdm"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Execute	.target.bash "/sbin/chkconfig -l SuSEfirewall2_init | /usr/bin/grep -q '[0-6]:on'" 0
@@ -87,7 +86,6 @@ Read	.etc.nsswitch_conf."hosts" "files dns6"
 Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."passwd_compat" nil
 Read	.target.size "/etc/sysconfig/displaymanager" 0
-Read	.sysconfig.displaymanager.DISPLAYMANAGER "kdm"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Return	true
