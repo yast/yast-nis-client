@@ -1223,6 +1223,7 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 	    }
 	    sleep(1000);	// workaround for bug #10428, ypbind restart
 
+// FIXME might be wrong with systemd!
 	    map out = (map) SCR::Execute (.target.bash_output, "/etc/init.d/ypbind start", $["TERM": "raw"]);
 	    if (out["exit"]:1 == 0)
 	    {
