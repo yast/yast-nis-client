@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Nov  3 14:30:58 CET 2011 - locilka@suse.cz
+
+- Fixed testsuite
+- 2.21.5
+
+-------------------------------------------------------------------
 Mon Oct 24 11:38:22 CEST 2011 - jsuchome@suse.cz
 
 - testsuite adapted to last change of yast2-pam
