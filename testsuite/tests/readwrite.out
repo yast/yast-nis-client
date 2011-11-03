@@ -17,7 +17,6 @@ Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Execute	.target.bash "/sbin/chkconfig -l SuSEfirewall2_init | /usr/bin/grep -q '[0-6]:on'" 0
 Execute	.target.bash "/sbin/chkconfig -l SuSEfirewall2_setup | /usr/bin/grep -q '[0-6]:on'" 0
-Execute	.target.bash "/sbin/service SuSEfirewall2_init status" $["TERM":"raw"] 0
 Return	true
 Read	.init.scripts.runlevel "rpcbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
 Read	.init.scripts.comment "rpcbind" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
@@ -69,7 +68,6 @@ Execute	.target.bash_output "/sbin/service ypbind stop" $["TERM":"raw"] $["exit"
 Execute	.target.bash "/sbin/service rpcbind status" $["TERM":"raw"] 0
 Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
-Execute	.target.bash "/sbin/service SuSEfirewall2_init status" $["TERM":"raw"] 0
 Return	true
 Dump	auto policy
 Execute	.target.bash "/sbin/chkconfig -l ypbind | /usr/bin/grep -q '[0-6]:on'" 0
@@ -142,5 +140,4 @@ Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":
 Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
 Execute	.target.bash_output "/sbin/service autofs stop" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash_output "/sbin/service autofs start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Execute	.target.bash "/sbin/service SuSEfirewall2_init status" $["TERM":"raw"] 0
 Return	true
