@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Nov 25 12:22:45 UTC 2011 - coolo@suse.com
+
+- add libtool as buildrequire to avoid implicit dependency
+
+-------------------------------------------------------------------
 Thu Nov  3 14:30:58 CET 2011 - locilka@suse.cz
 
 - Fixed testsuite
