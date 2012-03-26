@@ -104,6 +104,8 @@
 	],
 	"target"	: $[
 	    "size"	: 0,
+            // FileUtils::Exists
+            "stat"      : $[ 1:2 ]
 	],
     ];
 
