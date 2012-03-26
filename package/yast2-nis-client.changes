@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Mar 26 10:53:57 CEST 2012 - jsuchome@suse.cz
+
+- testsuite adapted to changes in FileUtils.ycp
+- 2.22.1
+
+-------------------------------------------------------------------
 Tue Jan 24 17:18:47 CET 2012 - jsuchome@suse.cz
 
 - confirmed license
