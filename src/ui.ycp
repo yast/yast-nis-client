@@ -218,8 +218,17 @@ This option is only available if the firewall is enabled.</p>
 ") +
 
 	// help text for netconfig part
-	_("<p>Select the way how NIS configuration  will be modified. Normally, it is handled by netconfig script which merges the data statically defined here with those obtained dynamically (e.g. from DHCP client, NetworkManager etc.). This is the default, Default Policy option and it is sufficient for most of the configurations.
-By choosing Only Manual Changes option, netconfig will no longer be allowed to modify configuration. You can however edit the file manually. By choosing Custom Policy option, you may specify a custom policy string, which consists of space-separated list of interface names, including wildcards, with STATIC/STATIC_FALLBACK as predefined special values. For more information, see netconfig manual page.</p>");
+	_("<p>Select the way how the NIS configuration will be modified. Normally, it is
+handled by the netconfig script, which merges the data statically defined here
+with dynamically obtained data (e.g. from DHCP client, NetworkManager
+etc.). This is the Default Policy and sufficient for most configurations. 
+By choosing Only Manual Changes, netconfig will no longer be allowed to modify
+the configuration. You can, however, edit the file manually. By choosing
+Custom Policy, you can specify a custom policy string, which consists of a
+space-separated list of interface names, including wildcards, with
+STATIC/STATIC_FALLBACK as predefined special values. For more information, see
+the netconfig manual page.</p>
+");
 
 	// help text
 	help_text = help_text + _("<p>Specify multiple servers
