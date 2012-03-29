@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Mar 29 15:29:20 CEST 2012 - jsuchome@suse.cz
+
+- merged proofread texts 
+- 2.22.2 
+
+-------------------------------------------------------------------
 Mon Mar 26 10:53:57 CEST 2012 - jsuchome@suse.cz
 
 - testsuite adapted to changes in FileUtils.ycp
