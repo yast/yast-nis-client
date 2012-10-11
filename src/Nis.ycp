@@ -1002,7 +1002,6 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 
     /**
      * Add "+" lines to system files so that NIS entries get merged in.
-     * (Formerly this was done in SuSEconfig.ypclient)
      * @return success?
      */
     define boolean WritePluses () ``{
@@ -1267,8 +1266,6 @@ because host names are resolved using NIS.\n\n") + IP::Valid4();
 		    return false;
 		}
 	    }
-	    if (Autologin::modified)
-		SCR::Execute (.target.bash, "/sbin/SuSEconfig --module kdm3");
 	}
 
 	// remove nscd cache
