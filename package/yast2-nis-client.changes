@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Oct 11 15:32:39 CEST 2012 - jsuchome@suse.cz
+
+- remove obsoleted SuSEconfig call
+- 2.23.0 
+
+-------------------------------------------------------------------
 Thu Mar 29 15:29:20 CEST 2012 - jsuchome@suse.cz
 
 - merged proofread texts 
