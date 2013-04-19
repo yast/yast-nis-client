@@ -15,12 +15,11 @@ Read	.etc.nsswitch_conf."passwd_compat" nil
 Read	.target.size "/etc/sysconfig/displaymanager" 0
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
-Execute	.target.bash "/bin/systemctl is-enabled SuSEfirewall2.service" 0
+Execute	.target.bash "/bin/systemctl is-enabled SuSEfirewall2_init.service" 0
+Execute	.target.bash "/bin/systemctl is-enabled SuSEfirewall2_setup.service" 0
 Return	true
-Read	.init.scripts.runlevel "rpcbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "rpcbind" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
-Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "ypbind" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
+Execute	.target.bash "/bin/systemctl is-enabled rpcbind.service" 0
+Execute	.target.bash "/bin/systemctl is-enabled ypbind.service" 0
 Write	.etc.defaultdomain "mydomain" true
 Execute	.target.remove "/etc/yp.conf.sv" true
 Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY "" true
@@ -61,8 +60,7 @@ Write	.etc.nsswitch_conf nil true
 Read	.etc.nsswitch_conf."automount" "files"
 Write	.etc.nsswitch_conf."automount" "files nis" true
 Write	.etc.nsswitch_conf nil true
-Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "autofs" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
+Execute	.target.bash "/bin/systemctl is-enabled autofs.service" 0
 Execute	.target.bash_output "/bin/systemctl stop ypbind.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash "/bin/systemctl status rpcbind.service" $["TERM":"raw"] 0
 Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
@@ -87,10 +85,8 @@ Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Return	true
 Return	nil
-Read	.init.scripts.runlevel "rpcbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "rpcbind" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
-Read	.init.scripts.runlevel "ypbind" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "ypbind" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
+Execute	.target.bash "/bin/systemctl is-enabled rpcbind.service" 0
+Execute	.target.bash "/bin/systemctl is-enabled ypbind.service" 0
 Write	.etc.defaultdomain "mydomain" true
 Execute	.target.remove "/etc/yp.conf.sv" true
 Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY "auto" true
@@ -131,8 +127,7 @@ Write	.etc.nsswitch_conf nil true
 Read	.etc.nsswitch_conf."automount" "files"
 Write	.etc.nsswitch_conf."automount" "files nis" true
 Write	.etc.nsswitch_conf nil true
-Read	.init.scripts.runlevel "autofs" $["autofs":$["start":["3", "5"], "stop":["3", "5"]], "rpcbind":$["start":["3", "5"], "stop":["3", "5"]], "ypbind":$["start":["3", "5"], "stop":["3", "5"]]]
-Read	.init.scripts.comment "autofs" $["autofs":$[], "rpcbind":$[], "ypbind":$[]]
+Execute	.target.bash "/bin/systemctl is-enabled autofs.service" 0
 Execute	.target.bash_output "/bin/systemctl stop ypbind.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash "/bin/systemctl status rpcbind.service" $["TERM":"raw"] 0
 Execute	.target.bash_output "/etc/init.d/ypbind start" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]

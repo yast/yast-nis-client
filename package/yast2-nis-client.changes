@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr 19 12:43:42 CEST 2013 - jsuchome@suse.cz
+
+- testsuite adapted to last change of Service.ycp 
+- 2.24.0
+
+-------------------------------------------------------------------
 Thu Jan  3 15:54:23 UTC 2013 - locilka@suse.com
 
 - Testsuites adapted to switching Service module to systemd
