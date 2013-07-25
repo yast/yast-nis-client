@@ -1,5 +1,11 @@
 -------------------------------------------------------------------
-Thu Jul 25 10:55:44 UTC 2013 - lslezak@localhost
+Thu Jul 25 16:15:46 CEST 2013 - jsuchome@suse.cz
+
+- reduced obsoleted documentation
+- 2.24.2
+
+-------------------------------------------------------------------
+Thu Jul 25 10:55:44 UTC 2013 - lslezak@suse.cz
 
 - move the development documentation to devel-doc subpackage
 - 2.24.1

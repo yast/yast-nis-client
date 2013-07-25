@@ -64,8 +64,6 @@ provided by yast2-nis-client package.
 
 %files devel-doc
 %doc @docdir@/autodocs
-%doc @docdir@/*.png
 %doc @docdir@/*.html
-%doc @docdir@/*.dia
 %doc @docdir@/*.txt
 
