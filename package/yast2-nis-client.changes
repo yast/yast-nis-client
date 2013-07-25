@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jul 25 10:55:44 UTC 2013 - lslezak@localhost
+
+- move the development documentation to devel-doc subpackage
+- 2.24.1
+
+-------------------------------------------------------------------
 Fri Apr 19 16:16:57 CEST 2013 - jsuchome@suse.cz
 
 - testsuite adapted to last changes in Service and SuSEfirewall2
