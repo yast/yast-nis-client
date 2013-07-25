@@ -1,5 +1,5 @@
 #
-# Makefile.am for core/agent-ypserv
+# Makefile.am for nis-client/agent-ypserv
 #
 
-SUBDIRS = conf doc src
+SUBDIRS = conf src
