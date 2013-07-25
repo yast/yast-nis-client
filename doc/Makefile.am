@@ -8,8 +8,5 @@ SUBDIRS = autodocs
 
 htmldir = $(docdir)
 
-screenshots = \
-	$(wildcard nis*.png)
-
-html_DATA = index.html ypdomainname.txt workflow.dia workflow.png $(screenshots)
+html_DATA = index.html ypdomainname.txt
 EXTRA_DIST = $(html_DATA)
