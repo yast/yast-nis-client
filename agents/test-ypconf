@@ -2,7 +2,7 @@
 # $Id$
 set -o errexit
 
-AGENT=./ag_yp_conf
+AGENT=../src/servers_non_y2/ag_yp_conf
 CASE=test-ypconf
 AGPROG='YpConf ("'$CASE'-i.in")
 Read (.)'

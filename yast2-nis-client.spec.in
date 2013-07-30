@@ -18,6 +18,8 @@ Provides:	yast2-trans-nis
 Obsoletes:	yast2-trans-nis
 Provides:	yast2-config-network:/usr/lib/YaST2/clients/lan_ypclient.ycp
 
+Requires:       yast2-ruby-bindings >= 1.0.0
+
 Summary:	YaST2 - Network Information Services (NIS, YP) Configuration
 
 %description
@@ -44,10 +46,10 @@ provided by yast2-nis-client package.
 %files
 %defattr(-,root,root)
 %dir @yncludedir@/nis
-@yncludedir@/nis/ui.ycp
-@clientdir@/nis.ycp
-@clientdir@/nis-client.ycp
-@clientdir@/nis_auto.ycp
+@yncludedir@/nis/ui.rb
+@clientdir@/nis.rb
+@clientdir@/nis-client.rb
+@clientdir@/nis_auto.rb
 @moduledir@/Nis.*
 @desktopdir@/nis.desktop
 @agentdir@/ag_yp_conf
