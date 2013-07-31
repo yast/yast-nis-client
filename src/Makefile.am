@@ -1,27 +1,32 @@
-# Makefile.am for source/nis-client/src
+# Sources for nis-client
 
-myyncludedir = $(yncludedir)/nis
-rncdir =  $(schemadir)/autoyast/rnc
+module_DATA = \
+  modules/Nis.rb
 
-client_DATA =		\
-	nis.ycp		\
-	nis-client.ycp	\
-	nis_auto.ycp
+client_DATA = \
+  clients/nis.rb \
+  clients/nis-client.rb \
+  clients/nis_auto.rb
 
-myynclude_DATA =	\
-	ui.ycp
+yncludedir = @yncludedir@/nis
+ynclude_DATA = \
+  include/nis/ui.rb
 
-module_DATA =		\
-	Nis.ycp
+scrconf_DATA = \
+  scrconf/ypserv.scr \
+  scrconf/cfg_ypbind.scr \
+  scrconf/yp_conf.scr
 
-desktop_DATA = nis.desktop
+agent_SCRIPTS = \
+  servers_non_y2/ag_yp_conf
 
-rnc_DATA = nis.rnc
+schemafilesdir = $(schemadir)/autoyast/rnc
+schemafiles_DATA = \
+  autoyast-rnc/nis.rnc
 
-nis:
-	ln -sf . $@
-ycpchook = nis
+desktop_DATA = \
+  desktop/nis.desktop
 
-EXTRA_DIST = $(client_DATA) $(myynclude_DATA) $(module_DATA) $(desktop_DATA) $(rnc_DATA)
+EXTRA_DIST = $(module_DATA) $(client_DATA) $(ynclude_DATA) $(scrconf_DATA) $(agent_SCRIPTS) $(schemafiles_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common
