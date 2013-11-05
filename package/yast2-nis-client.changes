@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Nov  5 11:51:47 CET 2013 - jsuchome@suse.cz
+
+- add/remove unix-nis PAM module option if needed (bnc#848963) 
+- 3.0.1
+
+-------------------------------------------------------------------
 Wed Jul 31 08:34:09 UTC 2013 - yast-devel@opensuse.org
 
 - converted from YCP to Ruby by YCP Killer
