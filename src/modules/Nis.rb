@@ -47,6 +47,7 @@ module Yast
       Yast.import "IP"
       Yast.import "Message"
       Yast.import "Nsswitch"
+      Yast.import "Pam"
       Yast.import "Package"
       Yast.import "Progress"
       Yast.import "Report"
@@ -1285,6 +1286,15 @@ module Yast
         Service.Stop("autofs")
 
         Service.Start("autofs") if @_start_autofs
+      end
+
+      # adapt PAM if needed (bnc#848963)
+      if @touched && Pam.Enabled("unix")
+        if @start
+          Pam.Add("unix-nis")
+        else
+          Pam.Remove("unix-nis")
+        end 
       end
 
       SuSEFirewall.ActivateConfiguration
