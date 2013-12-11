@@ -28,7 +28,7 @@ License:        GPL-2.0
 # SuSEfirewall2_* services merged into one service yast2-2.23.17
 BuildRequires:	yast2 >= 2.23.17
 BuildRequires:	gcc-c++ perl-XML-Writer doxygen yast2-core-devel yast2-testsuite yast2-pam update-desktop-files libtool
-BuildRequires:  yast2-devtools >= 3.0.6
+BuildRequires:  yast2-devtools >= 3.1.10
 # Wizard::SetDesktopTitleAndIcon
 Requires:	yast2 >= 2.21.22
 Requires:       yast2-pam
