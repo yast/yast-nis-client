@@ -84,6 +84,7 @@ provided by yast2-nis-client package.
 %{yast_scrconfdir}/cfg_ypbind.scr
 %{yast_scrconfdir}/yp_conf.scr
 %{yast_scrconfdir}/ypserv.scr
+%{yast_scrconfdir}/etc_defaultdomain.scr
 %{yast_schemadir}/autoyast/rnc/nis.rnc
 %dir %{yast_docdir}
 %doc %{yast_docdir}/COPYING
