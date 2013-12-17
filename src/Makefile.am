@@ -15,7 +15,8 @@ ynclude_DATA = \
 scrconf_DATA = \
   scrconf/ypserv.scr \
   scrconf/cfg_ypbind.scr \
-  scrconf/yp_conf.scr
+  scrconf/yp_conf.scr \
+  scrconf/etc_defaultdomain.scr
 
 agent_SCRIPTS = \
   servers_non_y2/ag_yp_conf
