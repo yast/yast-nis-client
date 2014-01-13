@@ -328,7 +328,7 @@ module Yast
       Builtins.y2debug("all_servers: %1", all_servers)
       Builtins.y2debug("additional_domains: %1", additional_domains)
 
-      automatic_label = NetworkService.IsManaged ?
+      automatic_label = NetworkService.is_network_manager ?
         # radio button label
         _("Au&tomatic Setup (Via NetworkManager and DHCP)") :
         # radio button label
