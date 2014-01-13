@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Jan 13 15:59:10 CET 2014 - jsuchome@suse.cz
+
+- updated for current NetworkService API (bnc#856376)
+
+-------------------------------------------------------------------
 Tue Dec 17 09:44:57 UTC 2013 - mfilka@suse.com
 
 - contains .etc.defaultdomain agent
