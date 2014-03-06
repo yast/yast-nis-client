@@ -1249,22 +1249,7 @@ module Yast
         end
         Builtins.sleep(1000) # workaround for bug #10428, ypbind restart
 
-        # FIXME might be wrong with systemd!
-        out = Convert.to_map(
-          SCR.Execute(
-            path(".target.bash_output"),
-            "/etc/init.d/ypbind start",
-            { "TERM" => "raw" }
-          )
-        )
-        if Ops.get_integer(out, "exit", 1) == 0
-          @YpbindErrors = ""
-        else
-          @YpbindErrors = Ops.get_string(out, "stdout", "internal error")
-          # error popup message
-          Report.Error(_("Error while running ypclient."))
-          return false
-        end
+        Service.Start("ypbind")
 
         # only test for a server if domain not changed
         if !@domain_changed
