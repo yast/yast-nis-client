@@ -1249,7 +1249,11 @@ module Yast
         end
         Builtins.sleep(1000) # workaround for bug #10428, ypbind restart
 
-        Service.Start("ypbind")
+        if !Service.Start("ypbind")
+          # error popup message
+          Report.Error(_("Error while running ypclient."))
+          return false
+        end
 
         # only test for a server if domain not changed
         if !@domain_changed
