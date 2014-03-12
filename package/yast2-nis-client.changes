@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Mar 12 10:19:01 UTC 2014 - vmoravec@suse.com
+
+- Fix failing testsuite due to changes in yast2
+- 3.1.6
+
+-------------------------------------------------------------------
 Thu Mar  6 12:58:47 CET 2014 - jsuchome@suse.cz
 
 - use Service API for starting ypbind (bnc#866923)

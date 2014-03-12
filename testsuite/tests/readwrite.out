@@ -61,7 +61,7 @@ Write	.etc.nsswitch_conf."automount" "files nis" true
 Write	.etc.nsswitch_conf nil true
 Execute	.target.bash "/bin/systemctl is-enabled autofs.service" 0
 Execute	.target.bash_output "/bin/systemctl stop ypbind.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Execute	.target.bash "/bin/systemctl status rpcbind.service" $["TERM":"raw"] 0
+Execute	.target.bash "/bin/systemctl is-active rpcbind.service" $["TERM":"raw"] 0
 Execute	.target.bash_output "/bin/systemctl start ypbind.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
 Return	true
@@ -128,7 +128,7 @@ Write	.etc.nsswitch_conf."automount" "files nis" true
 Write	.etc.nsswitch_conf nil true
 Execute	.target.bash "/bin/systemctl is-enabled autofs.service" 0
 Execute	.target.bash_output "/bin/systemctl stop ypbind.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Execute	.target.bash "/bin/systemctl status rpcbind.service" $["TERM":"raw"] 0
+Execute	.target.bash "/bin/systemctl is-active rpcbind.service" $["TERM":"raw"] 0
 Execute	.target.bash_output "/bin/systemctl start ypbind.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
 Execute	.target.bash_output "/bin/systemctl stop autofs.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]

@@ -17,8 +17,9 @@
 
 
 Name:           yast2-nis-client
-Version:        3.1.5
+Version:        3.1.6
 Release:        0
+Url:            https://github.com/yast/yast-nis-client
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
