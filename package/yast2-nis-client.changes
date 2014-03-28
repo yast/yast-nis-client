@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Mar 28 15:26:58 UTC 2014 - vmoravec@suse.com
+
+- Fix failing testsuite
+- 3.1.7
+
+-------------------------------------------------------------------
 Wed Mar 12 10:19:01 UTC 2014 - vmoravec@suse.com
 
 - Fix failing testsuite due to changes in yast2
