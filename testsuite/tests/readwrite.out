@@ -1,5 +1,4 @@
 Dump	no policy
-Execute	.target.bash "/bin/systemctl is-enabled ypbind.service" 0
 Read	.sysconfig.network.config.NETCONFIG_NIS_POLICY ""
 Dir	.sysconfig.network.config: ["NETCONFIG_NIS_POLICY"]
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
@@ -8,17 +7,13 @@ Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
 Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
 Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
 Read	.sysconfig.ypbind.YPBIND_OPTIONS ""
-Execute	.target.bash "/bin/systemctl is-enabled autofs.service" 0
 Read	.etc.nsswitch_conf."hosts" "files dns6"
 Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."passwd_compat" nil
 Read	.target.size "/etc/sysconfig/displaymanager" 0
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
-Execute	.target.bash "/bin/systemctl is-enabled SuSEfirewall2.service" 0
 Return	true
-Execute	.target.bash "/bin/systemctl is-enabled rpcbind.service" 0
-Execute	.target.bash "/bin/systemctl is-enabled ypbind.service" 0
 Write	.etc.defaultdomain "mydomain" true
 Execute	.target.remove "/etc/yp.conf.sv" true
 Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY "" true
@@ -59,14 +54,9 @@ Write	.etc.nsswitch_conf nil true
 Read	.etc.nsswitch_conf."automount" "files"
 Write	.etc.nsswitch_conf."automount" "files nis" true
 Write	.etc.nsswitch_conf nil true
-Execute	.target.bash "/bin/systemctl is-enabled autofs.service" 0
-Execute	.target.bash_output "/bin/systemctl stop ypbind.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Execute	.target.bash "/bin/systemctl is-active rpcbind.service" $["TERM":"raw"] 0
-Execute	.target.bash_output "/bin/systemctl start ypbind.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
 Return	true
 Dump	auto policy
-Execute	.target.bash "/bin/systemctl is-enabled ypbind.service" 0
 Read	.sysconfig.network.config.NETCONFIG_NIS_POLICY "auto"
 Dir	.sysconfig.network.config: ["NETCONFIG_NIS_POLICY"]
 Execute	.target.bash_output "/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
@@ -75,7 +65,6 @@ Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
 Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
 Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
 Read	.sysconfig.ypbind.YPBIND_OPTIONS ""
-Execute	.target.bash "/bin/systemctl is-enabled autofs.service" 0
 Read	.etc.nsswitch_conf."hosts" "files dns6"
 Read	.etc.nsswitch_conf."passwd" "compat"
 Read	.etc.nsswitch_conf."passwd_compat" nil
@@ -84,8 +73,6 @@ Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Return	true
 Return	nil
-Execute	.target.bash "/bin/systemctl is-enabled rpcbind.service" 0
-Execute	.target.bash "/bin/systemctl is-enabled ypbind.service" 0
 Write	.etc.defaultdomain "mydomain" true
 Execute	.target.remove "/etc/yp.conf.sv" true
 Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY "auto" true
@@ -126,11 +113,5 @@ Write	.etc.nsswitch_conf nil true
 Read	.etc.nsswitch_conf."automount" "files"
 Write	.etc.nsswitch_conf."automount" "files nis" true
 Write	.etc.nsswitch_conf nil true
-Execute	.target.bash "/bin/systemctl is-enabled autofs.service" 0
-Execute	.target.bash_output "/bin/systemctl stop ypbind.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Execute	.target.bash "/bin/systemctl is-active rpcbind.service" $["TERM":"raw"] 0
-Execute	.target.bash_output "/bin/systemctl start ypbind.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
-Execute	.target.bash_output "/bin/systemctl stop autofs.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Execute	.target.bash_output "/bin/systemctl start autofs.service" $["TERM":"raw"] $["exit":0, "stderr":"", "stdout":"mydomain\n"]
 Return	true
