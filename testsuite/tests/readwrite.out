@@ -14,47 +14,15 @@ Read	.target.size "/etc/sysconfig/displaymanager" 0
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Return	true
-Write	.etc.defaultdomain "mydomain" true
-Execute	.target.remove "/etc/yp.conf.sv" true
-Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY "" true
-Write	.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN "" true
-Write	.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS "" true
-Write	.sysconfig.network.config nil true
-Execute	.target.bash "/sbin/netconfig update" 0
-Write	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no" true
-Write	.sysconfig.ypbind.YPBIND_BROADCAST "no" true
-Write	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no" true
-Write	.sysconfig.ypbind.YPBIND_OPTIONS "" true
-Write	.sysconfig.ypbind nil true
-Write	.sysconfig.network.config.NETCONFIG_NIS_SETDOMAINNAME "no" true
-Write	.sysconfig.network.dhcp nil true
-Read	.etc.nsswitch_conf."passwd" "compat"
-Write	.etc.nsswitch_conf."passwd_compat" nil true
-Read	.etc.nsswitch_conf."group" "compat"
-Write	.etc.nsswitch_conf."group_compat" nil true
-Read	.etc.nsswitch_conf."shadow" nil
-Write	.etc.nsswitch_conf."shadow" "compat" true
-Write	.etc.nsswitch_conf."shadow_compat" nil true
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
-Execute	.target.bash "/bin/grep -q '^+::::::/sbin/nologin' /etc/passwd" 0
-Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+::::::/sbin/nologin@+::::::@' /etc/passwd" 0
-Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/shadow" 0
-Execute	.target.bash "/bin/grep -q '^+/sbin/nologin' /etc/shadow" 0
-Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+/sbin/nologin@+@' /etc/shadow" 0
-Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/group" 0
-Execute	.target.bash "/bin/grep -q '^+:::/sbin/nologin' /etc/group" 0
-Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+:::/sbin/nologin@+:::@' /etc/group" 0
 Read	.etc.nsswitch_conf."services" "files"
-Write	.etc.nsswitch_conf."services" "files nis" true
+Write	.etc.nsswitch_conf."services" "files" true
 Read	.etc.nsswitch_conf."netgroup" "files"
-Write	.etc.nsswitch_conf."netgroup" "nis" true
+Write	.etc.nsswitch_conf."netgroup" "files" true
 Read	.etc.nsswitch_conf."aliases" "files"
-Write	.etc.nsswitch_conf."aliases" "files nis" true
+Write	.etc.nsswitch_conf."aliases" "files" true
 Write	.etc.nsswitch_conf nil true
 Read	.etc.nsswitch_conf."automount" "files"
-Write	.etc.nsswitch_conf."automount" "files nis" true
-Write	.etc.nsswitch_conf nil true
-Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
 Return	true
 Dump	auto policy
 Read	.sysconfig.network.config.NETCONFIG_NIS_POLICY "auto"
@@ -73,45 +41,13 @@ Read	.sysconfig.displaymanager.DISPLAYMANAGER_AUTOLOGIN "no"
 Read	.sysconfig.displaymanager.DISPLAYMANAGER_PASSWORD_LESS_LOGIN "no"
 Return	true
 Return	nil
-Write	.etc.defaultdomain "mydomain" true
-Execute	.target.remove "/etc/yp.conf.sv" true
-Write	.sysconfig.network.config.NETCONFIG_NIS_POLICY "auto" true
-Write	.sysconfig.network.config.NETCONFIG_NIS_STATIC_DOMAIN "" true
-Write	.sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS "" true
-Write	.sysconfig.network.config nil true
-Execute	.target.bash "/sbin/netconfig update" 0
-Write	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no" true
-Write	.sysconfig.ypbind.YPBIND_BROADCAST "no" true
-Write	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no" true
-Write	.sysconfig.ypbind.YPBIND_OPTIONS "" true
-Write	.sysconfig.ypbind nil true
-Write	.sysconfig.network.config.NETCONFIG_NIS_SETDOMAINNAME "yes" true
-Write	.sysconfig.network.dhcp nil true
-Read	.etc.nsswitch_conf."passwd" "compat"
-Write	.etc.nsswitch_conf."passwd_compat" nil true
-Read	.etc.nsswitch_conf."group" "compat"
-Write	.etc.nsswitch_conf."group_compat" nil true
-Read	.etc.nsswitch_conf."shadow" nil
-Write	.etc.nsswitch_conf."shadow" "compat" true
-Write	.etc.nsswitch_conf."shadow_compat" nil true
 Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/passwd" 0
-Execute	.target.bash "/bin/grep -q '^+::::::/sbin/nologin' /etc/passwd" 0
-Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+::::::/sbin/nologin@+::::::@' /etc/passwd" 0
-Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/shadow" 0
-Execute	.target.bash "/bin/grep -q '^+/sbin/nologin' /etc/shadow" 0
-Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+/sbin/nologin@+@' /etc/shadow" 0
-Execute	.target.bash "/usr/bin/grep -q '^[+-]' /etc/group" 0
-Execute	.target.bash "/bin/grep -q '^+:::/sbin/nologin' /etc/group" 0
-Execute	.target.bash "/usr/bin/sed -i.YaST2save -e 's@+:::/sbin/nologin@+:::@' /etc/group" 0
 Read	.etc.nsswitch_conf."services" "files"
-Write	.etc.nsswitch_conf."services" "files nis" true
+Write	.etc.nsswitch_conf."services" "files" true
 Read	.etc.nsswitch_conf."netgroup" "files"
-Write	.etc.nsswitch_conf."netgroup" "nis" true
+Write	.etc.nsswitch_conf."netgroup" "files" true
 Read	.etc.nsswitch_conf."aliases" "files"
-Write	.etc.nsswitch_conf."aliases" "files nis" true
+Write	.etc.nsswitch_conf."aliases" "files" true
 Write	.etc.nsswitch_conf nil true
 Read	.etc.nsswitch_conf."automount" "files"
-Write	.etc.nsswitch_conf."automount" "files nis" true
-Write	.etc.nsswitch_conf nil true
-Execute	.target.bash "/usr/bin/ypwhich >/dev/null" 0
 Return	true
