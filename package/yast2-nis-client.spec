@@ -17,7 +17,7 @@
 
 
 Name:           yast2-nis-client
-Version:        3.1.8
+Version:        3.1.9
 Release:        0
 Url:            https://github.com/yast/yast-nis-client
 
@@ -32,7 +32,7 @@ BuildRequires:	gcc-c++ perl-XML-Writer doxygen yast2-core-devel yast2-testsuite 
 BuildRequires:  yast2-devtools >= 3.1.10
 # Wizard::SetDesktopTitleAndIcon
 Requires:	yast2 >= 2.21.22
-Requires:       yast2-pam
+Requires:       yast2-pam yast2-network
 # .net.hostnames.rpc
 Conflicts:      yast2-core < 2.8.0
 
