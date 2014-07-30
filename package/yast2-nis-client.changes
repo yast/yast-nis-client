@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jul 30 08:00:24 CEST 2014 - jsuchome@suse.cz
+
+- yast2-network required for writing network settings (bnc#888664)
+- 3.1.9
+
+-------------------------------------------------------------------
 Mon Mar 31 13:23:54 UTC 2014 - jreidinger@suse.com
 
 - one more fix for failing old testsuite as we cannot mock new
