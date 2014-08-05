@@ -224,7 +224,7 @@ module Yast
         {
           "services"        => ["service:ypbind"],
           "display_details" => true,
-          # firewall openning help
+          # firewall opening help
           "help"            => _(
             "<p><b>Firewall Settings</b><br>\n" +
               "To open the firewall to allow accessing the 'ypbind' service\n" +
@@ -234,7 +234,7 @@ module Yast
           )
         }
       )
-      firewall_layout = Ops.get_term(firewall_widget, "custom_widget", VBox())
+      firewall_layout = firewall_widget["custom_widget"] || VBox()
 
       # help text
       help_text = _(
@@ -476,29 +476,31 @@ module Yast
             VSpacing(0.4),
             nis_frame,
             VSpacing(0.4),
-            Frame("", HBox(HSpacing(0.4), firewall_layout)),
-            VSpacing(0.4),
-            # checkbox label
-            CheckBox(Id(:autofs), _("Start Auto&mounter"), autofs),
-            VSpacing(0.4),
             HBox(
-              PushButton(
-                Id(:expert),
-                Opt(:key_F7),
-                # button label (short for Expert settings)
-                _("E&xpert...")
-              ),
-              PushButton(
-                Id(:nfs),
-                Opt(:key_F8),
-                # button label
-                _("NFS Configuration...")
-              )
-            ),
-            VSpacing(0.4)
-          )
-        ),
-        HSpacing(0.5)
+                 HSquash(firewall_layout),
+                 HSpacing(0.8),
+                 VBox(
+                      VSpacing(0.8),
+                      HBox(
+                           PushButton(
+                                      Id(:expert),
+                                      Opt(:key_F7),
+                                      # button label (short for Expert settings)
+                                      _("E&xpert...")
+                                      ),
+                           PushButton(
+                                      Id(:nfs),
+                                      Opt(:key_F8),
+                                      # button label
+                                      _("NFS Configuration...")
+                                      )
+                           ),
+                      # check box label
+                      CheckBox(Id(:autofs), _("Start Auto&mounter"), autofs)
+                      )
+                 )
+            )
+        )
       )
 
       Wizard.SetContentsButtons(
