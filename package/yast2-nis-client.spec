@@ -17,7 +17,7 @@
 
 
 Name:           yast2-nis-client
-Version:        3.1.10
+Version:        3.1.11
 Release:        0
 Url:            https://github.com/yast/yast-nis-client
 
