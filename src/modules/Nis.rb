@@ -908,10 +908,8 @@ module Yast
       @multidomain_broadcast = {} if @multidomain_broadcast == nil
       @slp_domain = {} if @slp_domain == nil
 
-      out = Convert.to_map(
-        SCR.Execute(path(".target.bash_output"), "/bin/ypdomainname")
-      )
-      @domain = Builtins.deletechars(Ops.get_string(out, "stdout", ""), "\n")
+      out = SCR.Execute(path(".target.bash_output"), "/usr/bin/ypdomainname")
+      @domain = out["stdout"].chomp
       @old_domain = @domain
 
       @dhcpcd_running = SCR.Execute(
