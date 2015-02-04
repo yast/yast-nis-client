@@ -909,7 +909,7 @@ module Yast
       @slp_domain = {} if @slp_domain == nil
 
       out = SCR.Execute(path(".target.bash_output"), "/usr/bin/ypdomainname")
-      @domain = out["stdout"].strip
+      @domain = out["stdout"].chomp
       @old_domain = @domain
 
       @dhcpcd_running = SCR.Execute(
