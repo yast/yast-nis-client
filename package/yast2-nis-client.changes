@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Jun  1 14:54:19 UTC 2016 - igonzalezsosa@suse.com
+
+- Drop yast2-nis-client-devel-doc package (fate#320356)
+- 3.1.13
+
+-------------------------------------------------------------------
 Wed Feb  4 11:01:53 UTC 2015 - ancor@suse.com
 
 - Use correct location for ypdomainname (bnc#916031)

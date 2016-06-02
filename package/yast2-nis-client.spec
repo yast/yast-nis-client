@@ -17,7 +17,7 @@
 
 
 Name:           yast2-nis-client
-Version:        3.1.12
+Version:        3.1.13
 Release:        0
 Url:            https://github.com/yast/yast-nis-client
 
@@ -50,15 +50,6 @@ Summary:	YaST2 - Network Information Services (NIS, YP) Configuration
 The YaST2 component for NIS configuration. NIS is a service similar to
 yellow pages.
 
-%package devel-doc
-Requires:       yast2-nis-client = %version
-Group:          System/YaST
-Summary:        YaST2 - NIS Configuration - Development Documentation
-
-%description devel-doc
-This package contains development documentation for using the API
-provided by yast2-nis-client package.
-
 %prep
 %setup -n %{name}-%{version}
 
@@ -87,11 +78,6 @@ provided by yast2-nis-client package.
 %{yast_scrconfdir}/ypserv.scr
 %{yast_scrconfdir}/etc_defaultdomain.scr
 %{yast_schemadir}/autoyast/rnc/nis.rnc
+
 %dir %{yast_docdir}
 %doc %{yast_docdir}/COPYING
-
-%files devel-doc
-%doc %{yast_docdir}/autodocs
-%doc %{yast_docdir}/*.html
-%doc %{yast_docdir}/*.txt
-
