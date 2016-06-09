@@ -41,6 +41,7 @@ Obsoletes:	yast2-config-nis yast2-config-nis-devel
 Provides:	yast2-trans-nis
 Obsoletes:	yast2-trans-nis
 Provides:	yast2-config-network:/usr/lib/YaST2/clients/lan_ypclient.ycp
+Obsoletes:	yast2-nis-client-devel-doc
 
 Requires:       yast2-ruby-bindings >= 1.0.0
 
