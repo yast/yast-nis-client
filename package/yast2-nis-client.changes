@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Oct 19 15:17:12 UTC 2016 - jreidinger@suse.com
+
+- report error if ypdomainname failed instead of silent ignoring
+  (bsc#994530)
+- 3.2.0
+
+-------------------------------------------------------------------
 Tue Jul 19 06:49:37 UTC 2016 - mfilka@suse.com
 
 - bnc#988928
