@@ -909,6 +909,10 @@ module Yast
       @slp_domain = {} if @slp_domain == nil
 
       out = SCR.Execute(path(".target.bash_output"), "/usr/bin/ypdomainname")
+      # 0 OK, 1 mean no domain name set, so no nis, do not report it
+      if out["exit"] > 1
+        Report.Error(_("Getting domain name via ypdomainname failed with '%s'") % out["stderr"])
+      end
       @domain = out["stdout"].chomp
       @old_domain = @domain
 
