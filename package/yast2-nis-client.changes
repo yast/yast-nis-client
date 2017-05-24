@@ -3,7 +3,7 @@ Wed May 24 09:14:54 CEST 2017 - schubi@suse.de
 
 - Added yp-tools to the requirements in order to call ypdomainname
   (Additional fix for bnc#916031)
-- 3.1.13
+- 3.2.0
 
 -------------------------------------------------------------------
 Wed Feb  4 11:01:53 UTC 2015 - ancor@suse.com
