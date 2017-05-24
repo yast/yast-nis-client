@@ -2,10 +2,31 @@
 Wed May 24 09:14:54 CEST 2017 - schubi@suse.de
 
 - Added yp-tools to the requirements in order to call ypdomainname
-  (Additional fix for bnc#916031)
+  (Additional fix for bnc#916031 and bsc#994530)
+- 3.2.1
+
+-------------------------------------------------------------------
+Wed Oct 19 15:17:12 UTC 2016 - jreidinger@suse.com
+
+- report error if ypdomainname failed instead of silent ignoring
+  (bsc#994530)
 - 3.2.0
 
 -------------------------------------------------------------------
+Tue Jul 19 06:49:37 UTC 2016 - mfilka@suse.com
+
+- bnc#988928
+  - updated translation
+- 3.1.14
+
+-------------------------------------------------------------------
+Wed Jun  1 14:54:19 UTC 2016 - igonzalezsosa@suse.com
+
+- Drop yast2-nis-client-devel-doc package (fate#320356)
+- 3.1.13
+
+-------------------------------------------------------------------
+
 Wed Feb  4 11:01:53 UTC 2015 - ancor@suse.com
 
 - Use correct location for ypdomainname (bnc#916031)

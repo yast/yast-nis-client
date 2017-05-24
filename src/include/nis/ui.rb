@@ -408,7 +408,7 @@ module Yast
                 CheckBox(
                   Id(:broadcast),
                   Opt(:notify),
-                  _("Br&oadcast"),
+                  _("&Broadcast"),
                   default_broadcast
                 )
               ),
