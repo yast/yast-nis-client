@@ -17,7 +17,7 @@
 
 
 Name:           yast2-nis-client
-Version:        3.1.12
+Version:        3.1.13
 Release:        0
 Url:            https://github.com/yast/yast-nis-client
 
@@ -43,6 +43,7 @@ Obsoletes:	yast2-trans-nis
 Provides:	yast2-config-network:/usr/lib/YaST2/clients/lan_ypclient.ycp
 
 Requires:       yast2-ruby-bindings >= 1.0.0
+Requires:	yp-tools
 
 Summary:	YaST2 - Network Information Services (NIS, YP) Configuration
 
