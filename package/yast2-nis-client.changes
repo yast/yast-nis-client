@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Sep 11 07:34:10 UTC 2017 - jsrain@suse.cz
+
+- added libnsl-devel to BuildRequires for upstream changes
+- 4.0.0
+
+-------------------------------------------------------------------
 Wed May 24 09:14:54 CEST 2017 - schubi@suse.de
 
 - Added yp-tools to the requirements in order to call ypdomainname
