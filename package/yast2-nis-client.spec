@@ -17,7 +17,7 @@
 
 
 Name:           yast2-nis-client
-Version:        3.2.1
+Version:        4.0.0
 Release:        0
 Url:            https://github.com/yast/yast-nis-client
 
@@ -29,6 +29,7 @@ License:        GPL-2.0
 # SuSEfirewall2_* services merged into one service yast2-2.23.17
 BuildRequires:	yast2 >= 2.23.17
 BuildRequires:	gcc-c++ perl-XML-Writer doxygen yast2-core-devel yast2-testsuite yast2-pam update-desktop-files libtool
+BuildRequires:  libnsl-devel
 BuildRequires:  yast2-devtools >= 3.1.10
 # Wizard::SetDesktopTitleAndIcon
 Requires:	yast2 >= 2.21.22
