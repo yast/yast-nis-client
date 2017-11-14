@@ -2,12 +2,12 @@
 # Makefile.am for nis-client/agent-ypserv/src
 #
 
-AM_CXXFLAGS = -DY2LOG=\"agent-ypserv\"
+AM_CXXFLAGS = -DY2LOG=\"agent-ypserv\" -I/usr/include/tirpc
 
 noinst_LTLIBRARIES = libFindYpserv.la
 
 libFindYpserv_la_SOURCES = FindYpserv.cc FindYpserv.h
-libFindYpserv_la_LIBADD = -lnsl
+libFindYpserv_la_LIBADD = -lnsl -ltirpc
 
 plugin_LTLIBRARIES = libpy2ag_ypserv.la
 
