@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Nov 14 14:25:11 CET 2017 - kukuk@suse.de
+
+- Link ypserv agent against libtirpc, sunrpc is deprecated and does
+  not support IPv6
+
+-------------------------------------------------------------------
 Mon Sep 11 07:34:10 UTC 2017 - jsrain@suse.cz
 
 - added libnsl-devel to BuildRequires for upstream changes

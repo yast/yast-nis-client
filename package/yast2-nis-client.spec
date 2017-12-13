@@ -30,6 +30,7 @@ License:        GPL-2.0
 BuildRequires:	yast2 >= 2.23.17
 BuildRequires:	gcc-c++ perl-XML-Writer doxygen yast2-core-devel yast2-testsuite yast2-pam update-desktop-files libtool
 BuildRequires:  libnsl-devel
+BuildRequires:  libtirpc-devel
 BuildRequires:  yast2-devtools >= 3.1.10
 # Wizard::SetDesktopTitleAndIcon
 Requires:	yast2 >= 2.21.22
