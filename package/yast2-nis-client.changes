@@ -2,7 +2,7 @@
 Tue Nov 14 14:25:11 CET 2017 - kukuk@suse.de
 
 - Link ypserv agent against libtirpc, sunrpc is deprecated and does
-  not support IPv6
+  not support IPv6 (bsc#1076566)
 - 4.0.1
 
 -------------------------------------------------------------------
