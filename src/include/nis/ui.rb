@@ -222,7 +222,7 @@ module Yast
 
       firewall_widget = CWMFirewallInterfaces.CreateOpenFirewallWidget(
         {
-          "services"        => ["service:ypbind"],
+          "services"        => ["ypbind"],
           "display_details" => true,
           # firewall opening help
           "help"            => _(

@@ -36,6 +36,7 @@
 # $Id$
 #
 require "yast"
+require "y2firewall/firewalld"
 
 module Yast
   class NisClass < Module
@@ -53,7 +54,6 @@ module Yast
       Yast.import "Report"
       Yast.import "Service"
       Yast.import "Summary"
-      Yast.import "SuSEFirewall"
       Yast.import "Wizard"
 
       # default value of settings modified
@@ -940,9 +940,7 @@ module Yast
 
       Autologin.Read
 
-      progress_orig = Progress.set(false)
-      SuSEFirewall.Read
-      Progress.set(progress_orig)
+      Y2Firewall::Firewalld.instance.read
 
       true
     end
@@ -1193,9 +1191,7 @@ module Yast
         end
       end
 
-      progress_orig = Progress.set(false)
-      SuSEFirewall.WriteOnly
-      Progress.set(progress_orig)
+      Y2Firewall::Firewalld.instance.write_only
 
       true
     end
@@ -1288,8 +1284,7 @@ module Yast
         end 
       end
 
-      SuSEFirewall.ActivateConfiguration
-
+      Y2Firewall::Firewalld.instance.reload
       # final stage
       Progress.NextStage
 
