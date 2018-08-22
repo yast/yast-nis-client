@@ -25,7 +25,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
 
 Group:          System/YaST
-License:        GPL-2.0
+License:        GPL-2.0-only
 # SuSEfirewall2_* services merged into one service yast2-2.23.17
 BuildRequires:	yast2 >= 2.23.17
 BuildRequires:	gcc-c++ perl-XML-Writer doxygen yast2-core-devel yast2-testsuite yast2-pam update-desktop-files libtool
@@ -84,4 +84,4 @@ yellow pages.
 %{yast_schemadir}/autoyast/rnc/nis.rnc
 
 %dir %{yast_docdir}
-%doc %{yast_docdir}/COPYING
+%license %{yast_docdir}/COPYING
