@@ -11,5 +11,8 @@
 @YAST2-CHECKS-PROGRAM@
 @YAST2-CHECKS-TESTSUITE@
 
+icondir=/usr/share/icons
+AC_SUBST(icondir)
+
 ## and generate the output...
 @YAST2-OUTPUT@
