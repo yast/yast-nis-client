@@ -28,6 +28,7 @@ schemafiles_DATA = \
 desktop_DATA = \
   desktop/nis.desktop
 
+scalabledir = @icondir@/hicolor/scalable/apps
 scalable_DATA = \
   icons/hicolor/scalable/apps/yast-nis.svg
 
