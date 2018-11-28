@@ -17,7 +17,7 @@
 
 
 Name:           yast2-nis-client
-Version:        4.0.3
+Version:        4.0.4
 Release:        0
 Url:            https://github.com/yast/yast-nis-client
 
@@ -82,6 +82,6 @@ yellow pages.
 %{yast_scrconfdir}/ypserv.scr
 %{yast_scrconfdir}/etc_defaultdomain.scr
 %{yast_schemadir}/autoyast/rnc/nis.rnc
-
+%{yast_icondir}
 %dir %{yast_docdir}
 %license %{yast_docdir}/COPYING
