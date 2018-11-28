@@ -82,6 +82,6 @@ yellow pages.
 %{yast_scrconfdir}/ypserv.scr
 %{yast_scrconfdir}/etc_defaultdomain.scr
 %{yast_schemadir}/autoyast/rnc/nis.rnc
-%{_datadir}/icons/*
+%{yast_icondir}
 %dir %{yast_docdir}
 %license %{yast_docdir}/COPYING
