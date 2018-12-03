@@ -2,7 +2,7 @@ Dump	no policy
 Read	.sysconfig.network.config.NETCONFIG_NIS_POLICY ""
 Dir	.sysconfig.network.config: ["NETCONFIG_NIS_POLICY"]
 Execute	.target.bash_output "/usr/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Execute	.target.bash "ls /var/run/dhcpcd-*.pid" 0
+Execute	.target.bash "/usr/bin/ls /var/run/dhcpcd-*.pid" 0
 Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
 Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
 Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
@@ -28,7 +28,7 @@ Dump	auto policy
 Read	.sysconfig.network.config.NETCONFIG_NIS_POLICY "auto"
 Dir	.sysconfig.network.config: ["NETCONFIG_NIS_POLICY"]
 Execute	.target.bash_output "/usr/bin/ypdomainname" $["exit":0, "stderr":"", "stdout":"mydomain\n"]
-Execute	.target.bash "ls /var/run/dhcpcd-*.pid" 0
+Execute	.target.bash "/usr/bin/ls /var/run/dhcpcd-*.pid" 0
 Read	.sysconfig.ypbind.YPBIND_LOCAL_ONLY "no"
 Read	.sysconfig.ypbind.YPBIND_BROADCAST "no"
 Read	.sysconfig.ypbind.YPBIND_BROKEN_SERVER "no"
