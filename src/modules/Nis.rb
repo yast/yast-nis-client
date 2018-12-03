@@ -918,7 +918,7 @@ module Yast
 
       @dhcpcd_running = SCR.Execute(
         path(".target.bash"),
-        "ls /var/run/dhcpcd-*.pid"
+        "/usr/bin/ls /var/run/dhcpcd-*.pid"
       ) == 0
 
       @local_only = SCR.Read(path(".sysconfig.ypbind.YPBIND_LOCAL_ONLY")) == "yes"
@@ -995,11 +995,11 @@ module Yast
         # backup the file:
         SCR.Execute(
           path(".target.bash"),
-          Builtins.sformat("/bin/cp %1 %1.YaST2save", file)
+          Builtins.sformat("/usr/bin/cp %1 %1.YaST2save", file)
         )
         if SCR.Execute(
             path(".target.bash"),
-            Builtins.sformat("/bin/echo '%1' >> %2", what, file)
+            Builtins.sformat("/usr/bin/echo '%1' >> %2", what, file)
           ) != 0
           ok = false
         end
@@ -1007,7 +1007,7 @@ module Yast
       # replace the 'nologin' occurence (#40571)
       elsif SCR.Execute(
           path(".target.bash"),
-          Builtins.sformat("/bin/grep -q '^%1/sbin/nologin' %2", what, file)
+          Builtins.sformat("/usr/bin/grep -q '^%1/sbin/nologin' %2", what, file)
         ) == 0
         ok = SCR.Execute(
           path(".target.bash"),
