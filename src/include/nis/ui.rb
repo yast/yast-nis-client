@@ -694,7 +694,7 @@ module Yast
 
       local_only = Nis.local_only
       broken_server = Nis.broken_server
-      options = Nis.options
+      options = Nis.options || ""
 
       contents = HSquash(
         VBox(
