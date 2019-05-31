@@ -26,7 +26,7 @@ schemafiles_DATA = \
   autoyast-rnc/nis.rnc
 
 desktop_DATA = \
-  desktop/nis.desktop
+  desktop/org.openSUSE.YaST.NIS.desktop
 
 scalabledir = @icondir@/hicolor/scalable/apps
 scalable_DATA = \

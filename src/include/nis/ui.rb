@@ -1225,7 +1225,7 @@ module Yast
       normal_override = { "common-next" => { :next => "end" } }
 
       Wizard.CreateDialog
-      Wizard.SetDesktopTitleAndIcon("nis")
+      Wizard.SetDesktopTitleAndIcon("org.openSUSE.YaST.NIS")
 
       # checking for root permissions (#158483)
       if !Confirm.MustBeRoot
@@ -1275,7 +1275,7 @@ module Yast
     # @return `back, `abort or `next
     def AutoSequence
       Wizard.CreateDialog
-      Wizard.SetDesktopTitleAndIcon("nis")
+      Wizard.SetDesktopTitleAndIcon("org.openSUSE.YaST.NIS")
       ret = Sequencer.Run(@Dialogs, @Sequence)
       UI.CloseDialog
       ret
