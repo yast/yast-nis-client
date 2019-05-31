@@ -12,76 +12,68 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
 Name:           yast2-nis-client
+Summary:        YaST2 - Network Information Services (NIS, YP) Configuration
 Version:        4.1.1
 Release:        0
 Url:            https://github.com/yast/yast-nis-client
-
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-Source0:        %{name}-%{version}.tar.bz2
-
 Group:          System/YaST
 License:        GPL-2.0-only
+
+Source0:        %{name}-%{version}.tar.bz2
+
 # SuSEfirewall2_* services merged into one service yast2-2.23.17
-BuildRequires:	yast2 >= 2.23.17
-BuildRequires:	gcc-c++ perl-XML-Writer doxygen yast2-core-devel yast2-testsuite yast2-pam update-desktop-files libtool
+BuildRequires:  yast2 >= 2.23.17
+BuildRequires:  gcc-c++ perl-XML-Writer doxygen yast2-core-devel yast2-testsuite yast2-pam update-desktop-files libtool
 BuildRequires:  libnsl-devel
 BuildRequires:  libtirpc-devel
 BuildRequires:  yast2-devtools >= 3.1.10
+
 # Wizard::SetDesktopTitleAndIcon
-Requires:	yast2 >= 2.21.22
+Requires:       yast2 >= 2.21.22
 Requires:       yast2-pam yast2-network
+Requires:       yast2-ruby-bindings >= 1.0.0
+Requires:       yp-tools
+
 # .net.hostnames.rpc
 Conflicts:      yast2-core < 2.8.0
 
-Provides:	yast2-config-nis yast2-config-nis-devel
-Obsoletes:	yast2-config-nis yast2-config-nis-devel
-Provides:	yast2-trans-nis
-Obsoletes:	yast2-trans-nis
-Provides:	yast2-config-network:/usr/lib/YaST2/clients/lan_ypclient.ycp
-Obsoletes:	yast2-nis-client-devel-doc
+Provides:       yast2-config-nis yast2-config-nis-devel
+Provides:       yast2-trans-nis
+Provides:       yast2-config-network:/usr/lib/YaST2/clients/lan_ypclient.ycp
 
-Requires:       yast2-ruby-bindings >= 1.0.0
-Requires:	yp-tools
-
-Summary:	YaST2 - Network Information Services (NIS, YP) Configuration
+Obsoletes:      yast2-config-nis yast2-config-nis-devel
+Obsoletes:      yast2-trans-nis
+Obsoletes:      yast2-nis-client-devel-doc
 
 %description
 The YaST2 component for NIS configuration. NIS is a service similar to
 yellow pages.
 
 %prep
-%setup -n %{name}-%{version}
+%setup -q
 
 %build
 %yast_build
 
 %install
 %yast_install
-
+%yast_metainfo
 
 %files
-%defattr(-,root,root)
-%dir %{yast_yncludedir}/nis
-%{yast_yncludedir}/nis/ui.rb
-%{yast_clientdir}/nis.rb
-%{yast_clientdir}/nis-client.rb
-%{yast_clientdir}/nis_auto.rb
-%{yast_moduledir}/Nis.*
-%{yast_desktopdir}/nis.desktop
-%{yast_agentdir}/ag_yp_conf
-%{yast_plugindir}/libpy2ag_ypserv.so.*
-%{yast_plugindir}/libpy2ag_ypserv.so
-%{yast_plugindir}/libpy2ag_ypserv.la
-%{yast_scrconfdir}/cfg_ypbind.scr
-%{yast_scrconfdir}/yp_conf.scr
-%{yast_scrconfdir}/ypserv.scr
-%{yast_scrconfdir}/etc_defaultdomain.scr
-%{yast_schemadir}/autoyast/rnc/nis.rnc
+%{yast_yncludedir}
+%{yast_clientdir}
+%{yast_moduledir}
+%{yast_desktopdir}
+%{yast_metainfodir}
+%{yast_agentdir}
+%{yast_plugindir}
+%{yast_scrconfdir}
+%{yast_schemadir}
 %{yast_icondir}
 %dir %{yast_docdir}
-%license %{yast_docdir}/COPYING
+%license COPYING
