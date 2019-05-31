@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri May 31 12:34:40 UTC 2019 - Stasiek Michalski <hellcp@mailbox.org>
+
+- Add metainfo (fate#319035)
+- Revamp spec
+- Replace GenericName with Comment
+- 4.2.0
+
+-------------------------------------------------------------------
 Mon Mar 11 16:43:56 UTC 2019 - Stefan Hundhammer <shundhammer@suse.com>
 
 - Prevent UI syntax error due to nil in widget term (bsc#1126515)
