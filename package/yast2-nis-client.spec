@@ -75,5 +75,5 @@ yellow pages.
 %{yast_scrconfdir}
 %{yast_schemadir}
 %{yast_icondir}
-%dir %{yast_docdir}
+%doc %{yast_docdir}
 %license COPYING
