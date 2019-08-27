@@ -14,6 +14,7 @@ X-SuSE-YaST-Geometry=
 X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstClonable=true
 X-SuSE-YaST-AutoInstSchema=nis.rnc
+X-SuSE-YaST-AutoInstResource=nis
 X-SuSE-YaST-Keywords=authentication,network,users
 
 Icon=yast-nis
