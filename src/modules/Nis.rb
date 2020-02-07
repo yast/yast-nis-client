@@ -1089,7 +1089,7 @@ module Yast
             if db == "netgroup"
               db_l = ["nis"]
             else
-              db_l = ["files", "nis"]
+              db_l << "nis"
             end
             Nsswitch.WriteDb(db, db_l)
           end
@@ -1109,7 +1109,7 @@ module Yast
         Builtins.foreach(nis_dbs) do |db|
           db_l = Nsswitch.ReadDb(db)
           db_l = Builtins.filter(db_l) { |s| s != "nis" }
-          db_l = ["files"] if db_l == []
+          db_l = ["files", "usrfiles"] if db_l == []
           Nsswitch.WriteDb(db, db_l)
         end
       end
