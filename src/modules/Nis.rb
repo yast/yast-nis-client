@@ -1024,8 +1024,9 @@ module Yast
     end
 
     # Do we need compat? Is there a plus in any of the user databases?
-    # @return true/false
-    def HavePlus
+    #
+    # @return [Boolean]
+    def has_plus?
       files = ["/etc/passwd", "/etc/shadow", "/etc/group"]
       # find a file having a plus
       nil != Builtins.find(files) { |file| HasPlus(file) }
@@ -1053,12 +1054,14 @@ module Yast
       true
     end
 
-    # Configures the name service switch for the user databases
-    # according to chosen settings
-    # @return success?
+    # Configures the name service switch for the user databases according to chosen settings
+    #
+    # @return [Boolean] true on success; false otherwise
     def WriteNssConf
       dbs = ["passwd", "group", "shadow"]
+
       nis_dbs = ["services", "netgroup", "aliases"]
+
       # Why bother with both compat and nis?
       # If there's no plus, we don't have to write passwd etc.
       # And it's supposed to be faster.
@@ -1066,59 +1069,75 @@ module Yast
       # so we stick with compat.
       if @start
         # we want to switch to "compat"
-        Builtins.foreach(dbs) do |db|
+        dbs.each do |db|
           # what if a db is not mentioned?
           # We get [] meaning compat, so it's ok to make it explicit
           db_l = Nsswitch.ReadDb(db)
-          if !Builtins.contains(db_l, "compat")
+
+          if db_l.include?("compat")
             # remove "files" and "nis", if there;
-            db_l = Builtins.filter(db_l) { |s| s != "files" && s != "nis" }
+            db_l -= ["files", "nis"]
+
             # put "compat" and the rest;
-            db_l = Builtins.prepend(db_l, "compat")
+            db_l.prepend("compat")
+
             Nsswitch.WriteDb(db, db_l)
           end
+
           # *_compat may be set to nisplus, nuke it (#16168)
-          db_c = Ops.add(db, "_compat")
+          db_c = db + ["_compat"]
+
           Nsswitch.WriteDb(db_c, [])
         end
+
         Builtins.y2milestone("Writing pluses")
+
         WritePluses()
-        Builtins.foreach(nis_dbs) do |db|
+
+        nis_dbs.each do |db|
           db_l = Nsswitch.ReadDb(db)
-          if !Builtins.contains(db_l, "nis")
+
+          if !db_l.include?("nis")
             if db == "netgroup"
               db_l = ["nis"]
             else
               db_l << "nis"
             end
+
             Nsswitch.WriteDb(db, db_l)
           end
         end # not start
       else
         Builtins.y2milestone("not writing pluses")
-        have_plus = HavePlus()
 
-        Builtins.foreach(dbs) do |db|
+        if !has_plus?
+          dbs.each do |db|
+            db_l = Nsswitch.ReadDb(db)
+
+            # remove "nis" if there;
+            db_l -= ["nis"]
+
+            # if nothing left, put "files";
+            # NOT. just remove it, meaning compat. #35299
+            Nsswitch.WriteDb(db, db_l)
+          end
+        end
+
+        nis_dbs.each do |db|
           db_l = Nsswitch.ReadDb(db)
-          # remove "nis" if there;
-          db_l = Builtins.filter(db_l) { |s| s != "nis" }
-          # if nothing left, put "files";
-          # NOT. just remove it, meaning compat. #35299
-          Nsswitch.WriteDb(db, db_l)
-        end if !have_plus
-        Builtins.foreach(nis_dbs) do |db|
-          db_l = Nsswitch.ReadDb(db)
-          db_l = Builtins.filter(db_l) { |s| s != "nis" }
-          db_l = ["files", "usrfiles"] if db_l == []
+
+          db_l -= ["nis"]
+          db_l = ["files", "usrfiles"] if db_l.empty?
+
           Nsswitch.WriteDb(db, db_l)
         end
       end
 
-      if !SCR.Write(path(".etc.nsswitch_conf"), nil)
-        Report.Error(Message.ErrorWritingFile("/etc/nsswitch.conf"))
-        return false
-      end
-      true
+      return true if SCR.Write(path(".etc.nsswitch_conf"), nil)
+
+      Report.Error(Message.ErrorWritingFile("/etc/nsswitch.conf"))
+
+      false
     end
 
     # Only write new configuration w/o starting any scripts
@@ -1282,7 +1301,7 @@ module Yast
           Pam.Add("unix-nis")
         else
           Pam.Remove("unix-nis")
-        end 
+        end
       end
 
       Y2Firewall::Firewalld.instance.reload
