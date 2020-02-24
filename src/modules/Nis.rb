@@ -1085,7 +1085,7 @@ module Yast
           end
 
           # *_compat may be set to nisplus, nuke it (#16168)
-          db_c = db + ["_compat"]
+          db_c = db + "_compat"
 
           Nsswitch.WriteDb(db_c, [])
         end
