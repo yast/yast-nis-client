@@ -1,5 +1,5 @@
 TESTS = \
-  commandline_test.rb
+  nis_test.rb
 
 TEST_EXTENSIONS = .rb
 RB_LOG_COMPILER = rspec
