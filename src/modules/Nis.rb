@@ -745,7 +745,7 @@ module Yast
 
       Builtins.y2error("Attempt to export Nis::global_broadcast") if @global_broadcast
 
-      settings = {
+      {
         "start_nis"         => @start,
         "nis_servers"       => @servers,
         "nis_domain"        => @domain,
@@ -758,7 +758,6 @@ module Yast
         "slp_domain"        => @slp_domain,
         "netconfig_policy"  => @policy
       }
-      settings.reject { |_k, v| v.nil? }
     end
 
     # copied from Mail.ycp
@@ -911,9 +910,7 @@ module Yast
       @local_only = SCR.Read(path(".sysconfig.ypbind.YPBIND_LOCAL_ONLY")) == "yes"
       @global_broadcast = SCR.Read(path(".sysconfig.ypbind.YPBIND_BROADCAST")) == "yes"
       @broken_server = SCR.Read(path(".sysconfig.ypbind.YPBIND_BROKEN_SERVER")) == "yes"
-      @options = Convert.to_string(
-        SCR.Read(path(".sysconfig.ypbind.YPBIND_OPTIONS"))
-      )
+      @options = SCR.Read(path(".sysconfig.ypbind.YPBIND_OPTIONS")).to_s
 
       # install on demand
       @_start_autofs = @_autofs_allowed && Service.Enabled("autofs")

@@ -84,6 +84,18 @@ describe Yast::Nis do
       expect(subject.options).to eq "yohoho"
     end
 
+    context "if options cannot be read" do
+      before do
+        allow(Yast::SCR).to receive(:Read)
+          .with(path(".sysconfig.ypbind.YPBIND_OPTIONS")).and_return(nil)
+      end
+
+      it "sets the option to an empty string" do
+        subject.Read
+        expect(subject.options).to eq ""
+      end
+    end
+
     it "reads if users is defined in ldap" do
       expect(Yast::Nsswitch).to receive(:ReadDb).with("passwd").and_return(["ldap"])
 
@@ -146,31 +158,20 @@ describe Yast::Nis do
 
   describe "#Export" do
     let(:ypbind_installed) { true }
-    let(:nis_options) { "-verbose" }
 
     before do
       allow(Yast::Package).to receive(:Installed).with("ypbind").and_return(ypbind_installed)
       subject.Import(
         "start_nis"   => true,
-        "nis_servers" => ["nis.example.net"],
-        "nis_options" => nis_options
+        "nis_servers" => ["nis.example.net"]
       )
     end
 
     it "returns module settings" do
       expect(subject.Export).to include(
         "start_nis"   => subject.start,
-        "nis_servers" => subject.servers,
-        "nis_options" => nis_options
+        "nis_servers" => subject.servers
       )
-    end
-
-    context "when some value is nil" do
-      let(:nis_options) { nil }
-
-      it "does not include the nil value" do
-        expect(subject.Export.keys).to_not include("nis_options")
-      end
     end
 
     context "when the ypbind package is not installed" do
