@@ -53,31 +53,47 @@ describe Yast::Nis do
     end
 
     it "reads local_only flag" do
-      expect(Yast::SCR).to receive(:Read).with(path(".sysconfig.ypbind.YPBIND_LOCAL_ONLY")).and_return("yes")
+      expect(Yast::SCR).to receive(:Read)
+        .with(path(".sysconfig.ypbind.YPBIND_LOCAL_ONLY")).and_return("yes")
 
       subject.Read
       expect(subject.local_only).to eq true
     end
 
     it "reads global_broadcast flag" do
-      expect(Yast::SCR).to receive(:Read).with(path(".sysconfig.ypbind.YPBIND_BROADCAST")).and_return("yes")
+      expect(Yast::SCR).to receive(:Read)
+        .with(path(".sysconfig.ypbind.YPBIND_BROADCAST")).and_return("yes")
 
       subject.Read
       expect(subject.global_broadcast).to eq true
     end
 
     it "reads broken_server flag" do
-      expect(Yast::SCR).to receive(:Read).with(path(".sysconfig.ypbind.YPBIND_BROKEN_SERVER")).and_return("yes")
+      expect(Yast::SCR).to receive(:Read)
+        .with(path(".sysconfig.ypbind.YPBIND_BROKEN_SERVER")).and_return("yes")
 
       subject.Read
       expect(subject.broken_server).to eq true
     end
 
     it "reads options" do
-      expect(Yast::SCR).to receive(:Read).with(path(".sysconfig.ypbind.YPBIND_OPTIONS")).and_return("yohoho")
+      expect(Yast::SCR).to receive(:Read)
+        .with(path(".sysconfig.ypbind.YPBIND_OPTIONS")).and_return("yohoho")
 
       subject.Read
       expect(subject.options).to eq "yohoho"
+    end
+
+    context "if options cannot be read" do
+      before do
+        allow(Yast::SCR).to receive(:Read)
+          .with(path(".sysconfig.ypbind.YPBIND_OPTIONS")).and_return(nil)
+      end
+
+      it "sets the option to an empty string" do
+        subject.Read
+        expect(subject.options).to eq ""
+      end
     end
 
     it "reads if users is defined in ldap" do
@@ -137,6 +153,47 @@ describe Yast::Nis do
       expect(Y2Firewall::Firewalld.instance).to receive(:reload)
 
       subject.Write
+    end
+  end
+
+  describe "#Export" do
+    let(:ypbind_installed) { true }
+    let(:config_mode) { false }
+
+    before do
+      allow(Yast::Package).to receive(:Installed).with("ypbind").and_return(ypbind_installed)
+      allow(Yast::Mode).to receive(:config).and_return(config_mode)
+      subject.Import(
+        "start_nis"   => true,
+        "nis_servers" => ["nis.example.net"]
+      )
+    end
+
+    it "returns module settings" do
+      expect(subject.Export).to include(
+        "start_nis"   => subject.start,
+        "nis_servers" => subject.servers
+      )
+    end
+
+    context "when the ypbind package is not installed" do
+      let(:ypbind_installed) { false }
+
+      context "during config mode" do
+        let(:config_mode) { true }
+
+        it "returns the module settings" do
+          expect(subject.Export).to_not be_empty
+        end
+      end
+
+      context "during not config mode" do
+        let(:config_mode) { false }
+
+        it "returns an empty hash" do
+          expect(subject.Export).to eq({})
+        end
+      end
     end
   end
 end

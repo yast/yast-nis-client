@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2006-2012 Novell, Inc. All Rights Reserved.
 #
@@ -38,9 +36,13 @@
 require "yast"
 require "y2firewall/firewalld"
 require "shellwords"
+Yast.import "Mode"
 
 module Yast
   class NisClass < Module
+    # @return [String] NIS client package name
+    NIS_CLIENT_PACKAGE = "ypbind".freeze
+
     def main
       textdomain "nis"
 
@@ -61,7 +63,7 @@ module Yast
       @modified = false
       # Required packages for this module to operate
       #
-      @required_packages = ["ypbind"]
+      @required_packages = [NIS_CLIENT_PACKAGE]
 
       # Should ypbind be started at boot?
       # If not, other settings are not touched.
@@ -125,7 +127,6 @@ module Yast
       # If this option is set, ypbind will only bind to the loopback
       # interface and remote hosts cannot query it.
       @local_only = false
-
 
       # You should set this to "yes" if you have a NIS server in your
       # network, which binds only to high ports over 1024. Since this
@@ -212,20 +213,21 @@ module Yast
         SCR.Read(path(".sysconfig.network.config.NETCONFIG_NIS_POLICY"))
       )
       Builtins.y2milestone("policy : %1", @policy)
-      @policy = "" if @policy == nil
+      @policy = "" if @policy.nil?
 
       staticVals = {}
       keylist = SCR.Dir(path(".sysconfig.network.config"))
 
       Builtins.y2milestone("KEYLIST: %1", keylist)
 
-      keylist = [] if keylist == nil
+      keylist = [] if keylist.nil?
 
       Builtins.foreach(keylist) do |key|
         if !Builtins.issubstring(key, "NETCONFIG_NIS_STATIC_DOMAIN") &&
             !Builtins.issubstring(key, "NETCONFIG_NIS_STATIC_SERVERS")
           next
         end
+
         value = Convert.to_string(
           SCR.Read(Builtins.add(path(".sysconfig.network.config"), key))
         )
@@ -296,24 +298,18 @@ module Yast
         end
       end
 
-      Builtins.foreach(@multidomain_servers) do |domain, value|
-        if !Builtins.haskey(@multidomain_broadcast, domain)
-          Ops.set(@multidomain_broadcast, domain, false)
-        end
+      Builtins.foreach(@multidomain_servers) do |domain, _value|
+        Ops.set(@multidomain_broadcast, domain, false) if !Builtins.haskey(@multidomain_broadcast, domain)
       end
 
-      Builtins.foreach(@multidomain_broadcast) do |domain, value|
-        if !Builtins.haskey(@multidomain_servers, domain)
-          Ops.set(@multidomain_servers, domain, [])
-        end
+      Builtins.foreach(@multidomain_broadcast) do |domain, _value|
+        Ops.set(@multidomain_servers, domain, []) if !Builtins.haskey(@multidomain_servers, domain)
       end
 
       Builtins.foreach(
-        Convert.convert(@slp_domain, :from => "map", :to => "map <string, any>")
-      ) do |domain, value|
-        if !Builtins.haskey(@multidomain_servers, domain)
-          Ops.set(@multidomain_servers, domain, [])
-        end
+        Convert.convert(@slp_domain, from: "map", to: "map <string, any>")
+      ) do |domain, _value|
+        Ops.set(@multidomain_servers, domain, []) if !Builtins.haskey(@multidomain_servers, domain)
       end
 
       Builtins.y2milestone("Servers: %1", @servers)
@@ -329,24 +325,18 @@ module Yast
     def setNetconfigValues
       SCR.Write(path(".sysconfig.network.config.NETCONFIG_NIS_POLICY"), @policy)
 
-      Builtins.foreach(@multidomain_servers) do |domain, value|
-        if !Builtins.haskey(@multidomain_broadcast, domain)
-          Ops.set(@multidomain_broadcast, domain, false)
-        end
+      Builtins.foreach(@multidomain_servers) do |domain, _value|
+        Ops.set(@multidomain_broadcast, domain, false) if !Builtins.haskey(@multidomain_broadcast, domain)
       end
 
-      Builtins.foreach(@multidomain_broadcast) do |domain, value|
-        if !Builtins.haskey(@multidomain_servers, domain)
-          Ops.set(@multidomain_servers, domain, [])
-        end
+      Builtins.foreach(@multidomain_broadcast) do |domain, _value|
+        Ops.set(@multidomain_servers, domain, []) if !Builtins.haskey(@multidomain_servers, domain)
       end
 
       Builtins.foreach(
-        Convert.convert(@slp_domain, :from => "map", :to => "map <string, any>")
-      ) do |domain, value|
-        if !Builtins.haskey(@multidomain_servers, domain)
-          Ops.set(@multidomain_servers, domain, [])
-        end
+        Convert.convert(@slp_domain, from: "map", to: "map <string, any>")
+      ) do |domain, _value|
+        Ops.set(@multidomain_servers, domain, []) if !Builtins.haskey(@multidomain_servers, domain)
       end
 
       Builtins.foreach(@static_keylist) do |key|
@@ -363,7 +353,6 @@ module Yast
         path(".sysconfig.network.config.NETCONFIG_NIS_STATIC_SERVERS"),
         ""
       )
-
 
       Builtins.y2milestone("Servers: %1", @servers)
       Builtins.y2milestone("multidomain_servers: %1", @multidomain_servers)
@@ -387,11 +376,12 @@ module Yast
       Builtins.foreach(
         Convert.convert(
           @multidomain_servers,
-          :from => "map <string, list>",
-          :to   => "map <string, list <string>>"
+          from: "map <string, list>",
+          to:   "map <string, list <string>>"
         )
       ) do |dom, srvs|
         next if dom == ""
+
         if Ops.greater_than(Builtins.size(srvs), 0)
           if cnt == 0
             SCR.Write(
@@ -566,8 +556,8 @@ module Yast
     # used also for nis-server
 
     # Check syntax of a NIS domain name
-    # @param [String] domain	a domain name
-    # @return		true if correct
+    # @param [String] domain  a domain name
+    # @return    true if correct
     def check_nisdomainname(domain)
       # TODO
       # disallow whitespace and special characters...
@@ -579,8 +569,8 @@ module Yast
     def valid_nisdomainname
       # Translators: do not translate (none)!
       _(
-        "A NIS domain name must not be empty,\n" +
-          "it must not be \"(none)\",\n" +
+        "A NIS domain name must not be empty,\n" \
+          "it must not be \"(none)\",\n" \
           "and it must be at most 64 characters long.\n"
       )
     end
@@ -599,8 +589,8 @@ module Yast
         # message popup
         return Ops.add(
           _(
-            "Only an IP address can be used\n" +
-              "because host names are resolved using NIS.\n" +
+            "Only an IP address can be used\n" \
+              "because host names are resolved using NIS.\n" \
               "\n"
           ),
           IP.Valid4
@@ -624,10 +614,10 @@ module Yast
     end
 
     # A convenient shortcut for setting touched.
-    # @param [Boolean] really	if true, set Nis::touched
+    # @param [Boolean] really  if true, set Nis::touched
     # @example Nis::Touch (Nis::var != ui_var);
     def Touch(really)
-      @touched = @touched || really
+      @touched ||= really
 
       nil
     end
@@ -648,9 +638,7 @@ module Yast
             _("The automounter package will be installed.\n")
           )
         end
-        if !Package.Installed("nfs-client")
-          @install_packages = Builtins.add(@install_packages, "nfs-client")
-        end
+        @install_packages = Builtins.add(@install_packages, "nfs-client") if !Package.Installed("nfs-client")
       end
 
       message
@@ -691,8 +679,8 @@ module Yast
       if @_start_autofs
         @required_packages = Convert.convert(
           Builtins.union(@required_packages, ["autofs", "nfs-client"]),
-          :from => "list",
-          :to   => "list <string>"
+          from: "list",
+          to:   "list <string>"
         )
       end
 
@@ -704,18 +692,18 @@ module Yast
       nil
     end
 
-    # TODO update the map keys
+    # TODO: update the map keys
     # better still: link to a current interface description
     # Get all the NIS configuration from a map.
     # When called by nis_auto (preparing autoinstallation data)
     # the map may be empty.
-    # @param [Hash] settings	$["start": "domain": "servers":[...] ]
-    # @return	success
+    # @param [Hash] settings  $["start": "domain": "servers":[...] ]
+    # @return  success
     def Import(settings)
       settings = deep_copy(settings)
       if Builtins.size(settings) == 0
-        #Provide defaults for autoinstallation editing:
-        #Leave empty.
+        # Provide defaults for autoinstallation editing:
+        # Leave empty.
         @old_domain = @domain
         # enable _autofs_allowed
         # Injecting it into the defaults for the GUI
@@ -741,11 +729,13 @@ module Yast
       true
     end
 
-    # TODO update the map keys
+    # TODO: update the map keys
     # better still: link to a current interface description
     # Dump the NIS settings to a map, for autoinstallation use.
     # @return $["start":, "servers":[...], "domain":]
     def Export
+      return {} unless Yast::Mode.config || Yast::Package.Installed(NIS_CLIENT_PACKAGE)
+
       other_domains = Builtins.maplist(@multidomain_servers) do |d, s|
         {
           "nis_domain"    => d,
@@ -754,9 +744,7 @@ module Yast
         }
       end
 
-      if @global_broadcast
-        Builtins.y2error("Attempt to export Nis::global_broadcast")
-      end
+      Builtins.y2error("Attempt to export Nis::global_broadcast") if @global_broadcast
 
       {
         "start_nis"         => @start,
@@ -783,25 +771,22 @@ module Yast
       value = deep_copy(value)
       summary = ""
       summary = Summary.AddHeader(summary, title)
-      #enhancement BEGIN
-      value = Builtins.maplist(Convert.to_map(value)) { |k, v| k } if Ops.is_map?(
+      # enhancement BEGIN
+      value = Builtins.maplist(Convert.to_map(value)) { |k, _v| k } if Ops.is_map?(
         value
       )
-      #enhancement END
+      # enhancement END
       if Ops.is_list?(value) &&
           Ops.greater_than(Builtins.size(Convert.to_list(value)), 0)
         summary = Summary.OpenList(summary)
         Builtins.foreach(Convert.to_list(value)) do |d|
-          entry = ""
-          if Ops.is_map?(d) || Ops.is_list?(d)
-            entry = Builtins.sformat(
+          entry = if Ops.is_map?(d) || Ops.is_list?(d)
+            Builtins.sformat(
               "%1 Entries configured",
-              Ops.is_map?(d) ?
-                Builtins.size(Convert.to_map(value)) :
-                Builtins.size(Convert.to_list(value))
+              Ops.is_map?(d) ? Builtins.size(Convert.to_map(value)) : Builtins.size(Convert.to_list(value))
             )
           else
-            entry = Convert.to_string(d)
+            Convert.to_string(d)
           end
           summary = Summary.AddListItem(summary, entry)
         end
@@ -814,17 +799,11 @@ module Yast
 
     # @return Html formatted configuration summary
     def Summary
-      # TODO multidomain_servers, multidomain_broadcast
+      # TODO: multidomain_servers, multidomain_broadcast
       # OK, a dumb mapping is possible, but wouldn't it be
       # too complicated to write by hand?
       summary = ""
       nc = Summary.NotConfigured
-
-      # summary: Domain or servers are retrieved by the
-      # Dynamic Host Configuration Protocol.
-      # Will be placed after NIS Domain/NIS Servers instead of the
-      # actual settings.
-      dhcp = _("by DHCP")
 
       # summary header
       summary = Summary.AddHeader(summary, _("NIS Client enabled"))
@@ -832,12 +811,12 @@ module Yast
       summary = Summary.AddLine(summary, @start ? _("Yes") : nc)
       # summary header
       summary = Summary.AddHeader(summary, _("NIS Domain"))
-      summary = Summary.AddLine(summary, @domain != "" ? @domain : nc)
+      summary = Summary.AddLine(summary, (@domain != "") ? @domain : nc)
       # summary header
       summary = Summary.AddHeader(summary, _("NIS Servers"))
       summary = Summary.AddLine(
         summary,
-        @servers != [] ? Builtins.mergestring(@servers, "<br>") : nc
+        (@servers != []) ? Builtins.mergestring(@servers, "<br>") : nc
       )
       # summary header
       summary = Summary.AddHeader(summary, _("Broadcast"))
@@ -858,7 +837,7 @@ module Yast
       summary = Summary.AddLine(summary, @broken_server ? _("Yes") : nc)
       # summary header
       summary = Summary.AddHeader(summary, _("ypbind options"))
-      summary = Summary.AddLine(summary, @options != "" ? @options : nc)
+      summary = Summary.AddLine(summary, (@options != "") ? @options : nc)
       # summary header
       summary = Summary.AddHeader(summary, _("Automounter enabled"))
       # summary item: an option is turned on
@@ -880,14 +859,13 @@ module Yast
     # It is called by "authentication/user sources" dialog in yast2-users
     # @return summary of the current configuration
     def ShortSummary
-      summary = ""
       nc = Summary.NotConfigured
       summary = Ops.add(
         Ops.add(
           # summary item
-          BrItem(_("Servers"), @servers != [] ? GetServers() : nc),
+          BrItem(_("Servers"), (@servers != []) ? GetServers() : nc),
           # summary item
-          BrItem(_("Domain"), @domain != "" ? @domain : nc)
+          BrItem(_("Domain"), (@domain != "") ? @domain : nc)
         ),
         # summary item (yes/no follows)
         BrItem(_("Client Enabled"), @start ? _("Yes") : _("No"))
@@ -903,17 +881,15 @@ module Yast
 
       getNetconfigValues
 
-      @servers = [] if @servers == nil
-      @default_broadcast = false if @default_broadcast == nil
-      @multidomain_servers = {} if @multidomain_servers == nil
-      @multidomain_broadcast = {} if @multidomain_broadcast == nil
-      @slp_domain = {} if @slp_domain == nil
+      @servers = [] if @servers.nil?
+      @default_broadcast = false if @default_broadcast.nil?
+      @multidomain_servers = {} if @multidomain_servers.nil?
+      @multidomain_broadcast = {} if @multidomain_broadcast.nil?
+      @slp_domain = {} if @slp_domain.nil?
 
       out = SCR.Execute(path(".target.bash_output"), "/usr/bin/ypdomainname")
       # 0 OK, 1 mean no domain name set, so no nis, do not report it
-      if out["exit"] > 1
-        Report.Error(_("Getting domain name via ypdomainname failed with '%s'") % out["stderr"])
-      end
+      Report.Error(_("Getting domain name via ypdomainname failed with '%s'") % out["stderr"]) if out["exit"] > 1
       @domain = out["stdout"].chomp
       @old_domain = @domain
 
@@ -925,9 +901,7 @@ module Yast
       @local_only = SCR.Read(path(".sysconfig.ypbind.YPBIND_LOCAL_ONLY")) == "yes"
       @global_broadcast = SCR.Read(path(".sysconfig.ypbind.YPBIND_BROADCAST")) == "yes"
       @broken_server = SCR.Read(path(".sysconfig.ypbind.YPBIND_BROKEN_SERVER")) == "yes"
-      @options = Convert.to_string(
-        SCR.Read(path(".sysconfig.ypbind.YPBIND_OPTIONS"))
-      )
+      @options = SCR.Read(path(".sysconfig.ypbind.YPBIND_OPTIONS")).to_s
 
       # install on demand
       @_start_autofs = @_autofs_allowed && Service.Enabled("autofs")
@@ -987,8 +961,8 @@ module Yast
     end
 
     # If a file does not contain a NIS entry, add it.
-    # @param [String] file	pathname
-    # @param [String] what	a "+" line without a '\n'
+    # @param [String] file  pathname
+    # @param [String] what  a "+" line without a '\n'
     # @return success?
     def WritePlusesTo(file, what)
       ok = true
@@ -999,17 +973,17 @@ module Yast
           Builtins.sformat("/usr/bin/cp %1 %1.YaST2save", file.shellescape)
         )
         if SCR.Execute(
-            path(".target.bash"),
-            Builtins.sformat("/usr/bin/echo %1 >> %2", what.shellescape, file.shellescape)
-          ) != 0
+          path(".target.bash"),
+          Builtins.sformat("/usr/bin/echo %1 >> %2", what.shellescape, file.shellescape)
+        ) != 0
           ok = false
         end
-      # TODO only for passwd?
+      # TODO: only for passwd?
       # replace the 'nologin' occurence (#40571)
       elsif SCR.Execute(
-          path(".target.bash"),
-          Builtins.sformat("/usr/bin/grep -q ^%1/sbin/nologin %2", what.shellescape, file.shellescape)
-        ) == 0
+        path(".target.bash"),
+        Builtins.sformat("/usr/bin/grep -q ^%1/sbin/nologin %2", what.shellescape, file.shellescape)
+      ) == 0
         ok = SCR.Execute(
           path(".target.bash"),
           Builtins.sformat(
@@ -1036,7 +1010,7 @@ module Yast
     # @return success?
     def WritePluses
       files = ["passwd", "shadow", "group"]
-      #don't forget a newline
+      # don't forget a newline
       what_to_write = {
         "passwd" => "+::::::",
         "group"  => "+:::",
@@ -1045,9 +1019,9 @@ module Yast
       Builtins.foreach(files) do |f|
         Builtins.y2milestone("Writing pluses to %1", f)
         if !WritePlusesTo(
-            Builtins.sformat("/etc/%1", f),
-            Ops.get_string(what_to_write, f, "")
-          )
+          Builtins.sformat("/etc/%1", f),
+          Ops.get_string(what_to_write, f, "")
+        )
           next false
         end
       end
@@ -1097,16 +1071,16 @@ module Yast
         nis_dbs.each do |db|
           db_l = Nsswitch.ReadDb(db)
 
-          if !db_l.include?("nis")
-            if db == "netgroup"
-              db_l = ["nis"]
-            else
-              db_l << "nis"
-            end
+          next if db_l.include?("nis")
 
-            Nsswitch.WriteDb(db, db_l)
+          if db == "netgroup"
+            db_l = ["nis"]
+          else
+            db_l << "nis"
           end
-        end # not start
+
+          Nsswitch.WriteDb(db, db_l)
+        end
       else
         Builtins.y2milestone("not writing pluses")
 
@@ -1144,10 +1118,10 @@ module Yast
     # @return true on success
     def WriteOnly
       if @start
-        if Package.Installed("rpcbind")
-          @rpc_mapper = "rpcbind"
+        @rpc_mapper = if Package.Installed("rpcbind")
+          "rpcbind"
         else
-          @rpc_mapper = "portmap"
+          "portmap"
         end
 
         Service.Enable(@rpc_mapper)
@@ -1185,7 +1159,7 @@ module Yast
 
         SCR.Write(
           path(".sysconfig.network.config.NETCONFIG_NIS_SETDOMAINNAME"),
-          @policy == "" ? "no" : "yes"
+          (@policy == "") ? "no" : "yes"
         )
 
         if !SCR.Write(path(".sysconfig.network.dhcp"), nil)
@@ -1197,7 +1171,7 @@ module Yast
         Service.Disable("ypbind")
       end
 
-      # TODO do as much as possible if one thing fails
+      # TODO: do as much as possible if one thing fails
       # especially WRT nis/autofs independence
       WriteNssConf()
 
@@ -1323,54 +1297,54 @@ module Yast
       { "install" => install_pkgs, "remove" => remove_pkgs }
     end
 
-    publish :variable => :modified, :type => "boolean"
-    publish :function => :SetModified, :type => "void ()"
-    publish :function => :GetModified, :type => "boolean ()"
-    publish :variable => :required_packages, :type => "list <string>"
-    publish :variable => :start, :type => "boolean"
-    publish :variable => :servers, :type => "list <string>"
-    publish :function => :GetServers, :type => "string ()"
-    publish :function => :SetServers, :type => "void (string)"
-    publish :variable => :default_broadcast, :type => "boolean"
-    publish :variable => :multidomain_servers, :type => "map <string, list>"
-    publish :variable => :multidomain_broadcast, :type => "map <string, boolean>"
-    publish :variable => :global_broadcast, :type => "boolean"
-    publish :variable => :slp_domain, :type => "map"
-    publish :variable => :policy, :type => "string"
-    publish :function => :getNetconfigValues, :type => "void ()"
-    publish :function => :setNetconfigValues, :type => "boolean ()"
-    publish :function => :DomainChanged, :type => "boolean ()"
-    publish :function => :GetDomain, :type => "string ()"
-    publish :function => :SetDomain, :type => "void (string)"
-    publish :variable => :dhcpcd_running, :type => "boolean"
-    publish :variable => :dhcp_restart, :type => "boolean"
-    publish :variable => :local_only, :type => "boolean"
-    publish :variable => :broken_server, :type => "boolean"
-    publish :variable => :options, :type => "string"
-    publish :variable => :_autofs_allowed, :type => "boolean"
-    publish :variable => :_start_autofs, :type => "boolean"
-    publish :variable => :YpbindErrors, :type => "string"
-    publish :function => :check_nisdomainname, :type => "boolean (string)"
-    publish :function => :valid_nisdomainname, :type => "string ()"
-    publish :function => :UsersByLdap, :type => "boolean ()"
-    publish :function => :valid_address_nis, :type => "string ()"
-    publish :function => :check_address_nis, :type => "boolean (string)"
-    publish :variable => :touched, :type => "boolean"
-    publish :function => :Touch, :type => "void (boolean)"
-    publish :variable => :install_packages, :type => "list <string>"
-    publish :function => :ProbePackages, :type => "string ()"
-    publish :function => :Set, :type => "void (map)"
-    publish :function => :Import, :type => "boolean (map)"
-    publish :function => :Export, :type => "map ()"
-    publish :function => :Summary, :type => "string ()"
-    publish :function => :BrItem, :type => "string (string, string)"
-    publish :function => :ShortSummary, :type => "string ()"
-    publish :function => :Read, :type => "boolean ()"
-    publish :function => :Fake, :type => "void ()"
-    publish :function => :WriteNssConf, :type => "boolean ()"
-    publish :function => :WriteOnly, :type => "boolean ()"
-    publish :function => :Write, :type => "boolean ()"
-    publish :function => :AutoPackages, :type => "map ()"
+    publish variable: :modified, type: "boolean"
+    publish function: :SetModified, type: "void ()"
+    publish function: :GetModified, type: "boolean ()"
+    publish variable: :required_packages, type: "list <string>"
+    publish variable: :start, type: "boolean"
+    publish variable: :servers, type: "list <string>"
+    publish function: :GetServers, type: "string ()"
+    publish function: :SetServers, type: "void (string)"
+    publish variable: :default_broadcast, type: "boolean"
+    publish variable: :multidomain_servers, type: "map <string, list>"
+    publish variable: :multidomain_broadcast, type: "map <string, boolean>"
+    publish variable: :global_broadcast, type: "boolean"
+    publish variable: :slp_domain, type: "map"
+    publish variable: :policy, type: "string"
+    publish function: :getNetconfigValues, type: "void ()"
+    publish function: :setNetconfigValues, type: "boolean ()"
+    publish function: :DomainChanged, type: "boolean ()"
+    publish function: :GetDomain, type: "string ()"
+    publish function: :SetDomain, type: "void (string)"
+    publish variable: :dhcpcd_running, type: "boolean"
+    publish variable: :dhcp_restart, type: "boolean"
+    publish variable: :local_only, type: "boolean"
+    publish variable: :broken_server, type: "boolean"
+    publish variable: :options, type: "string"
+    publish variable: :_autofs_allowed, type: "boolean"
+    publish variable: :_start_autofs, type: "boolean"
+    publish variable: :YpbindErrors, type: "string"
+    publish function: :check_nisdomainname, type: "boolean (string)"
+    publish function: :valid_nisdomainname, type: "string ()"
+    publish function: :UsersByLdap, type: "boolean ()"
+    publish function: :valid_address_nis, type: "string ()"
+    publish function: :check_address_nis, type: "boolean (string)"
+    publish variable: :touched, type: "boolean"
+    publish function: :Touch, type: "void (boolean)"
+    publish variable: :install_packages, type: "list <string>"
+    publish function: :ProbePackages, type: "string ()"
+    publish function: :Set, type: "void (map)"
+    publish function: :Import, type: "boolean (map)"
+    publish function: :Export, type: "map ()"
+    publish function: :Summary, type: "string ()"
+    publish function: :BrItem, type: "string (string, string)"
+    publish function: :ShortSummary, type: "string ()"
+    publish function: :Read, type: "boolean ()"
+    publish function: :Fake, type: "void ()"
+    publish function: :WriteNssConf, type: "boolean ()"
+    publish function: :WriteOnly, type: "boolean ()"
+    publish function: :Write, type: "boolean ()"
+    publish function: :AutoPackages, type: "map ()"
   end
 
   Nis = NisClass.new

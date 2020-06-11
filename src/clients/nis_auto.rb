@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2006-2012 Novell, Inc. All Rights Reserved.
 #
@@ -19,10 +17,10 @@
 # current contact information at www.novell.com.
 # ------------------------------------------------------------------------------
 
-# File:	clients/nis_auto.ycp
-# Package:	nis-client configuration
-# Summary:	client for autoinstallation
-# Authors:	Michal Svec <msvec@suse.cz>
+# File:  clients/nis_auto.ycp
+# Package:  nis-client configuration
+# Summary:  client for autoinstallation
+# Authors:  Michal Svec <msvec@suse.cz>
 #
 # $Id$
 module Yast
@@ -41,7 +39,6 @@ module Yast
       @ret = nil
       @func = ""
       @param = {}
-
 
       # Check arguments
       if Ops.greater_than(Builtins.size(WFM.Args), 0) &&
@@ -94,7 +91,7 @@ module Yast
       Builtins.y2milestone("NIS client autoinit client finished")
       Builtins.y2milestone("----------------------------------------")
 
-      deep_copy(@ret) 
+      deep_copy(@ret)
       # EOF
     end
   end
