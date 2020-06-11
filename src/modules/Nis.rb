@@ -39,6 +39,9 @@ require "shellwords"
 
 module Yast
   class NisClass < Module
+    # @return [String] NIS client package name
+    NIS_CLIENT_PACKAGE = "ypbind".freeze
+
     def main
       textdomain "nis"
 
@@ -59,7 +62,7 @@ module Yast
       @modified = false
       # Required packages for this module to operate
       #
-      @required_packages = ["ypbind"]
+      @required_packages = [NIS_CLIENT_PACKAGE]
 
       # Should ypbind be started at boot?
       # If not, other settings are not touched.
@@ -730,6 +733,8 @@ module Yast
     # Dump the NIS settings to a map, for autoinstallation use.
     # @return $["start":, "servers":[...], "domain":]
     def Export
+      return {} unless Yast::Package.Installed(NIS_CLIENT_PACKAGE)
+
       other_domains = Builtins.maplist(@multidomain_servers) do |d, s|
         {
           "nis_domain"    => d,
@@ -740,7 +745,7 @@ module Yast
 
       Builtins.y2error("Attempt to export Nis::global_broadcast") if @global_broadcast
 
-      {
+      settings = {
         "start_nis"         => @start,
         "nis_servers"       => @servers,
         "nis_domain"        => @domain,
@@ -753,6 +758,7 @@ module Yast
         "slp_domain"        => @slp_domain,
         "netconfig_policy"  => @policy
       }
+      settings.reject { |_k, v| v.nil? }
     end
 
     # copied from Mail.ycp

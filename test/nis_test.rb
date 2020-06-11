@@ -143,4 +143,42 @@ describe Yast::Nis do
       subject.Write
     end
   end
+
+  describe "#Export" do
+    let(:ypbind_installed) { true }
+    let(:nis_options) { "-verbose" }
+
+    before do
+      allow(Yast::Package).to receive(:Installed).with("ypbind").and_return(ypbind_installed)
+      subject.Import(
+        "start_nis"   => true,
+        "nis_servers" => ["nis.example.net"],
+        "nis_options" => nis_options
+      )
+    end
+
+    it "returns module settings" do
+      expect(subject.Export).to include(
+        "start_nis"   => subject.start,
+        "nis_servers" => subject.servers,
+        "nis_options" => nis_options
+      )
+    end
+
+    context "when some value is nil" do
+      let(:nis_options) { nil }
+
+      it "does not include the nil value" do
+        expect(subject.Export.keys).to_not include("nis_options")
+      end
+    end
+
+    context "when the ypbind package is not installed" do
+      let(:ypbind_installed) { false }
+
+      it "exports an empty hash" do
+        expect(subject.Export).to eq({})
+      end
+    end
+  end
 end
