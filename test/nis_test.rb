@@ -53,28 +53,32 @@ describe Yast::Nis do
     end
 
     it "reads local_only flag" do
-      expect(Yast::SCR).to receive(:Read).with(path(".sysconfig.ypbind.YPBIND_LOCAL_ONLY")).and_return("yes")
+      expect(Yast::SCR).to receive(:Read)
+        .with(path(".sysconfig.ypbind.YPBIND_LOCAL_ONLY")).and_return("yes")
 
       subject.Read
       expect(subject.local_only).to eq true
     end
 
     it "reads global_broadcast flag" do
-      expect(Yast::SCR).to receive(:Read).with(path(".sysconfig.ypbind.YPBIND_BROADCAST")).and_return("yes")
+      expect(Yast::SCR).to receive(:Read)
+        .with(path(".sysconfig.ypbind.YPBIND_BROADCAST")).and_return("yes")
 
       subject.Read
       expect(subject.global_broadcast).to eq true
     end
 
     it "reads broken_server flag" do
-      expect(Yast::SCR).to receive(:Read).with(path(".sysconfig.ypbind.YPBIND_BROKEN_SERVER")).and_return("yes")
+      expect(Yast::SCR).to receive(:Read)
+        .with(path(".sysconfig.ypbind.YPBIND_BROKEN_SERVER")).and_return("yes")
 
       subject.Read
       expect(subject.broken_server).to eq true
     end
 
     it "reads options" do
-      expect(Yast::SCR).to receive(:Read).with(path(".sysconfig.ypbind.YPBIND_OPTIONS")).and_return("yohoho")
+      expect(Yast::SCR).to receive(:Read)
+        .with(path(".sysconfig.ypbind.YPBIND_OPTIONS")).and_return("yohoho")
 
       subject.Read
       expect(subject.options).to eq "yohoho"

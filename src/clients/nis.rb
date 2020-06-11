@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2006-2012 Novell, Inc. All Rights Reserved.
 #
@@ -38,7 +36,7 @@
 # Modify: /etc/rc.config
 #
 
-#**
+# **
 # <h3>Configuration of the nis</h3>
 
 # @param flag "<b>screenshots</b>"<br>
@@ -62,8 +60,8 @@ module Yast
       @ret = :auto
 
       if !PackageSystem.CheckAndInstallPackagesInteractive(
-          Nis.required_packages
-        )
+        Nis.required_packages
+      )
         return deep_copy(@ret)
       end
 
@@ -100,7 +98,7 @@ module Yast
             )
           },
           "configure" => {
-            #FIXME "set" alias?
+            # FIXME: "set" alias?
             "handler" => fun_ref(
               method(:NisChangeConfiguration),
               "boolean (map)"
@@ -150,17 +148,17 @@ module Yast
             "typespec" => ["yes", "no"]
           }
         },
-        "mappings" =>
-          # TODO:
-          # more domains?
-          # YPBIND_OPTIONS: delimiter??
-          {
-            "enable"    => ["server", "domain", "automounter", "broadcast"],
-            "disable"   => [],
-            "summary"   => [],
-            "configure" => ["server", "domain", "automounter", "broadcast"],
-            "find"      => ["domain"]
-          }
+        "mappings"   =>
+                        # TODO:
+                        # more domains?
+                        # YPBIND_OPTIONS: delimiter??
+                        {
+                          "enable"    => ["server", "domain", "automounter", "broadcast"],
+                          "disable"   => [],
+                          "summary"   => [],
+                          "configure" => ["server", "domain", "automounter", "broadcast"],
+                          "find"      => ["domain"]
+                        }
       }
 
       @ret = CommandLine.Run(@cmdline)
@@ -208,7 +206,6 @@ module Yast
       ret
     end
 
-
     # Enable the NIS client
     # @param [Hash] options  a list of parameters passed as args
     # @return [Boolean] true on success
@@ -216,8 +213,8 @@ module Yast
       options = deep_copy(options)
       ret = NisChangeConfiguration(options)
       Nis.start = true
-      #if (Nis::GetDomain () == "" || Nis::GetServers () == "")
-      #Nis::dhcp_wanted	= true;
+      # if (Nis::GetDomain () == "" || Nis::GetServers () == "")
+      # Nis::dhcp_wanted  = true;
       true
     end
 
@@ -240,13 +237,12 @@ module Yast
       Builtins.foreach(
         Convert.convert(
           SCR.Read(Builtins.add(path(".net.ypserv.find"), domain)),
-          :from => "any",
-          :to   => "list <string>"
+          from: "any",
+          to:   "list <string>"
         )
       ) { |server| CommandLine.Print(server) }
       false
     end
-
 
     # Print summary of basic options
     # @return [Boolean] false

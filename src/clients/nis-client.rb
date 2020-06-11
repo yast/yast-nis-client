@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2006-2012 Novell, Inc. All Rights Reserved.
 #
@@ -19,8 +17,8 @@
 # current contact information at www.novell.com.
 # ------------------------------------------------------------------------------
 
-# Author:	Martin Vidner <mvidner@suse.cz>
-# Summary:	Just a redirection
+# Author:  Martin Vidner <mvidner@suse.cz>
+# Summary:  Just a redirection
 # $Id$
 module Yast
   class NisClientClient < Client
