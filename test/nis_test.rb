@@ -158,9 +158,11 @@ describe Yast::Nis do
 
   describe "#Export" do
     let(:ypbind_installed) { true }
+    let(:config_mode) { false }
 
     before do
       allow(Yast::Package).to receive(:Installed).with("ypbind").and_return(ypbind_installed)
+      allow(Yast::Mode).to receive(:config).and_return(config_mode)
       subject.Import(
         "start_nis"   => true,
         "nis_servers" => ["nis.example.net"]
@@ -177,8 +179,20 @@ describe Yast::Nis do
     context "when the ypbind package is not installed" do
       let(:ypbind_installed) { false }
 
-      it "exports an empty hash" do
-        expect(subject.Export).to eq({})
+      context "during config mode" do
+        let(:config_mode) { true }
+
+        it "returns the module settings" do
+          expect(subject.Export).to_not be_empty
+        end
+      end
+
+      context "during not config mode" do
+        let(:config_mode) { false }
+
+        it "returns an empty hash" do
+          expect(subject.Export).to eq({})
+        end
       end
     end
   end

@@ -36,6 +36,7 @@
 require "yast"
 require "y2firewall/firewalld"
 require "shellwords"
+Yast.import "Mode"
 
 module Yast
   class NisClass < Module
@@ -733,7 +734,7 @@ module Yast
     # Dump the NIS settings to a map, for autoinstallation use.
     # @return $["start":, "servers":[...], "domain":]
     def Export
-      return {} unless Yast::Package.Installed(NIS_CLIENT_PACKAGE)
+      return {} unless Yast::Mode.config || Yast::Package.Installed(NIS_CLIENT_PACKAGE)
 
       other_domains = Builtins.maplist(@multidomain_servers) do |d, s|
         {
