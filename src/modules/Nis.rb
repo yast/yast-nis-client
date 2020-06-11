@@ -779,13 +779,10 @@ module Yast
           Ops.greater_than(Builtins.size(Convert.to_list(value)), 0)
         summary = Summary.OpenList(summary)
         Builtins.foreach(Convert.to_list(value)) do |d|
-          entry = ""
           entry = if Ops.is_map?(d) || Ops.is_list?(d)
             Builtins.sformat(
               "%1 Entries configured",
-              Ops.is_map?(d) ?
-                Builtins.size(Convert.to_map(value)) :
-                Builtins.size(Convert.to_list(value))
+              Ops.is_map?(d) ? Builtins.size(Convert.to_map(value)) : Builtins.size(Convert.to_list(value))
             )
           else
             Convert.to_string(d)
@@ -806,12 +803,6 @@ module Yast
       # too complicated to write by hand?
       summary = ""
       nc = Summary.NotConfigured
-
-      # summary: Domain or servers are retrieved by the
-      # Dynamic Host Configuration Protocol.
-      # Will be placed after NIS Domain/NIS Servers instead of the
-      # actual settings.
-      dhcp = _("by DHCP")
 
       # summary header
       summary = Summary.AddHeader(summary, _("NIS Client enabled"))
@@ -867,7 +858,6 @@ module Yast
     # It is called by "authentication/user sources" dialog in yast2-users
     # @return summary of the current configuration
     def ShortSummary
-      summary = ""
       nc = Summary.NotConfigured
       summary = Ops.add(
         Ops.add(
@@ -1089,7 +1079,7 @@ module Yast
           end
 
           Nsswitch.WriteDb(db, db_l)
-        end # not start
+        end
       else
         Builtins.y2milestone("not writing pluses")
 

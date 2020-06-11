@@ -316,15 +316,8 @@ module Yast
       Builtins.y2debug("all_servers: %1", all_servers)
       Builtins.y2debug("additional_domains: %1", additional_domains)
 
-      automatic_label = NetworkService.is_network_manager ?
-        # radio button label
-        _("Au&tomatic Setup (Via NetworkManager and DHCP)") :
-        # radio button label
-        _("Au&tomatic Setup (via DHCP)")
-
       text_mode = Ops.get_boolean(UI.GetDisplayInfo, "TextMode", false)
 
-      con = nil
       # frame label
       nis_frame = Frame(
         _("NIS client"),
@@ -357,39 +350,7 @@ module Yast
               )
             ),
             VSpacing(0.2),
-            text_mode ?
-              HBox(
-                InputField(
-                  Id(:domain),
-                  Opt(:hstretch),
-                  _("N&IS Domain"),
-                  domain
-                ),
-                HSpacing(),
-                InputField(
-                  Id(:servers),
-                  Opt(:hstretch),
-                  _("&Addresses of NIS servers"),
-                  servers
-                )
-              ) :
-              VBox(
-                # text entry label
-                InputField(
-                  Id(:domain),
-                  Opt(:hstretch),
-                  _("N&IS Domain"),
-                  domain
-                ),
-                VSpacing(0.2),
-                InputField(
-                  Id(:servers),
-                  Opt(:hstretch),
-                  # text entry label
-                  _("&Addresses of NIS servers"),
-                  servers
-                )
-              ),
+            domain_and_servers(domain, servers, horizontal: text_mode),
             HBox(
               # check box label
               Left(
@@ -721,7 +682,6 @@ module Yast
       )
       Wizard.HideAbortButton
 
-      event = {}
       result = nil
       begin
         event = UI.WaitForEvent
@@ -1007,10 +967,6 @@ module Yast
 
       nis_vbox = VBox(VSpacing(0.2), multiple, VSpacing(0.2))
 
-      nis_frame =
-        # frame label
-        Frame(_("NIS client"), nis_vbox)
-
       contents = deep_copy(nis_vbox)
 
       Wizard.SetContentsButtons(
@@ -1127,9 +1083,6 @@ module Yast
           { d => Ops.get_list(v, 0, []) }
         end
         servers = Ops.get(only_servers, "", [])
-        default_broadcast = nil
-        multidomain_servers = nil
-        multidomain_broadcast = nil
 
         only_broadcast = Builtins.mapmap(all_servers) do |d, v|
           { d => Ops.get_boolean(v, 1, false) }
@@ -1257,6 +1210,18 @@ module Yast
       ret = Sequencer.Run(@Dialogs, @Sequence)
       UI.CloseDialog
       ret
+    end
+
+  private
+
+    def domain_and_servers(domain, servers, horizontal:)
+      widgets = [
+        InputField(Id(:domain), Opt(:hstretch), _("N&IS Domain"), domain),
+        horizontal ? HSpacing() : VSpacing(0.2),
+        InputField(Id(:servers), Opt(:hstretch), _("&Addresses of NIS servers"), servers)
+      ]
+
+      horizontal ? HBox(*widgets) : VBox(*widgets)
     end
   end
 end

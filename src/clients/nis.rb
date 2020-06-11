@@ -149,8 +149,7 @@ module Yast
           }
         },
         "mappings"   =>
-                        # TODO:
-                        # more domains?
+                        # TODO: more domains?
                         # YPBIND_OPTIONS: delimiter??
                         {
                           "enable"    => ["server", "domain", "automounter", "broadcast"],
@@ -211,7 +210,7 @@ module Yast
     # @return [Boolean] true on success
     def NisEnableHandler(options)
       options = deep_copy(options)
-      ret = NisChangeConfiguration(options)
+      NisChangeConfiguration(options)
       Nis.start = true
       # if (Nis::GetDomain () == "" || Nis::GetServers () == "")
       # Nis::dhcp_wanted  = true;
@@ -221,8 +220,7 @@ module Yast
     # Disable the NIS client
     # @param [Hash] options  a list of parameters passed as args
     # @return [Boolean] true on success
-    def NisDisableHandler(options)
-      options = deep_copy(options)
+    def NisDisableHandler(_options)
       Nis.start = false
       true
     end
@@ -246,8 +244,7 @@ module Yast
 
     # Print summary of basic options
     # @return [Boolean] false
-    def NisSummaryHandler(options)
-      options = deep_copy(options)
+    def NisSummaryHandler(_options)
       CommandLine.Print(
         RichText.Rich2Plain(
           Ops.add(

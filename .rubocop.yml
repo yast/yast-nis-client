@@ -43,13 +43,6 @@ Metrics/ModuleLength:
 Metrics/ParameterLists:
   Max: 7
 
-# Offense count: 13
-Lint/UselessAssignment:
-  Exclude:
-    - 'src/clients/nis.rb'
-    - 'src/include/nis/ui.rb'
-    - 'src/modules/Nis.rb'
-
 # Offense count: 1
 Metrics/AbcSize:
   Max: 339
@@ -57,7 +50,7 @@ Metrics/AbcSize:
 # Offense count: 1
 # Configuration parameters: CountComments.
 Metrics/ClassLength:
-  Max: 908
+  Max: 909
 
 # Offense count: 1
 Metrics/CyclomaticComplexity:
@@ -66,11 +59,11 @@ Metrics/CyclomaticComplexity:
 # Offense count: 1
 # Configuration parameters: CountComments, ExcludedMethods.
 Metrics/MethodLength:
-  Max: 369
+  Max: 372
 
 # Offense count: 1
 Metrics/PerceivedComplexity:
-  Max: 62
+  Max: 63
 
 # Offense count: 2
 # Configuration parameters: ExpectMatchingDefinition, Regex, IgnoreExecutableScripts, AllowedAcronyms.
@@ -99,19 +92,6 @@ Naming/UncommunicativeMethodParamName:
     - 'src/include/nis/ui.rb'
     - 'src/modules/Nis.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: Keywords.
-# Keywords: TODO, FIXME, OPTIMIZE, HACK, REVIEW
-Style/CommentAnnotation:
-  Exclude:
-    - 'src/clients/nis.rb'
-
-# Offense count: 1
-Style/CommentedKeyword:
-  Exclude:
-    - 'src/modules/Nis.rb'
-
 # Offense count: 6
 Style/Documentation:
   Exclude:
@@ -134,12 +114,6 @@ Style/Documentation:
 # Offense count: 3
 # Configuration parameters: MinBodyLength.
 Style/GuardClause:
-  Exclude:
-    - 'src/include/nis/ui.rb'
-    - 'src/modules/Nis.rb'
-
-# Offense count: 3
-Style/MultilineTernaryOperator:
   Exclude:
     - 'src/include/nis/ui.rb'
     - 'src/modules/Nis.rb'
