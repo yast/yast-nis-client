@@ -28,7 +28,9 @@ Source0:        %{name}-%{version}.tar.bz2
 
 # SuSEfirewall2_* services merged into one service yast2-2.23.17
 BuildRequires:  yast2 >= 2.23.17
-BuildRequires:  gcc-c++ doxygen yast2-core-devel yast2-pam update-desktop-files libtool
+BuildRequires:  gcc-c++ doxygen yast2-core-devel update-desktop-files libtool
+# Nsswitch#Write
+BuildRequires:  yast2-pam >= 4.3.0
 BuildRequires:  libnsl-devel
 BuildRequires:  libtirpc-devel
 BuildRequires:  yast2-devtools >= 4.2.2
@@ -36,7 +38,9 @@ BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
 # Wizard::SetDesktopTitleAndIcon
 Requires:       yast2 >= 2.21.22
-Requires:       yast2-pam yast2-network
+Requires:       yast2-network
+# Nsswitch#Write
+Requires:       yast2-pam >= 4.3.0
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       yp-tools
 
