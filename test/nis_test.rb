@@ -19,6 +19,7 @@ describe Yast::Nis do
     allow(Yast::Service).to receive(:Status).and_return(0)
     allow(Y2Firewall::Firewalld.instance).to receive(:read)
     allow(Yast::Autologin).to receive(:Read)
+    allow(Yast::Nsswitch).to receive(:Write).and_return(true)
     allow(Yast::Nsswitch).to receive(:ReadDb).and_return([])
     allow(Yast::Package).to receive(:Installed).and_return(true)
 

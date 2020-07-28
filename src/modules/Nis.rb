@@ -1107,11 +1107,7 @@ module Yast
         end
       end
 
-      return true if SCR.Write(path(".etc.nsswitch_conf"), nil)
-
-      Report.Error(Message.ErrorWritingFile("/etc/nsswitch.conf"))
-
-      false
+      Nsswitch.Write
     end
 
     # Only write new configuration w/o starting any scripts
