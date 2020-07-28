@@ -18,7 +18,7 @@
 
 Name:           yast2-nis-client
 Summary:        YaST2 - Network Information Services (NIS, YP) Configuration
-Version:        4.3.1
+Version:        4.3.2
 Release:        0
 Url:            https://github.com/yast/yast-nis-client
 Group:          System/YaST
