@@ -18,7 +18,7 @@
 
 Name:           yast2-nis-client
 Summary:        YaST2 - Network Information Services (NIS, YP) Configuration
-Version:        4.3.2
+Version:        4.3.3
 Release:        0
 Url:            https://github.com/yast/yast-nis-client
 Group:          System/YaST
@@ -39,8 +39,8 @@ BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 # Wizard::SetDesktopTitleAndIcon
 Requires:       yast2 >= 2.21.22
 Requires:       yast2-network
-# Nsswitch#Write
-Requires:       yast2-pam >= 4.3.0
+# Fixed Nsswitch#WriteDb
+Requires:       yast2-pam >= 4.3.2
 Requires:       yast2-ruby-bindings >= 1.0.0
 Requires:       yp-tools
 
