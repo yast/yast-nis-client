@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jul 28 12:49:27 UTC 2020 - Ancor Gonzalez Sosa <ancor@suse.com>
+
+- Fixed the mechanism used to ensure the usage of "compat" for
+  certain databases (bsc#1174603).
+- 4.2.4
+
+-------------------------------------------------------------------
 Mon Feb 24 14:12:47 UTC 2020 - Josef Reidinger <jreidinger@suse.com>
 
 - Fixed crash caused by previous fix (bsc#1164699)

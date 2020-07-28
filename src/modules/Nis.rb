@@ -1074,7 +1074,7 @@ module Yast
           # We get [] meaning compat, so it's ok to make it explicit
           db_l = Nsswitch.ReadDb(db)
 
-          if db_l.include?("compat")
+          if !db_l.include?("compat")
             # remove "files" and "nis", if there;
             db_l -= ["files", "nis"]
 
