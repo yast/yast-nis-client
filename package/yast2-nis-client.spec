@@ -32,6 +32,7 @@ BuildRequires:  gcc-c++ perl-XML-Writer doxygen yast2-core-devel yast2-testsuite
 BuildRequires:  libnsl-devel
 BuildRequires:  libtirpc-devel
 BuildRequires:  yast2-devtools >= 4.2.2
+BuildRequires:  rubygem(%{rb_default_ruby_abi}:rspec)
 
 # Wizard::SetDesktopTitleAndIcon
 Requires:       yast2 >= 2.21.22
