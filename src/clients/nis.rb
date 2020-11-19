@@ -59,10 +59,13 @@ module Yast
 
       @ret = :auto
 
-      if !PackageSystem.CheckAndInstallPackagesInteractive(
-        Nis.required_packages
-      )
-        return deep_copy(@ret)
+      # do not check for packages when just help asked (bsc#1172340)
+      if !WFM.Args.include?("help")
+        if !PackageSystem.CheckAndInstallPackagesInteractive(
+          Nis.required_packages
+        )
+          return deep_copy(@ret)
+        end
       end
 
       # the command line description map
