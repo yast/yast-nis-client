@@ -20,6 +20,7 @@ describe Yast::Nis do
     allow(Yast::Service).to receive(:Disable).and_return(true)
     allow(Yast::Service).to receive(:Status).and_return(0)
     allow(Y2Firewall::Firewalld.instance).to receive(:read)
+    allow_any_instance_of(Y2Firewall::Firewalld::Api).to receive(:running?).and_return(false)
     allow(Yast::Autologin).to receive(:Read)
     allow(Yast::Nsswitch).to receive(:Write).and_return(true)
     allow(Yast::Nsswitch).to receive(:ReadDb).and_return([])
