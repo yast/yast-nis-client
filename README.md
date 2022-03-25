@@ -1,4 +1,12 @@
-# YaST - The NIS Client Module #
+
+Obsoleted Repository
+====================
+
+**This repository is obsoleted and it is not developed anymore.**
+
+The package *yast2-nis-client* is only maitained for *SUSE SLE 15* and *openSUSE Leap 15* products.
+No new features will be implemented and the packate will be dropped from future products. *Tumbleweed*
+does not provide this package anymore.
 
 [![Workflow Status](https://github.com/yast/yast-nis-client/workflows/CI/badge.svg?branch=master)](
 https://github.com/yast/yast-nis-client/actions?query=branch%3Amaster)
