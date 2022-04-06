@@ -17,7 +17,7 @@
 
 
 Name:           yast2-nis-client
-Version:        4.4.2
+Version:        4.5.0
 Release:        0
 Summary:        YaST2 - Network Information Services (NIS, YP) Configuration
 License:        GPL-2.0-only
