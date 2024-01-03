@@ -570,8 +570,8 @@ module Yast
       # Translators: do not translate (none)!
       _(
         "A NIS domain name must not be empty,\n" \
-          "it must not be \"(none)\",\n" \
-          "and it must be at most 64 characters long.\n"
+        "it must not be \"(none)\",\n" \
+        "and it must be at most 64 characters long.\n"
       )
     end
 
@@ -587,16 +587,16 @@ module Yast
       Builtins.y2debug("hosts_by_nis %1", @hosts_by_nis)
       if @hosts_by_nis
         # message popup
-        return Ops.add(
+        Ops.add(
           _(
             "Only an IP address can be used\n" \
-              "because host names are resolved using NIS.\n" \
-              "\n"
+            "because host names are resolved using NIS.\n" \
+            "\n"
           ),
           IP.Valid4
         )
       else
-        return Address.Valid4
+        Address.Valid4
       end
     end
 
@@ -607,9 +607,9 @@ module Yast
     def check_address_nis(a)
       Builtins.y2debug("hosts_by_nis %1", @hosts_by_nis)
       if @hosts_by_nis
-        return IP.Check4(a)
+        IP.Check4(a)
       else
-        return Address.Check(a)
+        Address.Check(a)
       end
     end
 
@@ -841,9 +841,7 @@ module Yast
       # summary header
       summary = Summary.AddHeader(summary, _("Automounter enabled"))
       # summary item: an option is turned on
-      summary = Summary.AddLine(summary, @_start_autofs ? _("Yes") : nc)
-
-      summary
+      Summary.AddLine(summary, @_start_autofs ? _("Yes") : nc)
     end
 
     # Makes an item for the short summary. I guess the users module
@@ -860,7 +858,7 @@ module Yast
     # @return summary of the current configuration
     def ShortSummary
       nc = Summary.NotConfigured
-      summary = Ops.add(
+      Ops.add(
         Ops.add(
           # summary item
           BrItem(_("Servers"), (@servers != []) ? GetServers() : nc),
@@ -870,8 +868,6 @@ module Yast
         # summary item (yes/no follows)
         BrItem(_("Client Enabled"), @start ? _("Yes") : _("No"))
       )
-
-      summary
     end
 
     # Reads NIS settings from the SCR
@@ -910,8 +906,8 @@ module Yast
 
       nss_passwd = Nsswitch.ReadDb("passwd")
       @users_by_ldap = Builtins.contains(nss_passwd, "ldap") ||
-        Builtins.contains(nss_passwd, "compat") &&
-          Builtins.contains(Nsswitch.ReadDb("passwd_compat"), "ldap")
+        (Builtins.contains(nss_passwd, "compat") &&
+          Builtins.contains(Nsswitch.ReadDb("passwd_compat"), "ldap"))
 
       Autologin.Read
 
@@ -1229,11 +1225,9 @@ module Yast
       Progress.NextStage
 
       if @start
-        if Service.Status(@rpc_mapper) != 0
-          if Service.Start(@rpc_mapper) == false
-            Message.CannotStartService(@rpc_mapper)
-            return false
-          end
+        if Service.Status(@rpc_mapper) != 0 && (Service.Start(@rpc_mapper) == false)
+          Message.CannotStartService(@rpc_mapper)
+          return false
         end
         Builtins.sleep(1000) # workaround for bug #10428, ypbind restart
 
@@ -1244,12 +1238,10 @@ module Yast
         end
 
         # only test for a server if domain not changed
-        if !@domain_changed
-          if SCR.Execute(path(".target.bash"), "/usr/bin/ypwhich >/dev/null") != 0
-            # error popup message
-            Report.Error(_("NIS server not found."))
-            return false
-          end
+        if !@domain_changed && (SCR.Execute(path(".target.bash"), "/usr/bin/ypwhich >/dev/null") != 0)
+          # error popup message
+          Report.Error(_("NIS server not found."))
+          return false
         end
       end
 

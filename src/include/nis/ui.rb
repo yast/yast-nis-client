@@ -59,8 +59,8 @@ module Yast
         # Translators: network broadcast address
         _(
           "<p>The <b>Broadcast</b> option enables searching\n" \
-            "in the local network to find a server after the specified servers\n" \
-            "fail to respond. It is a security risk.</p>\n"
+          "in the local network to find a server after the specified servers\n" \
+          "fail to respond. It is a security risk.</p>\n"
         )
 
       # const
@@ -220,10 +220,10 @@ module Yast
         # firewall opening help
         "help"            => _(
           "<p><b>Firewall Settings</b><br>\n" \
-            "To open the firewall to allow accessing the 'ypbind' service\n" \
-            "from remote computers, set <b>Open Port in Firewall</b>.\n" \
-            "To select interfaces on which to open the port, click <b>Firewall Details</b>.\n" \
-            "This option is only available if the firewall is enabled.</p>\n"
+          "To open the firewall to allow accessing the 'ypbind' service\n" \
+          "from remote computers, set <b>Open Port in Firewall</b>.\n" \
+          "To select interfaces on which to open the port, click <b>Firewall Details</b>.\n" \
+          "This option is only available if the firewall is enabled.</p>\n"
         )
       )
       firewall_layout = firewall_widget["custom_widget"] || VBox()
@@ -231,20 +231,20 @@ module Yast
       # help text
       help_text = _(
         "<p>Enter your NIS domain, such as example.com,\n and the NIS server's address, " \
-          "such as nis.example.com or 10.20.1.1.</p>\n"
+        "such as nis.example.com or 10.20.1.1.</p>\n"
       ) +
         # help text for netconfig part
         _(
           "<p>Select the way how the NIS configuration will be modified. Normally, it is\n" \
-            "handled by the netconfig script, which merges the data statically defined here\n" \
-            "with dynamically obtained data (e.g. from DHCP client, NetworkManager\n" \
-            "etc.). This is the Default Policy and sufficient for most configurations. \n" \
-            "By choosing Only Manual Changes, netconfig will no longer be allowed to modify\n" \
-            "the configuration. You can, however, edit the file manually. By choosing\n" \
-            "Custom Policy, you can specify a custom policy string, which consists of a\n" \
-            "space-separated list of interface names, including wildcards, with\n" \
-            "STATIC/STATIC_FALLBACK as predefined special values. For more information, see\n" \
-            "the netconfig manual page.</p>\n"
+          "handled by the netconfig script, which merges the data statically defined here\n" \
+          "with dynamically obtained data (e.g. from DHCP client, NetworkManager\n" \
+          "etc.). This is the Default Policy and sufficient for most configurations. \n" \
+          "By choosing Only Manual Changes, netconfig will no longer be allowed to modify\n" \
+          "the configuration. You can, however, edit the file manually. By choosing\n" \
+          "Custom Policy, you can specify a custom policy string, which consists of a\n" \
+          "space-separated list of interface names, including wildcards, with\n" \
+          "STATIC/STATIC_FALLBACK as predefined special values. For more information, see\n" \
+          "the netconfig manual page.</p>\n"
         )
 
       # help text
@@ -263,15 +263,15 @@ module Yast
           help_text,
           _(
             "<p><b>Automounter</b> is a daemon that mounts directories automatically,\n" \
-              "such as users' home directories.\n" \
-              "It is assumed that its configuration files (auto.*) already exist,\n" \
-              "either locally or over NIS.</p>"
+            "such as users' home directories.\n" \
+            "It is assumed that its configuration files (auto.*) already exist,\n" \
+            "either locally or over NIS.</p>"
           )
         ),
         # help text
         _(
           "<p>NFS Settings which affects how the automounter operates could be set in NFS Client, " \
-            "which can be configured using <b>NFS Configuration</b> button.</p>"
+          "which can be configured using <b>NFS Configuration</b> button.</p>"
         )
       )
 
@@ -534,18 +534,15 @@ module Yast
           yp_client = Convert.to_symbol(UI.QueryWidget(Id(:rd), :CurrentButton)) != :nisno
 
           # Using NIS and LDAP simultaneously is not supported (#36981).
-          if result == :next && yp_client && !Nis.start && Nis.UsersByLdap
-            # yes-no popup
-            if !Popup.YesNo(
+          if result == :next && yp_client && !Nis.start && Nis.UsersByLdap && !Popup.YesNo(
               _(
                 "When you configure your machine as a NIS client,\n" \
-                  "you cannot retrieve the user data from LDAP.\n" \
-                  "Are you sure?"
+                "you cannot retrieve the user data from LDAP.\n" \
+                "Are you sure?"
               )
             )
-              result = nil
-              next
-            end
+            result = nil
+            next
           end
 
           Nis.policy = if UI.QueryWidget(Id(:policy), :Value) == :custom
@@ -587,8 +584,8 @@ module Yast
           CWMFirewallInterfaces.OpenFirewallStore(firewall_widget, "", event) if result == :next
         end
       end until result == :edit || result == :next || result == :expert ||
-        result == :abort && ReallyAbort(Nis.touched) ||
-        result == :back && (Stage.cont || ReallyAbort(Nis.touched))
+        (result == :abort && ReallyAbort(Nis.touched)) ||
+        (result == :back && (Stage.cont || ReallyAbort(Nis.touched)))
 
       if Builtins.contains([:next, :expert, :edit], result)
         Nis.Touch(Nis.start != yp_client)
@@ -619,7 +616,7 @@ module Yast
       # help text 1/4
       help_text = _(
         "<p>Normally, it is possible for any host to query which server a client is using. " \
-          "Disabling <b>Answer Remote Hosts</b> restricts this only to the local host.</p>"
+        "Disabling <b>Answer Remote Hosts</b> restricts this only to the local host.</p>"
       )
 
       # help text 2/4
@@ -628,7 +625,7 @@ module Yast
         help_text,
         _(
           "<p>Check <b>Broken server</b> if answers from servers running on an unprivileged port should be accepted. " \
-            "It is a security risk and it is better to replace such a server.</p>"
+          "It is a security risk and it is better to replace such a server.</p>"
         )
       )
 
@@ -698,7 +695,7 @@ module Yast
           options = Convert.to_string(UI.QueryWidget(Id(:options), :Value))
         end
       end until result == :back || result == :next ||
-        result == :abort && ReallyAbort(Nis.touched)
+        (result == :abort && ReallyAbort(Nis.touched))
 
       if result == :next
         Nis.Touch(Nis.local_only != local_only)
@@ -1066,7 +1063,7 @@ module Yast
             UpdateDomainTable(nil, all_servers, "")
           end
         elsif result == :back || result == :next ||
-            result == :abort && ReallyAbort(Nis.touched)
+            (result == :abort && ReallyAbort(Nis.touched))
           break
         end
       end
@@ -1190,13 +1187,12 @@ module Yast
 
         # Install packages if needed.
         # Cannot do it in Write, autoinstall does it differently.
-        if Ops.greater_than(Builtins.size(Nis.install_packages), 0)
-          Popup.Error(Message.FailedToInstallPackages) if !Package.DoInstallAndRemove(Nis.install_packages, [])
+        if Ops.greater_than(Builtins.size(Nis.install_packages),
+          0) && !Package.DoInstallAndRemove(Nis.install_packages, [])
+          Popup.Error(Message.FailedToInstallPackages)
         end
 
-        if Nis.Write
-          Popup.Warning(Message.DomainHasChangedMustReboot) if Nis.start && Nis.DomainChanged
-        end
+        Popup.Warning(Message.DomainHasChangedMustReboot) if Nis.Write && (Nis.start && Nis.DomainChanged)
       end
       UI.CloseDialog
       result
