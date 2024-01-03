@@ -742,24 +742,23 @@ module Yast
 
     # @param [String] default_d  the default domain
     # @param [Hash{String => Array}] all_servers show these items
-    # @param [String] d  the selected item
-    def UpdateDomainTable(default_d, all_servers, d)
+    # @param [String] selected the selected item
+    def UpdateDomainTable(default_d, all_servers, selected)
       all_servers = deep_copy(all_servers)
       UI.ChangeWidget(
         Id(:domains),
         :Items,
         DomainTableItems(default_d, all_servers)
       )
-      UI.ChangeWidget(Id(:domains), :CurrentItem, d)
+      UI.ChangeWidget(Id(:domains), :CurrentItem, selected)
 
       nil
     end
 
-    # @param [Hash] m  a map
+    # @param [Hash] map  a map
     # @return    keys of the map
-    def mapkeys(m)
-      m = deep_copy(m)
-      Builtins.maplist(m) { |k, _v| k }
+    def mapkeys(map)
+      Builtins.maplist(map) { |k, _v| k }
     end
 
     #

@@ -605,14 +605,14 @@ module Yast
 
     # Check syntax of a network address (ip4 or name), names only if
     # nsswitch.conf does not have hosts: nis
-    # @param [String] a an address
+    # @param [String] addr an address
     # @return true if correct
-    def check_address_nis(a)
+    def check_address_nis(addr)
       Builtins.y2debug("hosts_by_nis %1", @hosts_by_nis)
       if @hosts_by_nis
-        IP.Check4(a)
+        IP.Check4(addr)
       else
-        Address.Check(a)
+        Address.Check(addr)
       end
     end
 

@@ -76,14 +76,6 @@ Naming/PredicateName:
     - 'spec/**/*'
     - 'src/modules/Nis.rb'
 
-# Offense count: 3
-# Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
-# AllowedNames: io, id, to, by, on, in, at, ip, db
-Naming/MethodParameterName:
-  Exclude:
-    - 'src/include/nis/ui.rb'
-    - 'src/modules/Nis.rb'
-
 # Offense count: 6
 Style/Documentation:
   Exclude:
