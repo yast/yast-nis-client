@@ -12,9 +12,6 @@ Naming/MethodName:
 Naming/VariableName:
   Enabled: false
 
-Lint/Loop:
-  Enabled: false
-
 # Offense count: 24
 # Configuration parameters: CountComments, ExcludedMethods.
 # ExcludedMethods: refine

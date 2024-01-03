@@ -143,7 +143,7 @@ module Yast
       )
       UI.SetFocus(Id(:items))
       ret = nil
-      begin
+      loop do
         ret = UI.UserInput
         case ret
         when :all
@@ -151,7 +151,8 @@ module Yast
         when :none
           UI.ChangeWidget(Id(:items), :SelectedItems, [])
         end
-      end while ret != :cancel && ret != :ok
+        break unless ret != :cancel && ret != :ok
+      end
 
       items = if ret == :ok
         Convert.convert(
@@ -482,7 +483,7 @@ module Yast
       end
       event = {}
       result = nil
-      begin
+      loop do
         Builtins.y2milestone("LOOP: %1", result)
         yp_client = UI.QueryWidget(Id(:rd), :CurrentButton) != :nisno
         UI.ChangeWidget(Id(:expert), :Enabled, yp_client)
@@ -587,9 +588,10 @@ module Yast
           end
           CWMFirewallInterfaces.OpenFirewallStore(firewall_widget, "", event) if result == :next
         end
-      end until result == :edit || result == :next || result == :expert ||
-        (result == :abort && ReallyAbort(Nis.touched)) ||
-        (result == :back && (Stage.cont || ReallyAbort(Nis.touched)))
+        break if result == :edit || result == :next || result == :expert ||
+          (result == :abort && ReallyAbort(Nis.touched)) ||
+          (result == :back && (Stage.cont || ReallyAbort(Nis.touched)))
+      end
 
       if Builtins.contains([:next, :expert, :edit], result)
         Nis.Touch(Nis.start != yp_client)
@@ -685,7 +687,7 @@ module Yast
       Wizard.HideAbortButton
 
       result = nil
-      begin
+      loop do
         event = UI.WaitForEvent
         result = Ops.get(event, "ID")
 
@@ -699,8 +701,9 @@ module Yast
           # TODO: disallow " in options
           options = Convert.to_string(UI.QueryWidget(Id(:options), :Value))
         end
-      end until result == :back || result == :next ||
-        (result == :abort && ReallyAbort(Nis.touched))
+        break if result == :back || result == :next ||
+          (result == :abort && ReallyAbort(Nis.touched))
+      end
 
       if result == :next
         Nis.Touch(Nis.local_only != local_only)
