@@ -215,7 +215,7 @@ module Yast
       Builtins.y2milestone("policy : %1", @policy)
       @policy = "" if @policy.nil?
 
-      staticVals = {}
+      static_vals = {}
       keylist = SCR.Dir(path(".sysconfig.network.config"))
 
       Builtins.y2milestone("KEYLIST: %1", keylist)
@@ -236,15 +236,15 @@ module Yast
         case key
         when "NETCONFIG_NIS_STATIC_DOMAIN"
           Ops.set(
-            staticVals,
+            static_vals,
             "0",
-            Builtins.add(Ops.get(staticVals, "0", {}), "DOMAIN", value)
+            Builtins.add(Ops.get(static_vals, "0", {}), "DOMAIN", value)
           )
         when "NETCONFIG_NIS_STATIC_SERVERS"
           Ops.set(
-            staticVals,
+            static_vals,
             "0",
-            Builtins.add(Ops.get(staticVals, "0", {}), "SERVERS", value)
+            Builtins.add(Ops.get(static_vals, "0", {}), "SERVERS", value)
           )
         else
           @static_keylist = Builtins.add(@static_keylist, key)
@@ -256,23 +256,23 @@ module Yast
           Builtins.y2milestone("try to get the number: %1", num)
           if Builtins.issubstring(key, "NETCONFIG_NIS_STATIC_DOMAIN")
             Ops.set(
-              staticVals,
+              static_vals,
               num,
-              Builtins.add(Ops.get(staticVals, num, {}), "DOMAIN", value)
+              Builtins.add(Ops.get(static_vals, num, {}), "DOMAIN", value)
             )
           elsif Builtins.issubstring(key, "NETCONFIG_NIS_STATIC_SERVERS")
             Ops.set(
-              staticVals,
+              static_vals,
               num,
-              Builtins.add(Ops.get(staticVals, num, {}), "SERVERS", value)
+              Builtins.add(Ops.get(static_vals, num, {}), "SERVERS", value)
             )
           end
         end
       end
 
-      Builtins.y2milestone("STATIC VALS: %1", staticVals)
+      Builtins.y2milestone("STATIC VALS: %1", static_vals)
 
-      Builtins.foreach(staticVals) do |key, value|
+      Builtins.foreach(static_vals) do |key, value|
         if Ops.get(value, "DOMAIN") == ""
           if Ops.get(value, "SERVERS", "") != ""
             sr = Ops.add(

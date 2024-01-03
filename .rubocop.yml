@@ -6,9 +6,11 @@ inherit_from:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
+# keep API compatible
 Naming/MethodName:
   Enabled: false
 
+# for instance variables we cannot change published one to not break API
 Naming/VariableName:
   Enabled: false
 
