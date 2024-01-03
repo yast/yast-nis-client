@@ -109,11 +109,6 @@ Style/GuardClause:
     - 'src/modules/Nis.rb'
 
 # Offense count: 1
-Style/NestedTernaryOperator:
-  Exclude:
-    - 'src/include/nis/ui.rb'
-
-# Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: IncludeSemanticChanges.
 Style/NonNilCheck:

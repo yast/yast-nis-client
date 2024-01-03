@@ -781,7 +781,11 @@ module Yast
       existing = deep_copy(existing)
       Wizard.SetScreenShotName("nis-client-2b1-domain")
 
-      domain = init.nil? ? "" : (init == "") ? default_d : init
+      domain = if init.nil?
+        ""
+      else
+        (init == "") ? default_d : init
+      end
       servers = Ops.get_list(server_sp, 0, [])
       servers_s = Builtins.mergestring(servers, "\n")
       broadcast = Ops.get_boolean(server_sp, 1, false)
