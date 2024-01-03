@@ -271,7 +271,8 @@ module Yast
         ),
         # help text
         _(
-          "<p>NFS Settings which affects how the automounter operates could be set in NFS Client, " \
+          "<p>NFS Settings which affects how the automounter operates could " \
+          "be set in NFS Client, " \
           "which can be configured using <b>NFS Configuration</b> button.</p>"
         )
       )
@@ -627,7 +628,8 @@ module Yast
       help_text = Ops.add(
         help_text,
         _(
-          "<p>Check <b>Broken server</b> if answers from servers running on an unprivileged port should be accepted. " \
+          "<p>Check <b>Broken server</b> if answers from servers running on " \
+          "an unprivileged port should be accepted. " \
           "It is a security risk and it is better to replace such a server.</p>"
         )
       )
@@ -889,7 +891,8 @@ module Yast
             # error message, 'Broadcast' and 'SLP' are checkboxes
             Popup.Error(
               _(
-                "Enabling both Broadcast and SLP options\ndoes not make any sense. Select just one option."
+                "Enabling both Broadcast and SLP options\n" \
+                "does not make any sense. Select just one option."
               )
             )
           else
@@ -1061,7 +1064,11 @@ module Yast
           if !d0.nil?
             Wizard.SetScreenShotName("nis-client-2b-del-dom")
             # Translators: a yes-no popup
-            all_servers = Builtins.filter(all_servers) { |k, _v| k != d0 } if Popup.YesNo(_("Really delete this domain?"))
+            if Popup.YesNo(_("Really delete this domain?"))
+              all_servers = Builtins.filter(all_servers) do |k, _v|
+                k != d0
+              end
+            end
             Wizard.RestoreScreenShotName
             # show these items, the default domain selected
             UpdateDomainTable(nil, all_servers, "")
@@ -1196,7 +1203,9 @@ module Yast
           Popup.Error(Message.FailedToInstallPackages)
         end
 
-        Popup.Warning(Message.DomainHasChangedMustReboot) if Nis.Write && (Nis.start && Nis.DomainChanged)
+        if Nis.Write && (Nis.start && Nis.DomainChanged)
+          Popup.Warning(Message.DomainHasChangedMustReboot)
+        end
       end
       UI.CloseDialog
       result

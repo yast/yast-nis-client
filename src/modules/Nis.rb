@@ -300,7 +300,8 @@ module Yast
       end
 
       Builtins.foreach(@multidomain_servers) do |domain, _value|
-        Ops.set(@multidomain_broadcast, domain, false) if !Builtins.haskey(@multidomain_broadcast, domain)
+        Ops.set(@multidomain_broadcast, domain, false) if !Builtins.haskey(@multidomain_broadcast,
+          domain)
       end
 
       Builtins.foreach(@multidomain_broadcast) do |domain, _value|
@@ -327,7 +328,8 @@ module Yast
       SCR.Write(path(".sysconfig.network.config.NETCONFIG_NIS_POLICY"), @policy)
 
       Builtins.foreach(@multidomain_servers) do |domain, _value|
-        Ops.set(@multidomain_broadcast, domain, false) if !Builtins.haskey(@multidomain_broadcast, domain)
+        Ops.set(@multidomain_broadcast, domain, false) if !Builtins.haskey(@multidomain_broadcast,
+          domain)
       end
 
       Builtins.foreach(@multidomain_broadcast) do |domain, _value|
@@ -639,7 +641,10 @@ module Yast
             _("The automounter package will be installed.\n")
           )
         end
-        @install_packages = Builtins.add(@install_packages, "nfs-client") if !Package.Installed("nfs-client")
+        if !Package.Installed("nfs-client")
+          @install_packages = Builtins.add(@install_packages,
+            "nfs-client")
+        end
       end
 
       message
@@ -784,7 +789,11 @@ module Yast
           entry = if Ops.is_map?(d) || Ops.is_list?(d)
             Builtins.sformat(
               "%1 Entries configured",
-              Ops.is_map?(d) ? Builtins.size(Convert.to_map(value)) : Builtins.size(Convert.to_list(value))
+              if Ops.is_map?(d)
+                Builtins.size(Convert.to_map(value))
+              else
+                Builtins.size(Convert.to_list(value))
+              end
             )
           else
             Convert.to_string(d)
@@ -886,7 +895,9 @@ module Yast
 
       out = SCR.Execute(path(".target.bash_output"), "/usr/bin/ypdomainname")
       # 0 OK, 1 mean no domain name set, so no nis, do not report it
-      Report.Error(_("Getting domain name via ypdomainname failed with '%s'") % out["stderr"]) if out["exit"] > 1
+      if out["exit"] > 1
+        Report.Error(_("Getting domain name via ypdomainname failed with '%s'") % out["stderr"])
+      end
       @domain = out["stdout"].chomp
       @old_domain = @domain
 
@@ -1239,7 +1250,8 @@ module Yast
         end
 
         # only test for a server if domain not changed
-        if !@domain_changed && (SCR.Execute(path(".target.bash"), "/usr/bin/ypwhich >/dev/null") != 0)
+        if !@domain_changed && (SCR.Execute(path(".target.bash"),
+          "/usr/bin/ypwhich >/dev/null") != 0)
           # error popup message
           Report.Error(_("NIS server not found."))
           return false
