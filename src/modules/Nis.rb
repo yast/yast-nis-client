@@ -233,13 +233,14 @@ module Yast
         )
         Builtins.y2milestone("Found %1 = %2", key, value)
         num = ""
-        if key == "NETCONFIG_NIS_STATIC_DOMAIN"
+        case key
+        when "NETCONFIG_NIS_STATIC_DOMAIN"
           Ops.set(
             staticVals,
             "0",
             Builtins.add(Ops.get(staticVals, "0", {}), "DOMAIN", value)
           )
-        elsif key == "NETCONFIG_NIS_STATIC_SERVERS"
+        when "NETCONFIG_NIS_STATIC_SERVERS"
           Ops.set(
             staticVals,
             "0",

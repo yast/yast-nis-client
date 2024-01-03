@@ -145,9 +145,10 @@ module Yast
       ret = nil
       begin
         ret = UI.UserInput
-        if ret == :all
+        case ret
+        when :all
           UI.ChangeWidget(Id(:items), :SelectedItems, items)
-        elsif ret == :none
+        when :none
           UI.ChangeWidget(Id(:items), :SelectedItems, [])
         end
       end while ret != :cancel && ret != :ok
@@ -466,10 +467,11 @@ module Yast
 
       UI.ChangeWidget(Id(:autofs), :Enabled, Nis._autofs_allowed)
 
-      if Nis.policy == ""
+      case Nis.policy
+      when ""
         UI.ChangeWidget(Id(:policy), :Value, Id(:nomodify))
         UI.ChangeWidget(Id(:custompolicy), :Enabled, false)
-      elsif Nis.policy == "auto" || Nis.policy == "STATIC *"
+      when "auto", "STATIC *"
         UI.ChangeWidget(Id(:policy), :Value, Id(:auto))
         UI.ChangeWidget(Id(:custompolicy), :Enabled, false)
       else
@@ -545,11 +547,12 @@ module Yast
             next
           end
 
-          Nis.policy = if UI.QueryWidget(Id(:policy), :Value) == :custom
+          Nis.policy = case UI.QueryWidget(Id(:policy), :Value)
+          when :custom
             Convert.to_string(
               UI.QueryWidget(Id(:custompolicy), :Value)
             )
-          elsif UI.QueryWidget(Id(:policy), :Value) == :auto
+          when :auto
             "auto"
           else
             ""
@@ -834,9 +837,10 @@ module Yast
       ui = nil
       loop do
         ui = UI.UserInput
-        if ui == :cancel
+        case ui
+        when :cancel
           break
-        elsif ui == :find
+        when :find
           domain = Convert.to_string(UI.QueryWidget(Id(:domain), :Value))
           if domain == ""
             # Message popup. The user wants to Find servers
@@ -849,7 +853,7 @@ module Yast
             servers2 = SelectNisServers(domain)
             UI.ChangeWidget(Id(:servers), :Value, servers2) if servers2 != ""
           end
-        elsif ui == :ok
+        when :ok
           # Input validation
           # all querywidgets done now for consistency
           domain = Convert.to_string(UI.QueryWidget(Id(:domain), :Value))

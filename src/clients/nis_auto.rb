@@ -53,30 +53,31 @@ module Yast
       Builtins.y2debug("param=%1", @param)
 
       # Import data
-      if @func == "Import"
+      case @func
+      when "Import"
         @ret = Nis.Import(@param)
       # create a  summary
-      elsif @func == "Summary"
+      when "Summary"
         @ret = Nis.Summary
       # ShortSummary is used by Users module
-      elsif @func == "ShortSummary"
+      when "ShortSummary"
         @ret = Nis.ShortSummary
-      elsif @func == "Reset"
+      when "Reset"
         Nis.Import({})
         @ret = {}
-      elsif @func == "Change"
+      when "Change"
         @ret = AutoSequence()
-      elsif @func == "Read"
+      when "Read"
         @ret = Nis.Read
-      elsif @func == "GetModified"
+      when "GetModified"
         @ret = Nis.GetModified
-      elsif @func == "SetModified"
+      when "SetModified"
         Nis.SetModified
-      elsif @func == "Export"
+      when "Export"
         @ret = Nis.Export
-      elsif @func == "Packages"
+      when "Packages"
         @ret = Nis.AutoPackages
-      elsif @func == "Write"
+      when "Write"
         Yast.import "Progress"
         @progress_orig = Progress.set(false)
         @ret = Nis.WriteOnly
