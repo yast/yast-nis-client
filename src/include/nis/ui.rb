@@ -578,9 +578,8 @@ module Yast
           end
 
           if yp_client && !manual && !default_broadcast && servers != "" &&
-              (Builtins.size(temp_ad) == 0 || Builtins.find(temp_ad) do |a|
-                !Nis.check_address_nis(a)
-              end != nil)
+              (Builtins.size(temp_ad) == 0 ||
+                !Builtins.find(temp_ad) { |a| !Nis.check_address_nis(a) }.nil?)
             UI.SetFocus(Id(:servers))
             Popup.Message(Nis.valid_address_nis)
             result = nil
