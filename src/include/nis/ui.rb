@@ -503,7 +503,7 @@ module Yast
         if result == :policy
           mode = Convert.to_symbol(UI.QueryWidget(Id(:policy), :Value))
           Builtins.y2milestone("mode: %1", mode)
-          if mode == :nomodify || mode == :auto
+          if [:nomodify, :auto].include?(mode)
             Builtins.y2milestone("Disable custompolicy")
             UI.ChangeWidget(Id(:custompolicy), :Value, "")
             UI.ChangeWidget(Id(:custompolicy), :Enabled, false)
