@@ -1,18 +1,17 @@
 # use the shared Yast defaults
 inherit_from:
-  - /usr/share/YaST2/data/devtools/data/rubocop-0.71.0_yast_style.yml
+  - /usr/share/YaST2/data/devtools/data/rubocop-1.24.1_yast_style.yml
 
 # this needs more testing if we can have frozen string literals
 Style/FrozenStringLiteralComment:
   Enabled: false
 
+# keep API compatible
 Naming/MethodName:
   Enabled: false
 
+# for instance variables we cannot change published one to not break API
 Naming/VariableName:
-  Enabled: false
-
-Lint/Loop:
   Enabled: false
 
 # Offense count: 24
@@ -25,13 +24,6 @@ Metrics/BlockLength:
 # Configuration parameters: CountBlocks.
 Metrics/BlockNesting:
   Max: 4
-
-# Offense count: 12
-# Cop supports --auto-correct.
-# Configuration parameters: AutoCorrect, AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
-# URISchemes: http, https
-Metrics/LineLength:
-  Max: 122
 
 # Offense count: 1
 # Configuration parameters: CountComments.
@@ -84,14 +76,6 @@ Naming/PredicateName:
     - 'spec/**/*'
     - 'src/modules/Nis.rb'
 
-# Offense count: 3
-# Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
-# AllowedNames: io, id, to, by, on, in, at, ip, db
-Naming/UncommunicativeMethodParamName:
-  Exclude:
-    - 'src/include/nis/ui.rb'
-    - 'src/modules/Nis.rb'
-
 # Offense count: 6
 Style/Documentation:
   Exclude:
@@ -110,27 +94,3 @@ Style/Documentation:
     - 'src/clients/nis_auto.rb'
     - 'src/include/nis/ui.rb'
     - 'src/modules/Nis.rb'
-
-# Offense count: 3
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Exclude:
-    - 'src/include/nis/ui.rb'
-    - 'src/modules/Nis.rb'
-
-# Offense count: 1
-Style/MultipleComparison:
-  Exclude:
-    - 'src/include/nis/ui.rb'
-
-# Offense count: 1
-Style/NestedTernaryOperator:
-  Exclude:
-    - 'src/include/nis/ui.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: IncludeSemanticChanges.
-Style/NonNilCheck:
-  Exclude:
-    - 'src/include/nis/ui.rb'

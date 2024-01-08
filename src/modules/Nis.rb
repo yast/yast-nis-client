@@ -215,7 +215,7 @@ module Yast
       Builtins.y2milestone("policy : %1", @policy)
       @policy = "" if @policy.nil?
 
-      staticVals = {}
+      static_vals = {}
       keylist = SCR.Dir(path(".sysconfig.network.config"))
 
       Builtins.y2milestone("KEYLIST: %1", keylist)
@@ -233,17 +233,18 @@ module Yast
         )
         Builtins.y2milestone("Found %1 = %2", key, value)
         num = ""
-        if key == "NETCONFIG_NIS_STATIC_DOMAIN"
+        case key
+        when "NETCONFIG_NIS_STATIC_DOMAIN"
           Ops.set(
-            staticVals,
+            static_vals,
             "0",
-            Builtins.add(Ops.get(staticVals, "0", {}), "DOMAIN", value)
+            Builtins.add(Ops.get(static_vals, "0", {}), "DOMAIN", value)
           )
-        elsif key == "NETCONFIG_NIS_STATIC_SERVERS"
+        when "NETCONFIG_NIS_STATIC_SERVERS"
           Ops.set(
-            staticVals,
+            static_vals,
             "0",
-            Builtins.add(Ops.get(staticVals, "0", {}), "SERVERS", value)
+            Builtins.add(Ops.get(static_vals, "0", {}), "SERVERS", value)
           )
         else
           @static_keylist = Builtins.add(@static_keylist, key)
@@ -255,23 +256,23 @@ module Yast
           Builtins.y2milestone("try to get the number: %1", num)
           if Builtins.issubstring(key, "NETCONFIG_NIS_STATIC_DOMAIN")
             Ops.set(
-              staticVals,
+              static_vals,
               num,
-              Builtins.add(Ops.get(staticVals, num, {}), "DOMAIN", value)
+              Builtins.add(Ops.get(static_vals, num, {}), "DOMAIN", value)
             )
           elsif Builtins.issubstring(key, "NETCONFIG_NIS_STATIC_SERVERS")
             Ops.set(
-              staticVals,
+              static_vals,
               num,
-              Builtins.add(Ops.get(staticVals, num, {}), "SERVERS", value)
+              Builtins.add(Ops.get(static_vals, num, {}), "SERVERS", value)
             )
           end
         end
       end
 
-      Builtins.y2milestone("STATIC VALS: %1", staticVals)
+      Builtins.y2milestone("STATIC VALS: %1", static_vals)
 
-      Builtins.foreach(staticVals) do |key, value|
+      Builtins.foreach(static_vals) do |key, value|
         if Ops.get(value, "DOMAIN") == ""
           if Ops.get(value, "SERVERS", "") != ""
             sr = Ops.add(
@@ -299,7 +300,8 @@ module Yast
       end
 
       Builtins.foreach(@multidomain_servers) do |domain, _value|
-        Ops.set(@multidomain_broadcast, domain, false) if !Builtins.haskey(@multidomain_broadcast, domain)
+        Ops.set(@multidomain_broadcast, domain, false) if !Builtins.haskey(@multidomain_broadcast,
+          domain)
       end
 
       Builtins.foreach(@multidomain_broadcast) do |domain, _value|
@@ -326,7 +328,8 @@ module Yast
       SCR.Write(path(".sysconfig.network.config.NETCONFIG_NIS_POLICY"), @policy)
 
       Builtins.foreach(@multidomain_servers) do |domain, _value|
-        Ops.set(@multidomain_broadcast, domain, false) if !Builtins.haskey(@multidomain_broadcast, domain)
+        Ops.set(@multidomain_broadcast, domain, false) if !Builtins.haskey(@multidomain_broadcast,
+          domain)
       end
 
       Builtins.foreach(@multidomain_broadcast) do |domain, _value|
@@ -570,8 +573,8 @@ module Yast
       # Translators: do not translate (none)!
       _(
         "A NIS domain name must not be empty,\n" \
-          "it must not be \"(none)\",\n" \
-          "and it must be at most 64 characters long.\n"
+        "it must not be \"(none)\",\n" \
+        "and it must be at most 64 characters long.\n"
       )
     end
 
@@ -587,29 +590,29 @@ module Yast
       Builtins.y2debug("hosts_by_nis %1", @hosts_by_nis)
       if @hosts_by_nis
         # message popup
-        return Ops.add(
+        Ops.add(
           _(
             "Only an IP address can be used\n" \
-              "because host names are resolved using NIS.\n" \
-              "\n"
+            "because host names are resolved using NIS.\n" \
+            "\n"
           ),
           IP.Valid4
         )
       else
-        return Address.Valid4
+        Address.Valid4
       end
     end
 
     # Check syntax of a network address (ip4 or name), names only if
     # nsswitch.conf does not have hosts: nis
-    # @param [String] a an address
+    # @param [String] addr an address
     # @return true if correct
-    def check_address_nis(a)
+    def check_address_nis(addr)
       Builtins.y2debug("hosts_by_nis %1", @hosts_by_nis)
       if @hosts_by_nis
-        return IP.Check4(a)
+        IP.Check4(addr)
       else
-        return Address.Check(a)
+        Address.Check(addr)
       end
     end
 
@@ -638,7 +641,10 @@ module Yast
             _("The automounter package will be installed.\n")
           )
         end
-        @install_packages = Builtins.add(@install_packages, "nfs-client") if !Package.Installed("nfs-client")
+        if !Package.Installed("nfs-client")
+          @install_packages = Builtins.add(@install_packages,
+            "nfs-client")
+        end
       end
 
       message
@@ -783,7 +789,11 @@ module Yast
           entry = if Ops.is_map?(d) || Ops.is_list?(d)
             Builtins.sformat(
               "%1 Entries configured",
-              Ops.is_map?(d) ? Builtins.size(Convert.to_map(value)) : Builtins.size(Convert.to_list(value))
+              if Ops.is_map?(d)
+                Builtins.size(Convert.to_map(value))
+              else
+                Builtins.size(Convert.to_list(value))
+              end
             )
           else
             Convert.to_string(d)
@@ -841,9 +851,7 @@ module Yast
       # summary header
       summary = Summary.AddHeader(summary, _("Automounter enabled"))
       # summary item: an option is turned on
-      summary = Summary.AddLine(summary, @_start_autofs ? _("Yes") : nc)
-
-      summary
+      Summary.AddLine(summary, @_start_autofs ? _("Yes") : nc)
     end
 
     # Makes an item for the short summary. I guess the users module
@@ -860,7 +868,7 @@ module Yast
     # @return summary of the current configuration
     def ShortSummary
       nc = Summary.NotConfigured
-      summary = Ops.add(
+      Ops.add(
         Ops.add(
           # summary item
           BrItem(_("Servers"), (@servers != []) ? GetServers() : nc),
@@ -870,8 +878,6 @@ module Yast
         # summary item (yes/no follows)
         BrItem(_("Client Enabled"), @start ? _("Yes") : _("No"))
       )
-
-      summary
     end
 
     # Reads NIS settings from the SCR
@@ -889,7 +895,9 @@ module Yast
 
       out = SCR.Execute(path(".target.bash_output"), "/usr/bin/ypdomainname")
       # 0 OK, 1 mean no domain name set, so no nis, do not report it
-      Report.Error(_("Getting domain name via ypdomainname failed with '%s'") % out["stderr"]) if out["exit"] > 1
+      if out["exit"] > 1
+        Report.Error(_("Getting domain name via ypdomainname failed with '%s'") % out["stderr"])
+      end
       @domain = out["stdout"].chomp
       @old_domain = @domain
 
@@ -910,8 +918,8 @@ module Yast
 
       nss_passwd = Nsswitch.ReadDb("passwd")
       @users_by_ldap = Builtins.contains(nss_passwd, "ldap") ||
-        Builtins.contains(nss_passwd, "compat") &&
-          Builtins.contains(Nsswitch.ReadDb("passwd_compat"), "ldap")
+        (Builtins.contains(nss_passwd, "compat") &&
+          Builtins.contains(Nsswitch.ReadDb("passwd_compat"), "ldap"))
 
       Autologin.Read
 
@@ -1229,11 +1237,9 @@ module Yast
       Progress.NextStage
 
       if @start
-        if Service.Status(@rpc_mapper) != 0
-          if Service.Start(@rpc_mapper) == false
-            Message.CannotStartService(@rpc_mapper)
-            return false
-          end
+        if Service.Status(@rpc_mapper) != 0 && (Service.Start(@rpc_mapper) == false)
+          Message.CannotStartService(@rpc_mapper)
+          return false
         end
         Builtins.sleep(1000) # workaround for bug #10428, ypbind restart
 
@@ -1244,12 +1250,11 @@ module Yast
         end
 
         # only test for a server if domain not changed
-        if !@domain_changed
-          if SCR.Execute(path(".target.bash"), "/usr/bin/ypwhich >/dev/null") != 0
-            # error popup message
-            Report.Error(_("NIS server not found."))
-            return false
-          end
+        if !@domain_changed && (SCR.Execute(path(".target.bash"),
+          "/usr/bin/ypwhich >/dev/null") != 0)
+          # error popup message
+          Report.Error(_("NIS server not found."))
+          return false
         end
       end
 

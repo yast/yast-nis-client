@@ -59,8 +59,8 @@ module Yast
         # Translators: network broadcast address
         _(
           "<p>The <b>Broadcast</b> option enables searching\n" \
-            "in the local network to find a server after the specified servers\n" \
-            "fail to respond. It is a security risk.</p>\n"
+          "in the local network to find a server after the specified servers\n" \
+          "fail to respond. It is a security risk.</p>\n"
         )
 
       # const
@@ -143,14 +143,16 @@ module Yast
       )
       UI.SetFocus(Id(:items))
       ret = nil
-      begin
+      loop do
         ret = UI.UserInput
-        if ret == :all
+        case ret
+        when :all
           UI.ChangeWidget(Id(:items), :SelectedItems, items)
-        elsif ret == :none
+        when :none
           UI.ChangeWidget(Id(:items), :SelectedItems, [])
         end
-      end while ret != :cancel && ret != :ok
+        break unless ret != :cancel && ret != :ok
+      end
 
       items = if ret == :ok
         Convert.convert(
@@ -220,10 +222,10 @@ module Yast
         # firewall opening help
         "help"            => _(
           "<p><b>Firewall Settings</b><br>\n" \
-            "To open the firewall to allow accessing the 'ypbind' service\n" \
-            "from remote computers, set <b>Open Port in Firewall</b>.\n" \
-            "To select interfaces on which to open the port, click <b>Firewall Details</b>.\n" \
-            "This option is only available if the firewall is enabled.</p>\n"
+          "To open the firewall to allow accessing the 'ypbind' service\n" \
+          "from remote computers, set <b>Open Port in Firewall</b>.\n" \
+          "To select interfaces on which to open the port, click <b>Firewall Details</b>.\n" \
+          "This option is only available if the firewall is enabled.</p>\n"
         )
       )
       firewall_layout = firewall_widget["custom_widget"] || VBox()
@@ -231,20 +233,20 @@ module Yast
       # help text
       help_text = _(
         "<p>Enter your NIS domain, such as example.com,\n and the NIS server's address, " \
-          "such as nis.example.com or 10.20.1.1.</p>\n"
+        "such as nis.example.com or 10.20.1.1.</p>\n"
       ) +
         # help text for netconfig part
         _(
           "<p>Select the way how the NIS configuration will be modified. Normally, it is\n" \
-            "handled by the netconfig script, which merges the data statically defined here\n" \
-            "with dynamically obtained data (e.g. from DHCP client, NetworkManager\n" \
-            "etc.). This is the Default Policy and sufficient for most configurations. \n" \
-            "By choosing Only Manual Changes, netconfig will no longer be allowed to modify\n" \
-            "the configuration. You can, however, edit the file manually. By choosing\n" \
-            "Custom Policy, you can specify a custom policy string, which consists of a\n" \
-            "space-separated list of interface names, including wildcards, with\n" \
-            "STATIC/STATIC_FALLBACK as predefined special values. For more information, see\n" \
-            "the netconfig manual page.</p>\n"
+          "handled by the netconfig script, which merges the data statically defined here\n" \
+          "with dynamically obtained data (e.g. from DHCP client, NetworkManager\n" \
+          "etc.). This is the Default Policy and sufficient for most configurations. \n" \
+          "By choosing Only Manual Changes, netconfig will no longer be allowed to modify\n" \
+          "the configuration. You can, however, edit the file manually. By choosing\n" \
+          "Custom Policy, you can specify a custom policy string, which consists of a\n" \
+          "space-separated list of interface names, including wildcards, with\n" \
+          "STATIC/STATIC_FALLBACK as predefined special values. For more information, see\n" \
+          "the netconfig manual page.</p>\n"
         )
 
       # help text
@@ -263,15 +265,16 @@ module Yast
           help_text,
           _(
             "<p><b>Automounter</b> is a daemon that mounts directories automatically,\n" \
-              "such as users' home directories.\n" \
-              "It is assumed that its configuration files (auto.*) already exist,\n" \
-              "either locally or over NIS.</p>"
+            "such as users' home directories.\n" \
+            "It is assumed that its configuration files (auto.*) already exist,\n" \
+            "either locally or over NIS.</p>"
           )
         ),
         # help text
         _(
-          "<p>NFS Settings which affects how the automounter operates could be set in NFS Client, " \
-            "which can be configured using <b>NFS Configuration</b> button.</p>"
+          "<p>NFS Settings which affects how the automounter operates could " \
+          "be set in NFS Client, " \
+          "which can be configured using <b>NFS Configuration</b> button.</p>"
         )
       )
 
@@ -466,10 +469,11 @@ module Yast
 
       UI.ChangeWidget(Id(:autofs), :Enabled, Nis._autofs_allowed)
 
-      if Nis.policy == ""
+      case Nis.policy
+      when ""
         UI.ChangeWidget(Id(:policy), :Value, Id(:nomodify))
         UI.ChangeWidget(Id(:custompolicy), :Enabled, false)
-      elsif Nis.policy == "auto" || Nis.policy == "STATIC *"
+      when "auto", "STATIC *"
         UI.ChangeWidget(Id(:policy), :Value, Id(:auto))
         UI.ChangeWidget(Id(:custompolicy), :Enabled, false)
       else
@@ -479,7 +483,7 @@ module Yast
       end
       event = {}
       result = nil
-      begin
+      loop do
         Builtins.y2milestone("LOOP: %1", result)
         yp_client = UI.QueryWidget(Id(:rd), :CurrentButton) != :nisno
         UI.ChangeWidget(Id(:expert), :Enabled, yp_client)
@@ -499,7 +503,7 @@ module Yast
         if result == :policy
           mode = Convert.to_symbol(UI.QueryWidget(Id(:policy), :Value))
           Builtins.y2milestone("mode: %1", mode)
-          if mode == :nomodify || mode == :auto
+          if [:nomodify, :auto].include?(mode)
             Builtins.y2milestone("Disable custompolicy")
             UI.ChangeWidget(Id(:custompolicy), :Value, "")
             UI.ChangeWidget(Id(:custompolicy), :Enabled, false)
@@ -534,25 +538,23 @@ module Yast
           yp_client = Convert.to_symbol(UI.QueryWidget(Id(:rd), :CurrentButton)) != :nisno
 
           # Using NIS and LDAP simultaneously is not supported (#36981).
-          if result == :next && yp_client && !Nis.start && Nis.UsersByLdap
-            # yes-no popup
-            if !Popup.YesNo(
+          if result == :next && yp_client && !Nis.start && Nis.UsersByLdap && !Popup.YesNo(
               _(
                 "When you configure your machine as a NIS client,\n" \
-                  "you cannot retrieve the user data from LDAP.\n" \
-                  "Are you sure?"
+                "you cannot retrieve the user data from LDAP.\n" \
+                "Are you sure?"
               )
             )
-              result = nil
-              next
-            end
+            result = nil
+            next
           end
 
-          Nis.policy = if UI.QueryWidget(Id(:policy), :Value) == :custom
+          Nis.policy = case UI.QueryWidget(Id(:policy), :Value)
+          when :custom
             Convert.to_string(
               UI.QueryWidget(Id(:custompolicy), :Value)
             )
-          elsif UI.QueryWidget(Id(:policy), :Value) == :auto
+          when :auto
             "auto"
           else
             ""
@@ -576,9 +578,8 @@ module Yast
           end
 
           if yp_client && !manual && !default_broadcast && servers != "" &&
-              (Builtins.size(temp_ad) == 0 || Builtins.find(temp_ad) do |a|
-                !Nis.check_address_nis(a)
-              end != nil)
+              (Builtins.size(temp_ad) == 0 ||
+                !Builtins.find(temp_ad) { |a| !Nis.check_address_nis(a) }.nil?)
             UI.SetFocus(Id(:servers))
             Popup.Message(Nis.valid_address_nis)
             result = nil
@@ -586,9 +587,10 @@ module Yast
           end
           CWMFirewallInterfaces.OpenFirewallStore(firewall_widget, "", event) if result == :next
         end
-      end until result == :edit || result == :next || result == :expert ||
-        result == :abort && ReallyAbort(Nis.touched) ||
-        result == :back && (Stage.cont || ReallyAbort(Nis.touched))
+        break if result == :edit || result == :next || result == :expert ||
+          (result == :abort && ReallyAbort(Nis.touched)) ||
+          (result == :back && (Stage.cont || ReallyAbort(Nis.touched)))
+      end
 
       if Builtins.contains([:next, :expert, :edit], result)
         Nis.Touch(Nis.start != yp_client)
@@ -619,7 +621,7 @@ module Yast
       # help text 1/4
       help_text = _(
         "<p>Normally, it is possible for any host to query which server a client is using. " \
-          "Disabling <b>Answer Remote Hosts</b> restricts this only to the local host.</p>"
+        "Disabling <b>Answer Remote Hosts</b> restricts this only to the local host.</p>"
       )
 
       # help text 2/4
@@ -627,8 +629,9 @@ module Yast
       help_text = Ops.add(
         help_text,
         _(
-          "<p>Check <b>Broken server</b> if answers from servers running on an unprivileged port should be accepted. " \
-            "It is a security risk and it is better to replace such a server.</p>"
+          "<p>Check <b>Broken server</b> if answers from servers running on " \
+          "an unprivileged port should be accepted. " \
+          "It is a security risk and it is better to replace such a server.</p>"
         )
       )
 
@@ -683,7 +686,7 @@ module Yast
       Wizard.HideAbortButton
 
       result = nil
-      begin
+      loop do
         event = UI.WaitForEvent
         result = Ops.get(event, "ID")
 
@@ -697,8 +700,9 @@ module Yast
           # TODO: disallow " in options
           options = Convert.to_string(UI.QueryWidget(Id(:options), :Value))
         end
-      end until result == :back || result == :next ||
-        result == :abort && ReallyAbort(Nis.touched)
+        break if result == :back || result == :next ||
+          (result == :abort && ReallyAbort(Nis.touched))
+      end
 
       if result == :next
         Nis.Touch(Nis.local_only != local_only)
@@ -738,24 +742,23 @@ module Yast
 
     # @param [String] default_d  the default domain
     # @param [Hash{String => Array}] all_servers show these items
-    # @param [String] d  the selected item
-    def UpdateDomainTable(default_d, all_servers, d)
+    # @param [String] selected the selected item
+    def UpdateDomainTable(default_d, all_servers, selected)
       all_servers = deep_copy(all_servers)
       UI.ChangeWidget(
         Id(:domains),
         :Items,
         DomainTableItems(default_d, all_servers)
       )
-      UI.ChangeWidget(Id(:domains), :CurrentItem, d)
+      UI.ChangeWidget(Id(:domains), :CurrentItem, selected)
 
       nil
     end
 
-    # @param [Hash] m  a map
+    # @param [Hash] map  a map
     # @return    keys of the map
-    def mapkeys(m)
-      m = deep_copy(m)
-      Builtins.maplist(m) { |k, _v| k }
+    def mapkeys(map)
+      Builtins.maplist(map) { |k, _v| k }
     end
 
     #
@@ -776,7 +779,11 @@ module Yast
       existing = deep_copy(existing)
       Wizard.SetScreenShotName("nis-client-2b1-domain")
 
-      domain = init.nil? ? "" : (init == "") ? default_d : init
+      domain = if init.nil?
+        ""
+      else
+        (init == "") ? default_d : init
+      end
       servers = Ops.get_list(server_sp, 0, [])
       servers_s = Builtins.mergestring(servers, "\n")
       broadcast = Ops.get_boolean(server_sp, 1, false)
@@ -837,9 +844,10 @@ module Yast
       ui = nil
       loop do
         ui = UI.UserInput
-        if ui == :cancel
+        case ui
+        when :cancel
           break
-        elsif ui == :find
+        when :find
           domain = Convert.to_string(UI.QueryWidget(Id(:domain), :Value))
           if domain == ""
             # Message popup. The user wants to Find servers
@@ -852,7 +860,7 @@ module Yast
             servers2 = SelectNisServers(domain)
             UI.ChangeWidget(Id(:servers), :Value, servers2) if servers2 != ""
           end
-        elsif ui == :ok
+        when :ok
           # Input validation
           # all querywidgets done now for consistency
           domain = Convert.to_string(UI.QueryWidget(Id(:domain), :Value))
@@ -888,7 +896,8 @@ module Yast
             # error message, 'Broadcast' and 'SLP' are checkboxes
             Popup.Error(
               _(
-                "Enabling both Broadcast and SLP options\ndoes not make any sense. Select just one option."
+                "Enabling both Broadcast and SLP options\n" \
+                "does not make any sense. Select just one option."
               )
             )
           else
@@ -1060,13 +1069,17 @@ module Yast
           if !d0.nil?
             Wizard.SetScreenShotName("nis-client-2b-del-dom")
             # Translators: a yes-no popup
-            all_servers = Builtins.filter(all_servers) { |k, _v| k != d0 } if Popup.YesNo(_("Really delete this domain?"))
+            if Popup.YesNo(_("Really delete this domain?"))
+              all_servers = Builtins.filter(all_servers) do |k, _v|
+                k != d0
+              end
+            end
             Wizard.RestoreScreenShotName
             # show these items, the default domain selected
             UpdateDomainTable(nil, all_servers, "")
           end
         elsif result == :back || result == :next ||
-            result == :abort && ReallyAbort(Nis.touched)
+            (result == :abort && ReallyAbort(Nis.touched))
           break
         end
       end
@@ -1190,12 +1203,13 @@ module Yast
 
         # Install packages if needed.
         # Cannot do it in Write, autoinstall does it differently.
-        if Ops.greater_than(Builtins.size(Nis.install_packages), 0)
-          Popup.Error(Message.FailedToInstallPackages) if !Package.DoInstallAndRemove(Nis.install_packages, [])
+        if Ops.greater_than(Builtins.size(Nis.install_packages),
+          0) && !Package.DoInstallAndRemove(Nis.install_packages, [])
+          Popup.Error(Message.FailedToInstallPackages)
         end
 
-        if Nis.Write
-          Popup.Warning(Message.DomainHasChangedMustReboot) if Nis.start && Nis.DomainChanged
+        if Nis.Write && (Nis.start && Nis.DomainChanged)
+          Popup.Warning(Message.DomainHasChangedMustReboot)
         end
       end
       UI.CloseDialog
