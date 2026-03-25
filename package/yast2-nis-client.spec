@@ -17,7 +17,7 @@
 
 
 Name:           yast2-nis-client
-Version:        5.0.0
+Version:        5.0.1
 Release:        0
 Summary:        YaST2 - Network Information Services (NIS, YP) Configuration
 License:        GPL-2.0-only
@@ -31,7 +31,6 @@ BuildRequires:  gcc-c++
 BuildRequires:  libnsl-devel
 BuildRequires:  libtirpc-devel
 BuildRequires:  libtool
-BuildRequires:  update-desktop-files
 BuildRequires:  yast2 >= 2.23.17
 BuildRequires:  yast2-core-devel
 BuildRequires:  yast2-devtools >= 4.4.0
